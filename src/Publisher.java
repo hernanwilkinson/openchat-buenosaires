@@ -19,4 +19,8 @@ public class Publisher {
     public boolean isNamed(String potentialName) {
         return name.equals(potentialName);
     }
+
+    public boolean hasNoFollowees() {
+        return true;
+    }
 }

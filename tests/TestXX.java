@@ -21,13 +21,19 @@ public class TestXX {
 
         assertTrue(createdPublisher.isNamed(PEPE_SANCHEZ_NAME));
     }
-
     @Test
     public void isNamedReturnsFalseWhenAskedWithOtherName() {
         Publisher createdPublisher = createPepeSanchez();
 
         assertFalse(createdPublisher.isNamed("Juan"));
     }
+    @Test
+    public void createdPublisherHasNoFollowees() {
+        Publisher createdPublisher = createPepeSanchez();
+
+        assertTrue(createdPublisher.hasNoFollowees());
+    }
+
     private Publisher createPepeSanchez() {
         return Publisher.named(PEPE_SANCHEZ_NAME, PEPE_SANCHEZ_PASSWORD,"about");
     }
