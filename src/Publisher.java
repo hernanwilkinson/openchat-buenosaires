@@ -4,6 +4,7 @@ import java.util.List;
 public class Publisher {
     public static final String INVALID_NAME = "Name can not be blank";
     public static final String CAN_NOT_FOLLOW_SELF = "Can not follow self";
+    public static final String CAN_NOT_FOLLOW_TWICE = "Can not follow publisher twice";
     private final String name;
     private final List<Publisher> followees = new ArrayList<>();
 
@@ -29,10 +30,19 @@ public class Publisher {
         return followees.isEmpty();
     }
 
-    public void follow(Publisher followee) {
-        if(this.equals(followee)) throw new RuntimeException(CAN_NOT_FOLLOW_SELF);
+    public void follow(Publisher potentialFollowee) {
+        assertCanNotFollowSelf(potentialFollowee);
+        assertCanNotFollowTwice(potentialFollowee);
 
-        followees.add(followee);
+        followees.add(potentialFollowee);
+    }
+
+    private void assertCanNotFollowTwice(Publisher potentialFollowee) {
+        if(doesFollow(potentialFollowee)) throw new RuntimeException(CAN_NOT_FOLLOW_TWICE);
+    }
+
+    private void assertCanNotFollowSelf(Publisher potentialFollowee) {
+        if(this.equals(potentialFollowee)) throw new RuntimeException(CAN_NOT_FOLLOW_SELF);
     }
 
     public boolean doesFollow(Publisher potentialFollowee) {
