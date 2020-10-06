@@ -11,4 +11,9 @@ public class TestXX {
 
         assertEquals(Publisher.INVALID_NAME,error.getMessage());
     }
-}
+    @Test
+    public void canCreatePublisherWithNoBlankName() {
+        Publisher createdPublisher = Publisher.named("Pepe Sanchez","password","about");
+
+        assertTrue(createdPublisher.isNamed("Pepe Sanchez"));
+    }}
