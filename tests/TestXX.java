@@ -33,6 +33,17 @@ public class TestXX {
 
         assertTrue(createdPublisher.hasNoFollowees());
     }
+    @Test
+    public void publisherCanFollowOtherPublisher() {
+        Publisher follower = createPepeSanchez();
+        Publisher followee = Publisher.named("Juan Perez", "","about");
+
+        follower.follow(followee);
+
+        assertFalse(follower.hasNoFollowees());
+        assertTrue(follower.doesFollow(followee));
+        assertEquals(1,follower.numberOfFollowees());
+    }
 
     private Publisher createPepeSanchez() {
         return Publisher.named(PEPE_SANCHEZ_NAME, PEPE_SANCHEZ_PASSWORD,"about");
