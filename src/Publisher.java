@@ -74,7 +74,9 @@ public class Publisher {
     }
 
     public List<Publication> wall() {
-        return new ArrayList<>(publications);
+        final ArrayList<Publication> wall = new ArrayList<>(this.publications);
+        followees.stream().forEach(followee->followee.addPublicationTo(wall));
+        return wall;
     }
 
     private void addPublicationTo(List<Publication> publicationCollector) {
