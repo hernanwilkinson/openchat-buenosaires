@@ -1,5 +1,7 @@
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PublisherTest {
@@ -75,6 +77,18 @@ public class PublisherTest {
         Publisher createdPublisher = createPepeSanchez();
 
         assertTrue(createdPublisher.doesNotHavePublications());
+    }
+    @Test
+    public void publisherCanPublishMessages() {
+        Publisher createdPublisher = createPepeSanchez();
+
+        final LocalDateTime publicationTime = LocalDateTime.now();
+        final String message = "a message";
+        Publication publication = createdPublisher.publish(message, publicationTime);
+
+        assertFalse(createdPublisher.doesNotHavePublications());
+        assertTrue(publication.hasMessage(message));
+        assertTrue(publication.hasPublishAt(publicationTime));
     }
 
     private Publisher createJuanPerez() {

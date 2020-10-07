@@ -1,3 +1,4 @@
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ public class Publisher {
     public static final String CAN_NOT_FOLLOW_TWICE = "Can not follow publisher twice";
     private final String name;
     private final List<Publisher> followees = new ArrayList<>();
+    private final List<Publication> publications = new ArrayList<>();
 
     public Publisher(String name) {
         this.name = name;
@@ -54,6 +56,13 @@ public class Publisher {
     }
 
     public boolean doesNotHavePublications() {
-        return true;
+        return publications.isEmpty();
+    }
+
+    public Publication publish(String message, LocalDateTime publicationTime) {
+        final Publication newPublication = Publication.madeBy(this, message, publicationTime);
+        publications.add(newPublication);
+
+        return newPublication;
     }
 }
