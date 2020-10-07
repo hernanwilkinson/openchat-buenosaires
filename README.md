@@ -1,4 +1,5 @@
 #OpenChat-BuenosAires
+
 Implementación al estilo "Buenos Aires" del problema usado en los videos "London vs. Chicago"
 
 La solución es parte de los episodio del webinar de "Diseño a la Gorra" (http://alagorra.10pines.com/)
