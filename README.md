@@ -1,4 +1,4 @@
-#OpenChat-BuenosAires
+## OpenChat-BuenosAires
 
 Implementación al estilo "Buenos Aires" del problema usado en los videos "London vs. Chicago"
 
