@@ -72,4 +72,12 @@ public class Publisher {
                 .sorted((left,right)->left.comparePublicationTimeWith(right))
                 .collect(Collectors.toList());
     }
+
+    public List<Publication> wall() {
+        return new ArrayList<>(publications);
+    }
+
+    private void addPublicationTo(List<Publication> publicationCollector) {
+        publicationCollector.addAll(publications);
+    }
 }
