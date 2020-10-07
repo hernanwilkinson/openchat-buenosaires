@@ -52,4 +52,8 @@ public class Publisher {
     public int numberOfFollowees() {
         return followees.size();
     }
+
+    public boolean doesNotHavePublications() {
+        return true;
+    }
 }

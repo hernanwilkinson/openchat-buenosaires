@@ -2,7 +2,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestXX {
+public class PublisherTest {
 
     public static final String PEPE_SANCHEZ_NAME = "Pepe Sanchez";
     public static final String PEPE_SANCHEZ_PASSWORD = "password";
@@ -69,6 +69,12 @@ public class TestXX {
         assertFalse(follower.hasNoFollowees());
         assertTrue(follower.doesFollow(followee));
         assertEquals(1,follower.numberOfFollowees());
+    }
+    @Test
+    public void createdPusblisherHasNoPublications() {
+        Publisher createdPublisher = createPepeSanchez();
+
+        assertTrue(createdPublisher.doesNotHavePublications());
     }
 
     private Publisher createJuanPerez() {
