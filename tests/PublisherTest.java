@@ -118,7 +118,7 @@ public class PublisherTest {
         assertEquals(Arrays.asList(firstPublication),wall);
     }
     @Test
-    public void wallContainsFolloweesPublicationsInOrder() {
+    public void wallContainsFolloweesPublications() {
         Publisher follower = createPepeSanchez();
         Publisher followee = createJuanPerez();
 
@@ -132,7 +132,7 @@ public class PublisherTest {
         assertEquals(Arrays.asList(firstPublication),wall);
     }
 
-    /*@Test
+    @Test
     public void wallContainsFolloweesPublicationsInOrder() {
         Publisher follower = createPepeSanchez();
         Publisher followee = createJuanPerez();
@@ -142,12 +142,12 @@ public class PublisherTest {
         final String message = "a message";
         Publication firstPublication = follower.publish(message, publicationTime);
         Publication secondPublication = followee.publish(message, publicationTime.plusSeconds(1));
-        Publication thirdPublication = followee.publish(message, publicationTime.plusSeconds(2));
+        Publication thirdPublication = follower.publish(message, publicationTime.plusSeconds(2));
 
         List<Publication> wall = follower.wall();
 
         assertEquals(Arrays.asList(firstPublication,secondPublication,thirdPublication),wall);
-    }*/
+    }
 
     private Publisher createJuanPerez() {
         return Publisher.named("Juan Perez", "","about");
