@@ -1,7 +1,12 @@
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class Publication {
+    public static final String INAPPROPRIATE_WORD = "Can not publish with an inappropriate word";
+    public static final List<String> inappropriateWords =
+            Collections.unmodifiableList(Arrays.asList("elephant","ice cream","orange"));
     private final String message;
     private final LocalDateTime publicationTime;
 
@@ -12,7 +17,21 @@ public class Publication {
     }
 
     public static Publication madeBy(Publisher publisher, String message, LocalDateTime publicationTime) {
+        assertIsAppropriate(message);
+
         return new Publication(publisher,message,publicationTime);
+    }
+
+    private static void assertIsAppropriate(String message) {
+        if(isInappropriate(message))
+            throw new RuntimeException(INAPPROPRIATE_WORD);
+    }
+
+    private static boolean isInappropriate(String message) {
+        final String lowerCaseMessage = message.toLowerCase();
+
+        return inappropriateWords.stream().anyMatch(inappropriateWord ->
+                lowerCaseMessage.contains(inappropriateWord));
     }
 
     public boolean hasMessage(String potentialMessage) {

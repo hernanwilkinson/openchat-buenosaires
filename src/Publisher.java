@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Publisher {
-    public static final String INVALID_NAME = "Name can not be blank";
+    public static final String NAME_CAN_NOT_BE_BLANK = "Name can not be blank";
     public static final String CAN_NOT_FOLLOW_SELF = "Can not follow self";
     public static final String CAN_NOT_FOLLOW_TWICE = "Can not follow publisher twice";
     private final String name;
@@ -22,15 +22,15 @@ public class Publisher {
     }
 
     private static void assertNameIsNotBlank(String name) {
-        if(name.isBlank()) throw new RuntimeException(INVALID_NAME);
+        if(name.isBlank()) throw new RuntimeException(NAME_CAN_NOT_BE_BLANK);
     }
 
     public boolean isNamed(String potentialName) {
         return name.equals(potentialName);
     }
 
-    public boolean hasNoFollowees() {
-        return followees.isEmpty();
+    public boolean hasFollowees() {
+        return !followees.isEmpty();
     }
 
     public void follow(Publisher potentialFollowee) {
@@ -56,8 +56,8 @@ public class Publisher {
         return followees.size();
     }
 
-    public boolean doesNotHavePublications() {
-        return publications.isEmpty();
+    public boolean hasPublications() {
+        return !publications.isEmpty();
     }
 
     public Publication publish(String message, LocalDateTime publicationTime) {

@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -12,13 +13,21 @@ public class PublisherTest {
     public static final String PEPE_SANCHEZ_PASSWORD = "password";
 
     @Test
-    public void publisherCanNotHaveBlankName() {
-        RuntimeException error = assertThrows(
+    public void canNotCreatePublisherWithBlankName() {
+        assertThrowsWithErrorMessage(
                 RuntimeException.class,
-                ()->Publisher.named(" ","password","about"));
-
-        assertEquals(Publisher.INVALID_NAME,error.getMessage());
+                () -> Publisher.named(" ", "password", "about"),
+                Publisher.NAME_CAN_NOT_BE_BLANK);
     }
+
+    private <T extends Throwable> void assertThrowsWithErrorMessage(Class<T> expectedType, Executable closureToFail, String errorMessage) {
+        T error = assertThrows(
+                expectedType,
+                closureToFail);
+
+        assertEquals(errorMessage,error.getMessage());
+    }
+
     @Test
     public void canCreatePublisherWithNoBlankName() {
         Publisher createdPublisher = createPepeSanchez();
@@ -35,8 +44,9 @@ public class PublisherTest {
     public void createdPublisherHasNoFollowees() {
         Publisher createdPublisher = createPepeSanchez();
 
-        assertTrue(createdPublisher.hasNoFollowees());
+        assertFalse(createdPublisher.hasFollowees());
     }
+
     @Test
     public void publisherCanFollowOtherPublisher() {
         Publisher follower = createPepeSanchez();
@@ -44,20 +54,17 @@ public class PublisherTest {
 
         follower.follow(followee);
 
-        assertFalse(follower.hasNoFollowees());
+        assertTrue(follower.hasFollowees());
         assertTrue(follower.doesFollow(followee));
         assertEquals(1,follower.numberOfFollowees());
     }
+
     @Test
     public void publisherCanNotFollowSelf() {
         Publisher follower = createPepeSanchez();
 
-        RuntimeException error = assertThrows(
-                RuntimeException.class,
-                ()->follower.follow(follower));
-
-        assertEquals(Publisher.CAN_NOT_FOLLOW_SELF,error.getMessage());
-        assertTrue(follower.hasNoFollowees());
+        assertThrowsWithErrorMessage(RuntimeException.class, ()->follower.follow(follower), Publisher.CAN_NOT_FOLLOW_SELF);
+        assertFalse(follower.hasFollowees());
     }
     @Test
     public void publisherCanNotFollowSamePublisherTwice() {
@@ -65,21 +72,18 @@ public class PublisherTest {
         Publisher followee = createJuanPerez();
         follower.follow(followee);
 
-        RuntimeException error = assertThrows(
-                RuntimeException.class,
-                ()->follower.follow(followee));
-
-        assertEquals(Publisher.CAN_NOT_FOLLOW_TWICE,error.getMessage());
-        assertFalse(follower.hasNoFollowees());
+        assertThrowsWithErrorMessage(RuntimeException.class, ()->follower.follow(followee), Publisher.CAN_NOT_FOLLOW_TWICE);
+        assertTrue(follower.hasFollowees());
         assertTrue(follower.doesFollow(followee));
         assertEquals(1,follower.numberOfFollowees());
     }
     @Test
-    public void createdPusblisherHasNoPublications() {
+    public void createdPublisherHasNoPublications() {
         Publisher createdPublisher = createPepeSanchez();
 
-        assertTrue(createdPublisher.doesNotHavePublications());
+        assertFalse(createdPublisher.hasPublications());
     }
+
     @Test
     public void publisherCanPublishMessages() {
         Publisher createdPublisher = createPepeSanchez();
@@ -88,10 +92,14 @@ public class PublisherTest {
         final String message = "a message";
         Publication publication = createdPublisher.publish(message, publicationTime);
 
-        assertFalse(createdPublisher.doesNotHavePublications());
+        assertTrue(createdPublisher.hasPublications());
         assertTrue(publication.hasMessage(message));
         assertTrue(publication.hasPublishAt(publicationTime));
+
+        assertFalse(publication.hasMessage(""));
+        assertFalse(publication.hasPublishAt(publicationTime.plusSeconds(1)));
     }
+
     @Test
     public void timelineHasPublisherPublicationsSortedByPublicationTime() {
         Publisher createdPublisher = createPepeSanchez();
@@ -147,6 +155,50 @@ public class PublisherTest {
         List<Publication> wall = follower.wall();
 
         assertEquals(Arrays.asList(firstPublication,secondPublication,thirdPublication),wall);
+    }
+    @Test
+    public void canNotPublishWithInappropriateWord() {
+        Publisher follower = createPepeSanchez();
+
+        final LocalDateTime publicationTime = LocalDateTime.now();
+        final String message = "elephant";
+        assertThrowsWithErrorMessage(
+                RuntimeException.class,
+                ()->follower.publish(message, publicationTime),
+                Publication.INAPPROPRIATE_WORD);
+    }
+    @Test
+    public void canNotPublishWithInappropriateWordInUpperCase() {
+        Publisher follower = createPepeSanchez();
+
+        final LocalDateTime publicationTime = LocalDateTime.now();
+        final String message = "ELEPHANT";
+        assertThrowsWithErrorMessage(
+                RuntimeException.class,
+                ()->follower.publish(message, publicationTime),
+                Publication.INAPPROPRIATE_WORD);
+    }
+    @Test
+    public void canNotPublishAMessageContainingInappropriateWord() {
+        Publisher follower = createPepeSanchez();
+
+        final LocalDateTime publicationTime = LocalDateTime.now();
+        final String message = "abc ELEPHANT xx";
+        assertThrowsWithErrorMessage(
+                RuntimeException.class,
+                ()->follower.publish(message, publicationTime),
+                Publication.INAPPROPRIATE_WORD);
+    }
+    @Test
+    public void canNotPublishAnyInappropriateWord() {
+        Publisher follower = createPepeSanchez();
+
+        final LocalDateTime publicationTime = LocalDateTime.now();
+        Arrays.asList("elephant","ice cream","orange").forEach(
+                message-> assertThrowsWithErrorMessage(
+                RuntimeException.class,
+                ()->follower.publish(message, publicationTime),
+                Publication.INAPPROPRIATE_WORD));
     }
 
     private Publisher createJuanPerez() {
