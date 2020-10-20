@@ -172,6 +172,17 @@ public class PublisherTest {
                 ()->follower.publish(message, publicationTime),
                 Publication.INAPPROPRIATE_WORD);
     }
+    @Test
+    public void canNotPublishAMessageContainingInappropriateWord() {
+        Publisher follower = createPepeSanchez();
+
+        final LocalDateTime publicationTime = LocalDateTime.now();
+        final String message = "abc ELEPHANT xx";
+        assertThrowsWithErrorMessage(
+                RuntimeException.class,
+                ()->follower.publish(message, publicationTime),
+                Publication.INAPPROPRIATE_WORD);
+    }
 
 
 
