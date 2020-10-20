@@ -7,8 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.eclipse.jetty.http.HttpStatus.BAD_REQUEST_400;
-import static org.eclipse.jetty.http.HttpStatus.CREATED_201;
+import static org.eclipse.jetty.http.HttpStatus.*;
 
 public class RestReceptionist {
     public static final String USERNAME_KEY = "username";
@@ -16,7 +15,7 @@ public class RestReceptionist {
     public static final String ABOUT_KEY = "about";
     public static final String ID_KEY = "id";
     private final OpenChatSystem system;
-    private final Map<String,User> usersById = new HashMap<>();
+    private final Map<User,String> idsByUser = new HashMap<>();
 
     public RestReceptionist(OpenChatSystem system) {
         this.system = system;
@@ -32,7 +31,7 @@ public class RestReceptionist {
                     registrationAsJson.getString(ABOUT_KEY, ""));
 
             final String registeredUserId = UUID.randomUUID().toString();
-            usersById.put(registeredUserId,registeredUser);
+            idsByUser.put(registeredUser,registeredUserId);
 
             JsonObject responseAsJson = new JsonObject()
                     .add(ID_KEY,registeredUserId)
@@ -44,5 +43,23 @@ public class RestReceptionist {
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }
 
+    }
+
+    public ReceptionistResponse login(String loginBody) {
+        JsonObject loginBodyAsJson = Json.parse(loginBody).asObject();
+
+        return system.withAuthenticatedUserDo(
+            loginBodyAsJson.getString(USERNAME_KEY, ""),
+            loginBodyAsJson.getString(PASSWORD_KEY, ""),
+            authenticatedUser->{
+
+                String id = idsByUser.get(authenticatedUser);
+
+                JsonObject responseAsJson = new JsonObject()
+                        .add(ID_KEY,id)
+                        .add(USERNAME_KEY,authenticatedUser.name())
+                        .add(ABOUT_KEY,authenticatedUser.about());
+                return new ReceptionistResponse(OK_200,responseAsJson.toString());},
+            ()-> {return null;});
     }
 }
