@@ -13,7 +13,7 @@ public class Publication {
     }
 
     public static Publication madeBy(Publisher publisher, String message, LocalDateTime publicationTime) {
-        if(message.equals("elephant")) throw new RuntimeException(INAPPROPRIATE_WORD);
+        if(message.toLowerCase().equals("elephant")) throw new RuntimeException(INAPPROPRIATE_WORD);
 
         return new Publication(publisher,message,publicationTime);
     }
