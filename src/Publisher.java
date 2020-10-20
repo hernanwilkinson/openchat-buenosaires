@@ -1,5 +1,7 @@
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,5 +84,13 @@ public class Publisher {
 
     private void addPublicationTo(List<Publication> publicationCollector) {
         publicationCollector.addAll(publications);
+    }
+
+    public List<Publisher> followees() {
+        return Collections.unmodifiableList(followees);
+    }
+
+    public User relatedUser() {
+        return user;
     }
 }

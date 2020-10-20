@@ -117,4 +117,17 @@ public class OpenChatSystemTest {
                 OpenChatSystem.USER_NOT_REGISTERED);
 
     }
+    @Test
+    public void canFollowRegisteredUser() {
+        OpenChatSystem system = new OpenChatSystem();
+        system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
+        User followee = system.register(PublisherTest.JUAN_PEREZ_NAME,PublisherTest.JUAN_PEREZ_PASSWORD,"about");
+
+        system.followForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.JUAN_PEREZ_NAME);
+
+        List<User> followees = system.followeesOfUserNamed(PublisherTest.PEPE_SANCHEZ_NAME);
+
+        assertEquals(Arrays.asList(followee),followees);
+    }
+
 }

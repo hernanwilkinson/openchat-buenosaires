@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class OpenChatSystem {
     public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Cannot register same user twice";
@@ -18,13 +19,15 @@ public class OpenChatSystem {
         return !users.isEmpty();
     }
 
-    public void register(String userName, String password, String about) {
+    public User register(String userName, String password, String about) {
         assertIsNotDuplicated(userName);
 
         final User newUser = User.named(userName, password, about);
         users.add(newUser);
         passwordsByUser.put(newUser,password);
         publisherByUser.put(newUser,Publisher.relatedTo(newUser));
+
+        return newUser;
     }
 
     private void assertIsNotDuplicated(String userName) {
@@ -78,6 +81,19 @@ public class OpenChatSystem {
                 );
 
         return value.get();
+    }
+
+    public void followForUserNamed(String followerUserName, String followeeUserName) {
+        withPublisherForUserNamed(followerUserName,
+                follower->withPublisherForUserNamed(followeeUserName,
+                        followee->{ follower.follow(followee); return 1;}));
+    }
+
+    public List<User> followeesOfUserNamed(String userName) {
+        return withPublisherForUserNamed(userName,
+                follower->follower.followees().stream()
+                        .map(publisher->publisher.relatedUser())
+                        .collect(Collectors.toList()));
     }
 
 }
