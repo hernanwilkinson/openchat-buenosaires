@@ -1,5 +1,6 @@
 package bsas.org.openchat;
 
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 
 public class ReceptionistResponse {
@@ -21,5 +22,9 @@ public class ReceptionistResponse {
 
     public int status() {
         return status;
+    }
+
+    JsonObject responseBodyAsJson() {
+        return Json.parse(responseBody()).asObject();
     }
 }

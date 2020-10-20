@@ -26,40 +26,50 @@ public class RestReceptionist {
 
         try {
             User registeredUser = system.register(
-                    registrationAsJson.getString(USERNAME_KEY, ""),
-                    registrationAsJson.getString(PASSWORD_KEY, ""),
+                    userNameFrom(registrationAsJson),
+                    passwordFrom(registrationAsJson),
                     registrationAsJson.getString(ABOUT_KEY, ""));
 
             final String registeredUserId = UUID.randomUUID().toString();
             idsByUser.put(registeredUser,registeredUserId);
 
-            JsonObject responseAsJson = new JsonObject()
-                    .add(ID_KEY,registeredUserId)
-                    .add(USERNAME_KEY,registeredUser.name())
-                    .add(ABOUT_KEY,registeredUser.about());
+            JsonObject responseAsJson = userResponseAsJson(registeredUser, registeredUserId);
 
             return new ReceptionistResponse(CREATED_201, responseAsJson.toString());
         } catch (RuntimeException error){
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }
-
     }
 
     public ReceptionistResponse login(String loginBody) {
         JsonObject loginBodyAsJson = Json.parse(loginBody).asObject();
 
         return system.withAuthenticatedUserDo(
-            loginBodyAsJson.getString(USERNAME_KEY, ""),
-            loginBodyAsJson.getString(PASSWORD_KEY, ""),
-            authenticatedUser->{
-
-                String id = idsByUser.get(authenticatedUser);
-
-                JsonObject responseAsJson = new JsonObject()
-                        .add(ID_KEY,id)
-                        .add(USERNAME_KEY,authenticatedUser.name())
-                        .add(ABOUT_KEY,authenticatedUser.about());
-                return new ReceptionistResponse(OK_200,responseAsJson.toString());},
+                userNameFrom(loginBodyAsJson),
+                passwordFrom(loginBodyAsJson),
+            authenticatedUser->authenticatedUserResponse(authenticatedUser),
             ()-> {return null;});
+    }
+
+    private String passwordFrom(JsonObject registrationAsJson) {
+        return registrationAsJson.getString(PASSWORD_KEY, "");
+    }
+
+    private String userNameFrom(JsonObject registrationAsJson) {
+        return registrationAsJson.getString(USERNAME_KEY, "");
+    }
+
+    private JsonObject userResponseAsJson(User registeredUser, String registeredUserId) {
+        return new JsonObject()
+                .add(ID_KEY, registeredUserId)
+                .add(USERNAME_KEY, registeredUser.name())
+                .add(ABOUT_KEY, registeredUser.about());
+    }
+
+    private ReceptionistResponse authenticatedUserResponse(User authenticatedUser) {
+        String id = idsByUser.get(authenticatedUser);
+
+        JsonObject responseAsJson = userResponseAsJson(authenticatedUser, id);
+        return new ReceptionistResponse(OK_200,responseAsJson.toString());
     }
 }
