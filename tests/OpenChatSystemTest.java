@@ -9,4 +9,14 @@ public class OpenChatSystemTest {
 
         assertFalse(system.hasUsers());
     }
+    @Test
+    public void canRegisterUser() {
+        OpenChatSystem system = new OpenChatSystem();
+
+        system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
+
+        assertTrue(system.hasUsers());
+        assertTrue(system.hasUserNamed(PublisherTest.PEPE_SANCHEZ_NAME));
+        assertEquals(1,system.numberOfUsers());
+    }
 }
