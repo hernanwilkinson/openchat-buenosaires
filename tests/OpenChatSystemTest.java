@@ -70,5 +70,18 @@ public class OpenChatSystemTest {
 
         assertTrue(notAuthenticated[0]);
     }
+    @Test
+    public void canNotAuthenticateWithInvalidPassword() {
+        OpenChatSystem system = new OpenChatSystem();
+        system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
+        final boolean[] notAuthenticated = {false};
+
+        system.withAuthenticatedUserDo(
+                PublisherTest.PEPE_SANCHEZ_NAME,"",
+                user->fail(),
+                ()-> notAuthenticated[0] = true);
+
+        assertTrue(notAuthenticated[0]);
+    }
 
 }
