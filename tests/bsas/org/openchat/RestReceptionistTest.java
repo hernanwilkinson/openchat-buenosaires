@@ -122,7 +122,27 @@ public class RestReceptionistTest {
         assertTrue(response.isStatus(BAD_REQUEST_400));
         assertEquals(Publisher.CANNOT_FOLLOW_TWICE,response.responseBody());
     }
+    @Test
+    public void followeesReturns200WithUserFollowees() {
+        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem());
+        ReceptionistResponse followerReturnInfo = receptionist.registerUser(pepeSanchezRegistrationBody());
+        ReceptionistResponse followeeReturnInfo = receptionist.registerUser(juanPerezRegistrationBody());
 
+        String followinsBody = new JsonObject()
+                .add(RestReceptionist.FOLLOWER_ID, followerReturnInfo.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
+                .add(RestReceptionist.FOLLOWEE_ID, followeeReturnInfo.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
+                .toString();
+
+        receptionist.followings(followinsBody);
+        ReceptionistResponse response = receptionist.followeesOf(followerReturnInfo.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
+
+        assertTrue(response.isStatus(OK_200));
+
+        JsonArray responseBody = response.responseBodyAsJsonArray();
+        assertEquals(1,responseBody.size());
+        JsonObject userJson = responseBody.values().get(0).asObject();
+        assertJuanPerezJson(userJson);
+    }
     private JsonObject juanPerezLoginBodyAsJson() {
         return new JsonObject()
                 .add(RestReceptionist.USERNAME_KEY, TestObjectsBucket.JUAN_PEREZ_NAME)

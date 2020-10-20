@@ -5,6 +5,7 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -80,13 +81,7 @@ public class RestReceptionist {
     }
 
     public ReceptionistResponse users() {
-        JsonArray usersAsJsonArray = new JsonArray();
-
-        system.users().stream()
-                .map(user->userResponseAsJson(user,idsByUser.get(user)))
-                .forEach(userAsJson->usersAsJsonArray.add(userAsJson));
-
-        return new ReceptionistResponse(OK_200,usersAsJsonArray.toString());
+        return okResponseWithUserArrayFrom(system.users());
     }
 
     public ReceptionistResponse followings(String followinsBody) {
@@ -111,5 +106,19 @@ public class RestReceptionist {
                 .filter(userAndId->userAndId.getValue().equals(userId))
                 .findFirst()
                 .get().getKey();
+    }
+
+    public ReceptionistResponse followeesOf(String userId) {
+        final List<User> followees = system.followeesOfUserNamed(userIdentifiedAs(userId).name());
+        return okResponseWithUserArrayFrom(followees);
+    }
+
+    private ReceptionistResponse okResponseWithUserArrayFrom(List<User> followees) {
+        JsonArray usersAsJsonArray = new JsonArray();
+        followees.stream()
+                .map(user -> userResponseAsJson(user, idsByUser.get(user)))
+                .forEach(userAsJson -> usersAsJsonArray.add(userAsJson));
+
+        return new ReceptionistResponse(OK_200, usersAsJsonArray.toString());
     }
 }
