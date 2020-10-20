@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -11,14 +12,20 @@ public class PublisherTest {
     public static final String PEPE_SANCHEZ_NAME = "Pepe Sanchez";
     public static final String PEPE_SANCHEZ_PASSWORD = "password";
 
+    public static <T extends Throwable> void assertThrowsWithErrorMessage(
+            Class<T> expectedType, Executable closureToFail, String errorMessage) {
+        T error = assertThrows(
+                expectedType,
+                closureToFail);
+
+        assertEquals(errorMessage,error.getMessage());
+    }
+
     @Test
     public void canNotCreatePublisherWithBlankName() {
-        RuntimeException error = assertThrows(
-                RuntimeException.class,
-                ()->Publisher.named(" ","password","about"));
-
-        assertEquals(Publisher.NAME_CANNOT_BE_BLANK,error.getMessage());
+        assertThrowsWithErrorMessage(RuntimeException.class, () -> Publisher.named(" ", "password", "about"), Publisher.NAME_CANNOT_BE_BLANK);
     }
+
     @Test
     public void canCreatePublisherWithNoBlankName() {
         Publisher createdPublisher = createPepeSanchez();
@@ -52,11 +59,7 @@ public class PublisherTest {
     public void publisherCanNotFollowSelf() {
         Publisher follower = createPepeSanchez();
 
-        RuntimeException error = assertThrows(
-                RuntimeException.class,
-                ()->follower.follow(follower));
-
-        assertEquals(Publisher.CAN_NOT_FOLLOW_SELF,error.getMessage());
+        assertThrowsWithErrorMessage(RuntimeException.class, ()->follower.follow(follower), Publisher.CAN_NOT_FOLLOW_SELF);
         assertFalse(follower.hasFollowees());
     }
     @Test
@@ -65,11 +68,7 @@ public class PublisherTest {
         Publisher followee = createJuanPerez();
         follower.follow(followee);
 
-        RuntimeException error = assertThrows(
-                RuntimeException.class,
-                ()->follower.follow(followee));
-
-        assertEquals(Publisher.CAN_NOT_FOLLOW_TWICE,error.getMessage());
+        assertThrowsWithErrorMessage(RuntimeException.class, ()->follower.follow(followee), Publisher.CAN_NOT_FOLLOW_TWICE);
         assertTrue(follower.hasFollowees());
         assertTrue(follower.doesFollow(followee));
         assertEquals(1,follower.numberOfFollowees());
