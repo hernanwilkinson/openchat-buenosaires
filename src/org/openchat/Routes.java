@@ -27,10 +27,28 @@ public class Routes {
         post("login", (req, res) -> login(req,res));
         get("users", (req, res) -> users(req,res));
         post("users/:userId/timeline", (req, res) -> publish(req,res));
-        get("users/:userId/timeline", (req, res) -> "Implementar!");
-        post("followings", (req, res) -> "Implementar!");
-        get("followings/:followerId/followees", (req, res) -> "Implementar!");
+        get("users/:userId/timeline", (req, res) -> timeLine(req,res));
+        post("followings", (req, res) -> followings(req,res));
+        get("followings/:followerId/followees", (req, res) -> followees(req,res));
         get("users/:userId/wall", (req, res) -> "Implementar!");
+    }
+
+    private String followees(Request request, Response response) {
+        return receptionistDo(
+                ()->receptionist.followeesOf(request.params("followerId")),
+                response);
+    }
+
+    private String followings(Request request, Response response) {
+        return receptionistDo(
+                ()->receptionist.followings(request.body()),
+                response);
+    }
+
+    private String timeLine(Request request, Response response) {
+        return receptionistDo(
+                ()->receptionist.timelineOf(request.params("userid")),
+                response);
     }
 
     private String publish(Request request, Response response) {

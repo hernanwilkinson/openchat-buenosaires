@@ -84,7 +84,7 @@ public class Publisher {
 
     private List<Publication> sortedPublications(List<Publication> publications) {
         return publications.stream()
-                .sorted((left, right) -> left.comparePublicationTimeWith(right))
+                .sorted((left, right) -> right.comparePublicationTimeWith(left))
                 .collect(Collectors.toList());
     }
 

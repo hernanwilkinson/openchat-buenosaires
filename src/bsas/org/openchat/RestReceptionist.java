@@ -105,7 +105,7 @@ public class RestReceptionist {
 
         try {
             system.followForUserNamed(followerUser.name(), followeeUser.name());
-            return new ReceptionistResponse(OK_200, FOLLOWING_CREATED);
+            return new ReceptionistResponse(CREATED_201, FOLLOWING_CREATED);
         } catch (RuntimeException error){
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }
@@ -123,9 +123,9 @@ public class RestReceptionist {
         return okResponseWithUserArrayFrom(followees);
     }
 
-    private ReceptionistResponse okResponseWithUserArrayFrom(List<User> followees) {
+    private ReceptionistResponse okResponseWithUserArrayFrom(List<User> users) {
         JsonArray usersAsJsonArray = new JsonArray();
-        followees.stream()
+        users.stream()
                 .map(user -> userResponseAsJson(user, idsByUser.get(user)))
                 .forEach(userAsJson -> usersAsJsonArray.add(userAsJson));
 

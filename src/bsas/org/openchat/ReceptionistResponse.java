@@ -15,7 +15,7 @@ public class ReceptionistResponse {
     }
 
     public boolean isStatus(int potentialStatus) {
-        return true;
+        return status==potentialStatus;
     }
 
     public String responseBody() {

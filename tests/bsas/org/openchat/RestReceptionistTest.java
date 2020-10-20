@@ -18,11 +18,11 @@ public class RestReceptionistTest {
 
         ReceptionistResponse response = receptionist.registerUser(juanPerezRegistrationBody());
 
-        assertJuanPerezOk(response);
+        assertJuanPerezOk(response, CREATED_201);
     }
 
-    private void assertJuanPerezOk(ReceptionistResponse response) {
-        assertTrue(response.isStatus(CREATED_201));
+    private void assertJuanPerezOk(ReceptionistResponse response, int status) {
+        assertTrue(response.isStatus(status));
         JsonObject responseBodyAsJson = response.responseBodyAsJson();
         assertJuanPerezJson(responseBodyAsJson);
     }
@@ -63,7 +63,7 @@ public class RestReceptionistTest {
 
         ReceptionistResponse response = receptionist.login(juanPerezLoginBodyAsJson().toString());
 
-        assertJuanPerezOk(response);
+        assertJuanPerezOk(response, OK_200);
     }
     @Test
     public void loginOfRegisteredUserReturns400WithInvalidCredentials() {
