@@ -61,7 +61,7 @@ public class PublisherTest {
     public void publisherCanNotFollowSelf() {
         Publisher follower = createPepeSanchez();
 
-        assertThrowsWithErrorMessage(RuntimeException.class, ()->follower.follow(follower), Publisher.CAN_NOT_FOLLOW_SELF);
+        assertThrowsWithErrorMessage(RuntimeException.class, ()->follower.follow(follower), Publisher.CANNOT_FOLLOW_SELF);
         assertFalse(follower.hasFollowees());
     }
     @Test
@@ -70,7 +70,7 @@ public class PublisherTest {
         Publisher followee = createJuanPerez();
         follower.follow(followee);
 
-        assertThrowsWithErrorMessage(RuntimeException.class, ()->follower.follow(followee), Publisher.CAN_NOT_FOLLOW_TWICE);
+        assertThrowsWithErrorMessage(RuntimeException.class, ()->follower.follow(followee), Publisher.CANNOT_FOLLOW_TWICE);
         assertTrue(follower.hasFollowees());
         assertTrue(follower.doesFollow(followee));
         assertEquals(1,follower.numberOfFollowees());

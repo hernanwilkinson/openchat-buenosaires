@@ -1,13 +1,12 @@
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Publisher {
-    public static final String CAN_NOT_FOLLOW_SELF = "Can not follow self";
-    public static final String CAN_NOT_FOLLOW_TWICE = "Can not follow publisher twice";
+    public static final String CANNOT_FOLLOW_SELF = "Can not follow self";
+    public static final String CANNOT_FOLLOW_TWICE = "Can not follow publisher twice";
     private final List<Publisher> followees = new ArrayList<>();
     private final List<Publication> publications = new ArrayList<>();
     private final User user;
@@ -40,11 +39,11 @@ public class Publisher {
     }
 
     private void assertCanNotFollowTwice(Publisher potentialFollowee) {
-        if(doesFollow(potentialFollowee)) throw new RuntimeException(CAN_NOT_FOLLOW_TWICE);
+        if(doesFollow(potentialFollowee)) throw new RuntimeException(CANNOT_FOLLOW_TWICE);
     }
 
     private void assertCanNotFollowSelf(Publisher potentialFollowee) {
-        if(this.equals(potentialFollowee)) throw new RuntimeException(CAN_NOT_FOLLOW_SELF);
+        if(this.equals(potentialFollowee)) throw new RuntimeException(CANNOT_FOLLOW_SELF);
     }
 
     public boolean doesFollow(Publisher potentialFollowee) {
