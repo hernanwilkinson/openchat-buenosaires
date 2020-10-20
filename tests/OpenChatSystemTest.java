@@ -6,22 +6,25 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class OpenChatSystemTest {
-    @Test
-    public void createSystemHasNoUsers() {
-        OpenChatSystem system = createSystem();
 
-        assertFalse(system.hasUsers());
-        assertFalse(system.hasUserNamed(PublisherTest.PEPE_SANCHEZ_NAME));
-        assertEquals(0,system.numberOfUsers());
-    }
+    private OpenChatSystem system;
 
     private OpenChatSystem createSystem() {
         return new OpenChatSystem();
     }
 
     @Test
+    public void createSystemHasNoUsers() {
+        system = createSystem();
+
+        assertFalse(system.hasUsers());
+        assertFalse(system.hasUserNamed(PublisherTest.PEPE_SANCHEZ_NAME));
+        assertEquals(0, system.numberOfUsers());
+    }
+
+    @Test
     public void canRegisterUser() {
-        OpenChatSystem system = createSystem();
+        system = createSystem();
 
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
 
@@ -31,7 +34,7 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canRegisterManyUsers() {
-        OpenChatSystem system = createSystem();
+        system = createSystem();
 
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
         system.register(PublisherTest.JUAN_PEREZ_NAME,PublisherTest.JUAN_PEREZ_PASSWORD,"about");
@@ -43,7 +46,7 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canNotRegisterSameUserTwice() {
-        OpenChatSystem system = createSystem();
+        system = createSystem();
 
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
 
@@ -58,7 +61,7 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canWorkWithAuthenticatedUser() {
-        OpenChatSystem system = createSystem();
+        system = createSystem();
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
 
         final Object token = createSystem();
@@ -71,19 +74,19 @@ public class OpenChatSystemTest {
     }
     @Test
     public void notRegisteredUserIsNotAuthenticated() {
-        final OpenChatSystem system = createSystem();
+        system = createSystem();
         assertCanNotAuthenticateWith(system, PublisherTest.PEPE_SANCHEZ_PASSWORD);
     }
     @Test
     public void canNotAuthenticateWithInvalidPassword() {
-        OpenChatSystem system = createSystem();
+        system = createSystem();
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
 
         assertCanNotAuthenticateWith(system, PublisherTest.PEPE_SANCHEZ_PASSWORD+"something");
     }
     @Test
     public void registeredUserCanPublish() {
-        OpenChatSystem system = createSystem();
+        system = createSystem();
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
 
         Publication publication = system.publishForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,"hello");
@@ -94,7 +97,7 @@ public class OpenChatSystemTest {
     }
     @Test
     public void noRegisteredUserCanNotPublish() {
-        OpenChatSystem system = createSystem();
+        system = createSystem();
 
         PublisherTest.assertThrowsWithErrorMessage(
                 RuntimeException.class,
@@ -104,7 +107,7 @@ public class OpenChatSystemTest {
     }
     @Test
     public void noRegisteredUserCanAskItsTimeline() {
-        OpenChatSystem system = createSystem();
+        system = createSystem();
 
         PublisherTest.assertThrowsWithErrorMessage(
                 RuntimeException.class,
@@ -114,7 +117,7 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canFollowRegisteredUser() {
-        OpenChatSystem system = createSystem();
+        system = createSystem();
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
         User followee = system.register(PublisherTest.JUAN_PEREZ_NAME,PublisherTest.JUAN_PEREZ_PASSWORD,"about");
 
@@ -126,7 +129,7 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canGetWallOfRegisteredUser() {
-        OpenChatSystem system = createSystem();
+        system = createSystem();
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
         system.register(PublisherTest.JUAN_PEREZ_NAME,PublisherTest.JUAN_PEREZ_PASSWORD,"about");
         system.followForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.JUAN_PEREZ_NAME);
