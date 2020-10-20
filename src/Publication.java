@@ -2,6 +2,7 @@ import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDateTime;
 
 public class Publication {
+    public static final String INAPPROPRIATE_WORD = "Inappropriate word";
     private final String message;
     private final LocalDateTime publicationTime;
 
@@ -12,6 +13,8 @@ public class Publication {
     }
 
     public static Publication madeBy(Publisher publisher, String message, LocalDateTime publicationTime) {
+        if(message.equals("elephant")) throw new RuntimeException(INAPPROPRIATE_WORD);
+
         return new Publication(publisher,message,publicationTime);
     }
 

@@ -150,6 +150,18 @@ public class PublisherTest {
 
         assertEquals(Arrays.asList(firstPublication,secondPublication,thirdPublication),wall);
     }
+    @Test
+    public void canNotPublishWithInappropriateWord() {
+        Publisher follower = createPepeSanchez();
+
+        final LocalDateTime publicationTime = LocalDateTime.now();
+        final String message = "elephant";
+        assertThrowsWithErrorMessage(
+                RuntimeException.class,
+                ()->follower.publish(message, publicationTime),
+                Publication.INAPPROPRIATE_WORD);
+    }
+
 
     private Publisher createJuanPerez() {
         return Publisher.named("Juan Perez", "","about");
