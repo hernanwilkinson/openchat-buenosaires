@@ -38,6 +38,11 @@ public class RestReceptionistTest {
                 .add(RestReceptionist.ABOUT_KEY, TestObjectsBucket.JUAN_PEREZ_ABOUT)
                 .toString();
     }
+    private String pepeSanchezRegistrationBody() {
+        return pepeSanchezLoginBodyAsJson()
+                .add(RestReceptionist.ABOUT_KEY, TestObjectsBucket.PEPE_SANCHEZ_ABOUT)
+                .toString();
+    }
     @Test
     public void returns400WithDuplicatedUser() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem());
@@ -84,10 +89,30 @@ public class RestReceptionistTest {
         JsonObject userJson = responseBody.values().get(0).asObject();
         assertJuanPerezJson(userJson);
     }
+    @Test
+    public void followingsReturns201WhenFollowerCanFollowFollowee() {
+        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem());
+        ReceptionistResponse followerReturnInfo = receptionist.registerUser(juanPerezRegistrationBody());
+        ReceptionistResponse followeeReturnInfo = receptionist.registerUser(pepeSanchezRegistrationBody());
 
+        String followinsBody = new JsonObject()
+                .add(RestReceptionist.FOLLOWER_ID, followerReturnInfo.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
+                .add(RestReceptionist.FOLLOWEE_ID, followeeReturnInfo.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
+                .toString();
+
+        ReceptionistResponse response = receptionist.followings(followinsBody);
+
+        assertTrue(response.isStatus(CREATED_201));
+        assertEquals(RestReceptionist.FOLLOWING_CREATED,response.responseBody());
+    }
     private JsonObject juanPerezLoginBodyAsJson() {
         return new JsonObject()
                 .add(RestReceptionist.USERNAME_KEY, TestObjectsBucket.JUAN_PEREZ_NAME)
                 .add(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.JUAN_PEREZ_PASSWORD);
+    }
+    private JsonObject pepeSanchezLoginBodyAsJson() {
+        return new JsonObject()
+                .add(RestReceptionist.USERNAME_KEY, TestObjectsBucket.PEPE_SANCHEZ_NAME)
+                .add(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.PEPE_SANCHEZ_PASSWORD);
     }
 }

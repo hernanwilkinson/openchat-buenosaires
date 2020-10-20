@@ -17,6 +17,9 @@ public class RestReceptionist {
     public static final String ABOUT_KEY = "about";
     public static final String ID_KEY = "id";
     public static final String INVALID_CREDENTIALS = "Invalid credentials.";
+    public static final String FOLLOWING_CREATED = "Following created.";
+    public static final String FOLLOWER_ID = "followerId";
+    public static final String FOLLOWEE_ID = "followeeId";
     private final OpenChatSystem system;
     private final Map<User,String> idsByUser = new HashMap<>();
 
@@ -84,5 +87,26 @@ public class RestReceptionist {
                 .forEach(userAsJson->usersAsJsonArray.add(userAsJson));
 
         return new ReceptionistResponse(OK_200,usersAsJsonArray.toString());
+    }
+
+    public ReceptionistResponse followings(String followinsBody) {
+        JsonObject followingsBodyAsJson = Json.parse(followinsBody).asObject();
+
+        String followerId = followingsBodyAsJson.getString(FOLLOWER_ID,"");
+        String followeeId = followingsBodyAsJson.getString(FOLLOWEE_ID,"");
+
+        User followerUser = userIdentifiedAs(followerId);
+        User followeeUser = userIdentifiedAs(followeeId);
+
+        system.followForUserNamed(followerUser.name(),followeeUser.name());
+
+        return new ReceptionistResponse(OK_200,FOLLOWING_CREATED);
+    }
+
+    private User userIdentifiedAs(String userId) {
+        return idsByUser.entrySet().stream()
+                .filter(userAndId->userAndId.getValue().equals(userId))
+                .findFirst()
+                .get().getKey();
     }
 }
