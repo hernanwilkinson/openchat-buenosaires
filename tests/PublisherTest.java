@@ -12,7 +12,7 @@ public class PublisherTest {
     public static final String PEPE_SANCHEZ_PASSWORD = "password";
 
     @Test
-    public void publisherCanNotHaveBlankName() {
+    public void canNotCreatePublisherWithBlankName() {
         RuntimeException error = assertThrows(
                 RuntimeException.class,
                 ()->Publisher.named(" ","password","about"));
