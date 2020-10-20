@@ -18,4 +18,8 @@ public class ReceptionistResponse {
     public String responseBody() {
         return responseBody;
     }
+
+    public int status() {
+        return status;
+    }
 }

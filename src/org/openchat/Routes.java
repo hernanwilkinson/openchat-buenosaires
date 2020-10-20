@@ -1,5 +1,7 @@
 package org.openchat;
 
+import bsas.org.openchat.OpenChatSystem;
+import bsas.org.openchat.ReceptionistResponse;
 import bsas.org.openchat.RestReceptionist;
 import spark.Request;
 import spark.Response;
@@ -8,6 +10,8 @@ import static spark.Spark.get;
 import static spark.Spark.post;
 
 public class Routes {
+
+    private RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem());
 
     public void create() {
         openchatRoutes();
@@ -26,6 +30,10 @@ public class Routes {
     }
 
     private String registerUser(Request request, Response response) {
-        throw new RuntimeException();
+        ReceptionistResponse receptionistResponse = receptionist.registerUser(request.body());
+
+        response.status(receptionistResponse.status());
+        response.type("application/json");
+        return receptionistResponse.responseBody();
     }
 }

@@ -12,7 +12,7 @@ public class RestReceptionistTest {
 
     @Test
     public void canRegisterUserWithValidData() {
-        RestReceptionist receptionist = new RestReceptionist();
+        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem());
         String registrationBody = new JsonObject()
                 .add(RestReceptionist.USERNAME_KEY, TestObjectsBucket.JUAN_PEREZ_NAME)
                 .add(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.JUAN_PEREZ_PASSWORD)
@@ -30,4 +30,21 @@ public class RestReceptionistTest {
                 TestObjectsBucket.JUAN_PEREZ_PASSWORD+"x",
                 responseBodyAsJson.getString(RestReceptionist.PASSWORD_KEY,TestObjectsBucket.JUAN_PEREZ_PASSWORD+"x"));
     }
+
+    @Test
+    public void returns400WithDuplicatedUser() {
+        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem());
+        String registrationBody = new JsonObject()
+                .add(RestReceptionist.USERNAME_KEY, TestObjectsBucket.JUAN_PEREZ_NAME)
+                .add(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.JUAN_PEREZ_PASSWORD)
+                .add(RestReceptionist.ABOUT_KEY, TestObjectsBucket.JUAN_PEREZ_ABOUT)
+                .toString();
+
+        receptionist.registerUser(registrationBody);
+        ReceptionistResponse response = receptionist.registerUser(registrationBody);
+
+        assertTrue(response.isStatus(BAD_REQUEST_400));
+        assertEquals(OpenChatSystem.CANNOT_REGISTER_SAME_USER_TWICE,response.responseBody());
+    }
+
 }
