@@ -107,5 +107,14 @@ public class OpenChatSystemTest {
                 OpenChatSystem.USER_NOT_REGISTERED);
 
     }
+    @Test
+    public void noRegisteredUserCanAskItsTimeline() {
+        OpenChatSystem system = new OpenChatSystem();
 
+        PublisherTest.assertThrowsWithErrorMessage(
+                RuntimeException.class,
+                ()->system.timeLineForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME),
+                OpenChatSystem.USER_NOT_REGISTERED);
+
+    }
 }

@@ -70,12 +70,16 @@ public class OpenChatSystem {
     }
 
     public List<Publication> timeLineForUserNamed(String userName) {
-        User foundUser = users.stream().
+        AtomicReference<List<Publication>> timeLine = new AtomicReference<>();
+
+        users.stream().
                 filter(user->user.isNamed(userName))
                 .findFirst()
-                .get();
+                .ifPresentOrElse(
+                        user-> timeLine.set(publisherByUser.get(user).timeLine()),
+                        ()-> { throw new RuntimeException(USER_NOT_REGISTERED);});
 
-        return publisherByUser.get(foundUser).timeLine();
+        return timeLine.get();
     }
 
 }
