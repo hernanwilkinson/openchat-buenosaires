@@ -135,17 +135,21 @@ public class RestReceptionist {
     public ReceptionistResponse addPublication(String userId, String messageBody) {
         JsonObject messageBodyAsJson = Json.parse(messageBody).asObject();
 
-        Publication publication = system.publishForUserNamed(userIdentifiedAs(userId).name(),messageBodyAsJson.getString("text",""));
-        String publicationId = UUID.randomUUID().toString();
-        idsByPublication.put(publication,publicationId);
+        try {
+            Publication publication = system.publishForUserNamed(userIdentifiedAs(userId).name(), messageBodyAsJson.getString("text", ""));
+            String publicationId = UUID.randomUUID().toString();
+            idsByPublication.put(publication, publicationId);
 
-        JsonObject pubicationAsJson =new JsonObject()
-                .add(POST_ID_KEY, publicationId)
-                .add(USER_ID_KEY, userId)
-                .add(TEXT_KEY, publication.message())
-                .add(DATE_TIME_KEY,formatDateTime(publication.publicationTime()));
+            JsonObject pubicationAsJson = new JsonObject()
+                    .add(POST_ID_KEY, publicationId)
+                    .add(USER_ID_KEY, userId)
+                    .add(TEXT_KEY, publication.message())
+                    .add(DATE_TIME_KEY, formatDateTime(publication.publicationTime()));
 
-        return new ReceptionistResponse(CREATED_201,pubicationAsJson.toString());
+            return new ReceptionistResponse(CREATED_201, pubicationAsJson.toString());
+        } catch (RuntimeException error){
+            return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
+        }
     }
 
     private String formatDateTime(LocalDateTime dateTimeToFormat) {

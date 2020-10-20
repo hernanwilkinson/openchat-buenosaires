@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Publication {
-    public static final String INAPPROPRIATE_WORD = "Can not publish with an inappropriate word";
+    public static final String INAPPROPRIATE_WORD = "Post contains inappropriate language.";
     public static final List<String> inappropriateWords =
             Collections.unmodifiableList(Arrays.asList("elephant","ice cream","orange"));
 

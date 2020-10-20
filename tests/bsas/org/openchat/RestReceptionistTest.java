@@ -169,6 +169,23 @@ public class RestReceptionistTest {
         assertEquals(publicationMessage, responseBody.getString(RestReceptionist.TEXT_KEY,""));
         assertEquals(formattedNow(),responseBody.getString(RestReceptionist.DATE_TIME_KEY,""));
     }
+    @Test
+    public void publishReturns400WithInappropriateWords() {
+        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
+        ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBody());
+
+        final String publicationMessage = "elephant";
+        String messageBody = new JsonObject()
+                .add(RestReceptionist.TEXT_KEY, publicationMessage)
+                .toString();
+        final String registeredUserId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
+        ReceptionistResponse publicationInfo = receptionist.addPublication(
+                registeredUserId,
+                messageBody);
+
+        assertTrue(publicationInfo.isStatus(BAD_REQUEST_400));
+        assertEquals(Publication.INAPPROPRIATE_WORD,publicationInfo.responseBody());
+    }
 
     private String formattedNow() {
         return ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").format(testObjects.fixedNowClock().now());
