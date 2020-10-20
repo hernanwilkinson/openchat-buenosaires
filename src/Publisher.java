@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Publisher {
-    public static final String INVALID_NAME = "Name can not be blank";
+    public static final String NAME_CANNOT_BE_BLANK = "Name can not be blank";
     public static final String CAN_NOT_FOLLOW_SELF = "Can not follow self";
     public static final String CAN_NOT_FOLLOW_TWICE = "Can not follow publisher twice";
     private final String name;
@@ -22,7 +22,7 @@ public class Publisher {
     }
 
     private static void assertNameIsNotBlank(String name) {
-        if(name.isBlank()) throw new RuntimeException(INVALID_NAME);
+        if(name.isBlank()) throw new RuntimeException(NAME_CANNOT_BE_BLANK);
     }
 
     public boolean isNamed(String potentialName) {

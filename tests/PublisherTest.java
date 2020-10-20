@@ -17,7 +17,7 @@ public class PublisherTest {
                 RuntimeException.class,
                 ()->Publisher.named(" ","password","about"));
 
-        assertEquals(Publisher.INVALID_NAME,error.getMessage());
+        assertEquals(Publisher.NAME_CANNOT_BE_BLANK,error.getMessage());
     }
     @Test
     public void canCreatePublisherWithNoBlankName() {
