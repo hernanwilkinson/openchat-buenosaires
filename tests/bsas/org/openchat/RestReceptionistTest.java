@@ -105,6 +105,24 @@ public class RestReceptionistTest {
         assertTrue(response.isStatus(CREATED_201));
         assertEquals(RestReceptionist.FOLLOWING_CREATED,response.responseBody());
     }
+    @Test
+    public void followingsReturns400WhenAlreadyFollowing() {
+        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem());
+        ReceptionistResponse followerReturnInfo = receptionist.registerUser(juanPerezRegistrationBody());
+        ReceptionistResponse followeeReturnInfo = receptionist.registerUser(pepeSanchezRegistrationBody());
+
+        String followinsBody = new JsonObject()
+                .add(RestReceptionist.FOLLOWER_ID, followerReturnInfo.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
+                .add(RestReceptionist.FOLLOWEE_ID, followeeReturnInfo.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
+                .toString();
+
+        receptionist.followings(followinsBody);
+        ReceptionistResponse response = receptionist.followings(followinsBody);
+
+        assertTrue(response.isStatus(BAD_REQUEST_400));
+        assertEquals(Publisher.CANNOT_FOLLOW_TWICE,response.responseBody());
+    }
+
     private JsonObject juanPerezLoginBodyAsJson() {
         return new JsonObject()
                 .add(RestReceptionist.USERNAME_KEY, TestObjectsBucket.JUAN_PEREZ_NAME)

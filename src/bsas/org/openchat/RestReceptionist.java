@@ -98,9 +98,12 @@ public class RestReceptionist {
         User followerUser = userIdentifiedAs(followerId);
         User followeeUser = userIdentifiedAs(followeeId);
 
-        system.followForUserNamed(followerUser.name(),followeeUser.name());
-
-        return new ReceptionistResponse(OK_200,FOLLOWING_CREATED);
+        try {
+            system.followForUserNamed(followerUser.name(), followeeUser.name());
+            return new ReceptionistResponse(OK_200, FOLLOWING_CREATED);
+        } catch (RuntimeException error){
+            return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
+        }
     }
 
     private User userIdentifiedAs(String userId) {
