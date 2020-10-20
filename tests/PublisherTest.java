@@ -78,7 +78,7 @@ public class PublisherTest {
     public void createdPusblisherHasNoPublications() {
         Publisher createdPublisher = createPepeSanchez();
 
-        assertTrue(createdPublisher.doesNotHavePublications());
+        assertFalse(createdPublisher.hasPublications());
     }
     @Test
     public void publisherCanPublishMessages() {
@@ -88,7 +88,7 @@ public class PublisherTest {
         final String message = "a message";
         Publication publication = createdPublisher.publish(message, publicationTime);
 
-        assertFalse(createdPublisher.doesNotHavePublications());
+        assertTrue(createdPublisher.hasPublications());
         assertTrue(publication.hasMessage(message));
         assertTrue(publication.hasPublishAt(publicationTime));
     }

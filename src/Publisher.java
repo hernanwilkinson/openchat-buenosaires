@@ -56,8 +56,8 @@ public class Publisher {
         return followees.size();
     }
 
-    public boolean doesNotHavePublications() {
-        return publications.isEmpty();
+    public boolean hasPublications() {
+        return !publications.isEmpty();
     }
 
     public Publication publish(String message, LocalDateTime publicationTime) {
