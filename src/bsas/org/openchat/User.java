@@ -1,4 +1,4 @@
-package org.openchat.model;
+package bsas.org.openchat;
 
 public class User {
     public static final String NAME_CANNOT_BE_BLANK = "Name can not be blank";

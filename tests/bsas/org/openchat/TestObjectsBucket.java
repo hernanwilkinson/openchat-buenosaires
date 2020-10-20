@@ -1,7 +1,6 @@
-package org.openchat.test;
+package bsas.org.openchat;
 
 import org.junit.jupiter.api.function.Executable;
-import org.openchat.model.User;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

@@ -193,7 +193,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<mainClass>org.org.openchat.OpenChatLauncher</mainClass>
+					<mainClass>org.org.org.openchat.OpenChatLauncher</mainClass>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -236,7 +236,7 @@
 							<transformers>
 								<!-- add Main-Class to manifest file -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>org.org.openchat.OpenChatLauncher</mainClass>
+									<mainClass>org.org.org.openchat.OpenChatLauncher</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>

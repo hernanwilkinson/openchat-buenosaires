@@ -1,16 +1,14 @@
-package org.openchat.test;
+package bsas.org.openchat;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openchat.model.Publication;
-import org.openchat.model.Publisher;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.openchat.test.TestObjectsBucket.assertThrowsWithErrorMessage;
+import static bsas.org.openchat.TestObjectsBucket.assertThrowsWithErrorMessage;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PublisherTest {
 
@@ -31,7 +29,7 @@ public class PublisherTest {
 
         Assertions.assertTrue(follower.hasFollowees());
         Assertions.assertTrue(follower.doesFollow(followee));
-        Assertions.assertEquals(1,follower.numberOfFollowees());
+        assertEquals(1,follower.numberOfFollowees());
     }
     @Test
     public void publisherCanNotFollowSelf() {
@@ -49,7 +47,7 @@ public class PublisherTest {
         assertThrowsWithErrorMessage(RuntimeException.class, ()->follower.follow(followee), Publisher.CANNOT_FOLLOW_TWICE);
         Assertions.assertTrue(follower.hasFollowees());
         Assertions.assertTrue(follower.doesFollow(followee));
-        Assertions.assertEquals(1,follower.numberOfFollowees());
+        assertEquals(1,follower.numberOfFollowees());
     }
     @Test
     public void createdPusblisherHasNoPublications() {

@@ -1,10 +1,9 @@
-package org.openchat.test;
+package bsas.org.openchat;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openchat.model.User;
 
-import static org.openchat.test.TestObjectsBucket.assertThrowsWithErrorMessage;
+import static bsas.org.openchat.TestObjectsBucket.assertThrowsWithErrorMessage;
 
 public class UserTest {
     private final TestObjectsBucket testObjects = new TestObjectsBucket();

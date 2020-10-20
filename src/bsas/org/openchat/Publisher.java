@@ -1,4 +1,4 @@
-package org.openchat.model;
+package bsas.org.openchat;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

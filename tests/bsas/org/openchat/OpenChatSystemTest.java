@@ -1,17 +1,12 @@
-package org.openchat.test;
+package bsas.org.openchat;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openchat.model.OpenChatSystem;
-import org.openchat.model.Publication;
-import org.openchat.model.User;
-import org.openchat.test.TestObjectsBucket;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.openchat.test.TestObjectsBucket.assertThrowsWithErrorMessage;
 
 public class OpenChatSystemTest {
 
@@ -50,7 +45,7 @@ public class OpenChatSystemTest {
         system = createSystem();
         registerPepeSanchez();
 
-        assertThrowsWithErrorMessage(
+        TestObjectsBucket.assertThrowsWithErrorMessage(
                 RuntimeException.class,
                 ()->registerPepeSanchez(),
                 OpenChatSystem.CANNOT_REGISTER_SAME_USER_TWICE);
@@ -98,7 +93,7 @@ public class OpenChatSystemTest {
     public void noRegisteredUserCanNotPublish() {
         system = createSystem();
 
-        assertThrowsWithErrorMessage(
+        TestObjectsBucket.assertThrowsWithErrorMessage(
                 RuntimeException.class,
                 ()->system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello"),
                 OpenChatSystem.USER_NOT_REGISTERED);
@@ -107,7 +102,7 @@ public class OpenChatSystemTest {
     public void noRegisteredUserCanAskItsTimeline() {
         system = createSystem();
 
-        assertThrowsWithErrorMessage(
+        TestObjectsBucket.assertThrowsWithErrorMessage(
                 RuntimeException.class,
                 ()->system.timeLineForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME),
                 OpenChatSystem.USER_NOT_REGISTERED);
