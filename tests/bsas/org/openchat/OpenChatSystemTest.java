@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class OpenChatSystemTest {
 
     private OpenChatSystem system;
+    private TestObjectsBucket testObjects = new TestObjectsBucket();
 
     @Test
     public void createSystemHasNoUsers() {
@@ -143,7 +144,7 @@ public class OpenChatSystemTest {
     }
 
     private OpenChatSystem createSystem() {
-        return new OpenChatSystem();
+        return new OpenChatSystem(testObjects.fixedNowClock());
     }
 
     private User registerPepeSanchez() {

@@ -1,6 +1,5 @@
 package bsas.org.openchat;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -13,6 +12,11 @@ public class OpenChatSystem {
     private final List<User> users = new ArrayList<>();
     private final Map<User,String> passwordsByUser = new HashMap<>();
     private final Map<User,Publisher> publisherByUser = new HashMap<>();
+    private final Clock clock;
+
+    public OpenChatSystem(Clock clock){
+        this.clock = clock;
+    }
 
     public boolean hasUsers() {
         return !users.isEmpty();
@@ -53,7 +57,7 @@ public class OpenChatSystem {
 
     public Publication publishForUserNamed(String userName, String message) {
         return withPublisherForUserNamed(userName,
-                publisher->publisher.publish(message, LocalDateTime.now()));
+                publisher -> publisher.publish(message, clock.now()));
     }
 
     public List<Publication> timeLineForUserNamed(String userName) {

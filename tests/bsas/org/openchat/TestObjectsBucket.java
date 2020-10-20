@@ -2,6 +2,8 @@ package bsas.org.openchat;
 
 import org.junit.jupiter.api.function.Executable;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -28,5 +30,10 @@ public class TestObjectsBucket {
 
     public User createPepeSanchez() {
         return User.named(PEPE_SANCHEZ_NAME, PEPE_SANCHEZ_PASSWORD,"about");
+    }
+
+    public Clock fixedNowClock(){
+        final LocalDateTime now = LocalDateTime.now();
+        return ()->now;
     }
 }

@@ -6,6 +6,7 @@ import bsas.org.openchat.RestReceptionist;
 import spark.Request;
 import spark.Response;
 
+import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
 import static spark.Spark.get;
@@ -13,7 +14,8 @@ import static spark.Spark.post;
 
 public class Routes {
 
-    private RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem());
+    private RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(
+            ()-> LocalDateTime.now()));
 
     public void create() {
         openchatRoutes();

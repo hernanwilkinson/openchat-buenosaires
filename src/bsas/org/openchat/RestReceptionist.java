@@ -4,12 +4,15 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.eclipse.jetty.http.HttpStatus.*;
 
 public class RestReceptionist {
@@ -21,8 +24,15 @@ public class RestReceptionist {
     public static final String FOLLOWING_CREATED = "Following created.";
     public static final String FOLLOWER_ID = "followerId";
     public static final String FOLLOWEE_ID = "followeeId";
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    public static final String POST_ID_KEY = "postId";
+    public static final String USER_ID_KEY = "userId";
+    public static final String TEXT_KEY = "text";
+    public static final String DATE_TIME_KEY = "dateTime";
+
     private final OpenChatSystem system;
     private final Map<User,String> idsByUser = new HashMap<>();
+    private final Map<Publication,String> idsByPublication = new HashMap<>();
 
     public RestReceptionist(OpenChatSystem system) {
         this.system = system;
@@ -120,5 +130,25 @@ public class RestReceptionist {
                 .forEach(userAsJson -> usersAsJsonArray.add(userAsJson));
 
         return new ReceptionistResponse(OK_200, usersAsJsonArray.toString());
+    }
+
+    public ReceptionistResponse addPublication(String userId, String messageBody) {
+        JsonObject messageBodyAsJson = Json.parse(messageBody).asObject();
+
+        Publication publication = system.publishForUserNamed(userIdentifiedAs(userId).name(),messageBodyAsJson.getString("text",""));
+        String publicationId = UUID.randomUUID().toString();
+        idsByPublication.put(publication,publicationId);
+
+        JsonObject pubicationAsJson =new JsonObject()
+                .add(POST_ID_KEY, publicationId)
+                .add(USER_ID_KEY, userId)
+                .add(TEXT_KEY, publication.message())
+                .add(DATE_TIME_KEY,formatDateTime(publication.publicationTime()));
+
+        return new ReceptionistResponse(CREATED_201,pubicationAsJson.toString());
+    }
+
+    private String formatDateTime(LocalDateTime dateTimeToFormat) {
+        return DATE_TIME_FORMATTER.format(dateTimeToFormat);
     }
 }

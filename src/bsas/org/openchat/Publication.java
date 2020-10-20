@@ -48,7 +48,11 @@ public class Publication {
         return publicationTime.compareTo(publicationToCompare.publicationTime());
     }
 
-    private LocalDateTime publicationTime() {
+    public LocalDateTime publicationTime() {
         return publicationTime;
+    }
+
+    public String message() {
+        return message;
     }
 }
