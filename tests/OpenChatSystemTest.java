@@ -48,5 +48,15 @@ public class OpenChatSystemTest {
         assertTrue(system.hasUserNamed(PublisherTest.PEPE_SANCHEZ_NAME));
         assertEquals(1,system.numberOfUsers());
     }
+    @Test
+    public void canWorkWithAuthenticatedUser() {
+        OpenChatSystem system = new OpenChatSystem();
+        system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
+
+        system.withAuthenticatedUserDo(
+                PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,
+                (Publisher user)->assertTrue(user.isNamed(PublisherTest.PEPE_SANCHEZ_NAME)),
+                ()->fail());
+    }
 
 }

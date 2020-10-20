@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class OpenChatSystem {
     public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Cannot register same user twice";
@@ -25,5 +26,10 @@ public class OpenChatSystem {
 
     public int numberOfUsers() {
         return users.size();
+    }
+
+    public void withAuthenticatedUserDo(String userName, String password,
+            Consumer<Publisher> authenticatedClosure, Runnable failedClosure) {
+        authenticatedClosure.accept(users.get(0));
     }
 }
