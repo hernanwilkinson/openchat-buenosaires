@@ -13,11 +13,7 @@ public class RestReceptionistTest {
     @Test
     public void canRegisterUserWithValidData() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem());
-        String registrationBody = new JsonObject()
-                .add(RestReceptionist.USERNAME_KEY, TestObjectsBucket.JUAN_PEREZ_NAME)
-                .add(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.JUAN_PEREZ_PASSWORD)
-                .add(RestReceptionist.ABOUT_KEY, TestObjectsBucket.JUAN_PEREZ_ABOUT)
-                .toString();
+        String registrationBody = juanPerezRegistrationBody();
 
         ReceptionistResponse response = receptionist.registerUser(registrationBody);
 
@@ -31,14 +27,18 @@ public class RestReceptionistTest {
                 responseBodyAsJson.getString(RestReceptionist.PASSWORD_KEY,TestObjectsBucket.JUAN_PEREZ_PASSWORD+"x"));
     }
 
-    @Test
-    public void returns400WithDuplicatedUser() {
-        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem());
-        String registrationBody = new JsonObject()
+    private String juanPerezRegistrationBody() {
+        return new JsonObject()
                 .add(RestReceptionist.USERNAME_KEY, TestObjectsBucket.JUAN_PEREZ_NAME)
                 .add(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.JUAN_PEREZ_PASSWORD)
                 .add(RestReceptionist.ABOUT_KEY, TestObjectsBucket.JUAN_PEREZ_ABOUT)
                 .toString();
+    }
+
+    @Test
+    public void returns400WithDuplicatedUser() {
+        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem());
+        String registrationBody = juanPerezRegistrationBody();
 
         receptionist.registerUser(registrationBody);
         ReceptionistResponse response = receptionist.registerUser(registrationBody);
