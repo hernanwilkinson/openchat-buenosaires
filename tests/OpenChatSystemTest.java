@@ -1,5 +1,8 @@
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class OpenChatSystemTest {
@@ -82,6 +85,17 @@ public class OpenChatSystemTest {
                 ()-> notAuthenticated[0] = true);
 
         assertTrue(notAuthenticated[0]);
+    }
+    @Test
+    public void registeredUserCanPublish() {
+        OpenChatSystem system = new OpenChatSystem();
+        system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
+
+        Publication publication = system.publishForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,"hello");
+
+        List<Publication> timeLine = system.timeLineForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME);
+
+        assertEquals(Arrays.asList(publication),timeLine);
     }
 
 }
