@@ -25,7 +25,7 @@ public class TestObjectsBucket {
         return User.named(JUAN_PEREZ_NAME, JUAN_PEREZ_PASSWORD,"about");
     }
 
-    public User createUserPepeSanchez() {
+    public User createPepeSanchez() {
         return User.named(PEPE_SANCHEZ_NAME, PEPE_SANCHEZ_PASSWORD,"about");
     }
 }

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openchat.model.Publication;
 import org.openchat.model.Publisher;
-import org.openchat.model.User;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -17,23 +16,6 @@ public class PublisherTest {
 
     private final TestObjectsBucket testObjects = new TestObjectsBucket();
 
-    @Test
-    public void canNotCreatePublisherWithBlankName() {
-        assertThrowsWithErrorMessage(RuntimeException.class, () -> User.named(" ", "password", "about"), User.NAME_CANNOT_BE_BLANK);
-    }
-
-    @Test
-    public void canCreatePublisherWithNoBlankName() {
-        Publisher createdPublisher = createPepeSanchez();
-
-        Assertions.assertTrue(createdPublisher.isNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
-    }
-    @Test
-    public void isNamedReturnsFalseWhenAskedWithOtherName() {
-        Publisher createdPublisher = createPepeSanchez();
-
-        Assertions.assertFalse(createdPublisher.isNamed("Juan"));
-    }
     @Test
     public void createdPublisherHasNoFollowees() {
         Publisher createdPublisher = createPepeSanchez();
@@ -196,7 +178,7 @@ public class PublisherTest {
     }
 
     private Publisher createPepeSanchez() {
-        return Publisher.relatedTo(testObjects.createUserPepeSanchez());
+        return Publisher.relatedTo(testObjects.createPepeSanchez());
     }
 
 }
