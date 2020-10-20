@@ -183,6 +183,17 @@ public class PublisherTest {
                 ()->follower.publish(message, publicationTime),
                 Publication.INAPPROPRIATE_WORD);
     }
+    @Test
+    public void canNotPublishAnyInappropriateWord() {
+        Publisher follower = createPepeSanchez();
+
+        final LocalDateTime publicationTime = LocalDateTime.now();
+        Arrays.asList("elephant","ice cream","orange").forEach(
+                message-> assertThrowsWithErrorMessage(
+                        RuntimeException.class,
+                        ()->follower.publish(message, publicationTime),
+                        Publication.INAPPROPRIATE_WORD));
+    }
 
 
 
