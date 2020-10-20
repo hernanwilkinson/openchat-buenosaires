@@ -11,6 +11,8 @@ public class PublisherTest {
 
     public static final String PEPE_SANCHEZ_NAME = "Pepe Sanchez";
     public static final String PEPE_SANCHEZ_PASSWORD = "password";
+    public static final String JUAN_PEREZ_NAME = "Juan Perez";
+    public static final String JUAN_PEREZ_PASSWORD = "";
 
     public static <T extends Throwable> void assertThrowsWithErrorMessage(
             Class<T> expectedType, Executable closureToFail, String errorMessage) {
@@ -198,7 +200,7 @@ public class PublisherTest {
 
 
     private Publisher createJuanPerez() {
-        return Publisher.named("Juan Perez", "","about");
+        return Publisher.named(JUAN_PEREZ_NAME, JUAN_PEREZ_PASSWORD,"about");
     }
 
     private Publisher createPepeSanchez() {
