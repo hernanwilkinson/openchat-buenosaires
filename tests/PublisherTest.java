@@ -93,6 +93,7 @@ public class PublisherTest {
         assertTrue(publication.hasPublishAt(publicationTime));
 
         assertFalse(publication.hasMessage(message + "something"));
+        assertFalse(publication.hasPublishAt(publicationTime.plusSeconds(1)));
     }
     @Test
     public void timelineHasPublisherPublicationsSortedByPublicationTime() {
