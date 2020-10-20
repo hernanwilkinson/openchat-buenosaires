@@ -7,20 +7,17 @@ import java.util.stream.Collectors;
 public class Publisher {
     public static final String CANNOT_FOLLOW_SELF = "Can not follow self";
     public static final String CANNOT_FOLLOW_TWICE = "Can not follow publisher twice";
+
     private final List<Publisher> followees = new ArrayList<>();
     private final List<Publication> publications = new ArrayList<>();
     private final User user;
-
-    private Publisher(User user) {
-        this.user = user;
-    }
 
     public static Publisher relatedTo(User user){
         return new Publisher(user);
     }
 
-    private static void assertNameIsNotBlank(String name) {
-        if(name.isBlank()) throw new RuntimeException(User.NAME_CANNOT_BE_BLANK);
+    private Publisher(User user) {
+        this.user = user;
     }
 
     public boolean isNamed(String potentialName) {
@@ -36,14 +33,6 @@ public class Publisher {
         assertCanNotFollowTwice(potentialFollowee);
 
         followees.add(potentialFollowee);
-    }
-
-    private void assertCanNotFollowTwice(Publisher potentialFollowee) {
-        if(doesFollow(potentialFollowee)) throw new RuntimeException(CANNOT_FOLLOW_TWICE);
-    }
-
-    private void assertCanNotFollowSelf(Publisher potentialFollowee) {
-        if(this.equals(potentialFollowee)) throw new RuntimeException(CANNOT_FOLLOW_SELF);
     }
 
     public boolean doesFollow(Publisher potentialFollowee) {
@@ -69,20 +58,10 @@ public class Publisher {
         return sortedPublications(publications);
     }
 
-    private List<Publication> sortedPublications(List<Publication> publications) {
-        return publications.stream()
-                .sorted((left, right) -> left.comparePublicationTimeWith(right))
-                .collect(Collectors.toList());
-    }
-
     public List<Publication> wall() {
         final ArrayList<Publication> wall = new ArrayList<>(this.publications);
         followees.stream().forEach(followee->followee.addPublicationTo(wall));
         return sortedPublications(wall);
-    }
-
-    private void addPublicationTo(List<Publication> publicationCollector) {
-        publicationCollector.addAll(publications);
     }
 
     public List<Publisher> followees() {
@@ -92,4 +71,23 @@ public class Publisher {
     public User relatedUser() {
         return user;
     }
+
+    private void assertCanNotFollowTwice(Publisher potentialFollowee) {
+        if(doesFollow(potentialFollowee)) throw new RuntimeException(CANNOT_FOLLOW_TWICE);
+    }
+
+    private void assertCanNotFollowSelf(Publisher potentialFollowee) {
+        if(this.equals(potentialFollowee)) throw new RuntimeException(CANNOT_FOLLOW_SELF);
+    }
+
+    private List<Publication> sortedPublications(List<Publication> publications) {
+        return publications.stream()
+                .sorted((left, right) -> left.comparePublicationTimeWith(right))
+                .collect(Collectors.toList());
+    }
+
+    private void addPublicationTo(List<Publication> publicationCollector) {
+        publicationCollector.addAll(publications);
+    }
+
 }

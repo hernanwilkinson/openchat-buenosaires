@@ -1,5 +1,4 @@
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -8,11 +7,11 @@ public class Publication {
     public static final String INAPPROPRIATE_WORD = "Can not publish with an inappropriate word";
     public static final List<String> inappropriateWords =
             Collections.unmodifiableList(Arrays.asList("elephant","ice cream","orange"));
+
     private final String message;
     private final LocalDateTime publicationTime;
 
     public Publication(Publisher publisher, String message, LocalDateTime publicationTime) {
-
         this.message = message;
         this.publicationTime = publicationTime;
     }

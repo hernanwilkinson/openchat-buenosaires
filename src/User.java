@@ -1,10 +1,7 @@
 public class User {
     public static final String NAME_CANNOT_BE_BLANK = "Name can not be blank";
-    private final String name;
 
-    private User(String name, String password, String about) {
-        this.name = name;
-    }
+    private final String name;
 
     public static User named(String name, String password, String about) {
         assertNameIsNotBlank(name);
@@ -14,6 +11,10 @@ public class User {
 
     static void assertNameIsNotBlank(String name) {
         if(name.isBlank()) throw new RuntimeException(NAME_CANNOT_BE_BLANK);
+    }
+
+    private User(String name, String password, String about) {
+        this.name = name;
     }
 
     public boolean isNamed(String potentialName) {

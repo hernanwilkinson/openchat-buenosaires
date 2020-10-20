@@ -3,8 +3,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -12,6 +10,7 @@ import java.util.stream.Collectors;
 public class OpenChatSystem {
     public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Cannot register same user twice";
     public static final String USER_NOT_REGISTERED = "User not registered";
+
     private final List<User> users = new ArrayList<>();
     private final Map<User,String> passwordsByUser = new HashMap<>();
     private final Map<User,Publisher> publisherByUser = new HashMap<>();
@@ -53,14 +52,6 @@ public class OpenChatSystem {
                 .orElseGet(failedClosure);
     }
 
-    private <T> T ifValidPasswordDo(User user, String password,
-           Function<User,T> authenticatedClosure, Supplier<T> failedClosure) {
-        if(passwordsByUser.get(user).equals(password))
-            return authenticatedClosure.apply(user);
-        else
-            return failedClosure.get();
-    }
-
     public Publication publishForUserNamed(String userName, String message) {
         return withPublisherForUserNamed(userName,
                 publisher->publisher.publish(message, LocalDateTime.now()));
@@ -68,14 +59,6 @@ public class OpenChatSystem {
 
     public List<Publication> timeLineForUserNamed(String userName) {
         return withPublisherForUserNamed(userName, publisher->publisher.timeLine());
-    }
-
-    private <T> T withPublisherForUserNamed(String userName, Function<Publisher, T> publisherClosure) {
-        return users.stream().
-                filter(user->user.isNamed(userName))
-                .findFirst()
-                .map(user-> publisherClosure.apply(publisherByUser.get(user)))
-                .orElseThrow(()->new RuntimeException(USER_NOT_REGISTERED));
     }
 
     public void followForUserNamed(String followerUserName, String followeeUserName) {
@@ -96,4 +79,21 @@ public class OpenChatSystem {
                 userName,
                 publisher->publisher.wall());
     }
+
+    private <T> T ifValidPasswordDo(User user, String password,
+                                    Function<User,T> authenticatedClosure, Supplier<T> failedClosure) {
+        if(passwordsByUser.get(user).equals(password))
+            return authenticatedClosure.apply(user);
+        else
+            return failedClosure.get();
+    }
+
+    private <T> T withPublisherForUserNamed(String userName, Function<Publisher, T> publisherClosure) {
+        return users.stream().
+                filter(user->user.isNamed(userName))
+                .findFirst()
+                .map(user-> publisherClosure.apply(publisherByUser.get(user)))
+                .orElseThrow(()->new RuntimeException(USER_NOT_REGISTERED));
+    }
+
 }
