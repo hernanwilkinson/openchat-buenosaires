@@ -15,7 +15,7 @@ public class ReceptionistResponse {
     }
 
     public boolean isStatus(int potentialStatus) {
-        return status==potentialStatus;
+        return status()==potentialStatus;
     }
 
     public String responseBody() {
@@ -28,13 +28,6 @@ public class ReceptionistResponse {
 
     JsonObject responseBodyAsJson() {
         return Json.parse(responseBody).asObject();
-    }
-
-    public String toResponseInto(Response response) {
-        response.status(status());
-        response.type("application/json");
-
-        return responseBody;
     }
 
     public JsonArray responseBodyAsJsonArray() {

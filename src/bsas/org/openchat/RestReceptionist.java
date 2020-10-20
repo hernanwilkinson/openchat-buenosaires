@@ -162,9 +162,13 @@ public class RestReceptionist {
 
     public ReceptionistResponse timelineOf(String userId) {
         List<Publication> timeLine = system.timeLineForUserNamed(userIdentifiedAs(userId).name());
+        return publicationsAsJson(timeLine);
+    }
+
+    private ReceptionistResponse publicationsAsJson(List<Publication> timeLine) {
         JsonArray publicationsAsJsonObject = new JsonArray();
         timeLine.stream()
-                .map(publication -> publicationAsJson(userId, publication, idsByPublication.get(publication)))
+                .map(publication -> publicationAsJson(idsByUser.get(publication.publisherRelatedUser()), publication, idsByPublication.get(publication)))
                 .forEach(userAsJson -> publicationsAsJsonObject.add(userAsJson));
 
         return new ReceptionistResponse(OK_200, publicationsAsJsonObject.toString());
@@ -172,13 +176,6 @@ public class RestReceptionist {
 
     public ReceptionistResponse wallOf(String userId) {
         List<Publication> wall = system.wallForUserNamed(userIdentifiedAs(userId).name());
-        JsonArray publicationsAsJsonObject = new JsonArray();
-        wall.stream()
-                .map(publication -> publicationAsJson(
-                        idsByUser.get(publication.publisherRelatedUser()),
-                        publication, idsByPublication.get(publication)))
-                .forEach(userAsJson -> publicationsAsJsonObject.add(userAsJson));
-
-        return new ReceptionistResponse(OK_200, publicationsAsJsonObject.toString());
+        return publicationsAsJson(wall);
     }
 }

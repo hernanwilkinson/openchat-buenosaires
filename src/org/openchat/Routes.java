@@ -81,8 +81,10 @@ public class Routes {
 
     private String receptionistDo(Supplier<ReceptionistResponse> action, Response response) {
         ReceptionistResponse receptionistResponse = action.get();
+        response.status(receptionistResponse.status());
+        response.type("application/json");
 
-        return receptionistResponse.toResponseInto(response);
+        return receptionistResponse.responseBody();
     }
 
 }
