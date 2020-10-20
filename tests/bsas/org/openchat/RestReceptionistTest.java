@@ -1,5 +1,6 @@
 package bsas.org.openchat;
 
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.junit.jupiter.api.Test;
 
@@ -64,6 +65,25 @@ public class RestReceptionistTest {
 
         assertTrue(response.isStatus(NOT_FOUND_404));
         assertEquals(RestReceptionist.INVALID_CREDENTIALS,response.responseBody());
+    }
+    @Test
+    public void usersReturns200WithAllRegisteredUsers() {
+        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem());
+        receptionist.registerUser(juanPerezRegistrationBody());
+
+        ReceptionistResponse response = receptionist.users();
+
+        assertTrue(response.isStatus(OK_200));
+
+        JsonArray responseBody = response.responseBodyAsJsonArray();
+        assertEquals(1,responseBody.size());
+        JsonObject userJson = responseBody.values().get(0).asObject();
+        assertFalse(userJson.getString(RestReceptionist.ID_KEY,"").isBlank());
+        assertEquals(TestObjectsBucket.JUAN_PEREZ_NAME,userJson.getString(RestReceptionist.USERNAME_KEY,""));
+        assertEquals(TestObjectsBucket.JUAN_PEREZ_ABOUT,userJson.getString(RestReceptionist.ABOUT_KEY,""));
+        assertEquals(
+                TestObjectsBucket.JUAN_PEREZ_PASSWORD+"x",
+                userJson.getString(RestReceptionist.PASSWORD_KEY,TestObjectsBucket.JUAN_PEREZ_PASSWORD+"x"));
     }
 
     private JsonObject juanPerezLoginBodyAsJson() {

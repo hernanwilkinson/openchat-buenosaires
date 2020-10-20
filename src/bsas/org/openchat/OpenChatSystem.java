@@ -1,10 +1,7 @@
 package bsas.org.openchat;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -98,4 +95,7 @@ public class OpenChatSystem {
                 .orElseThrow(()->new RuntimeException(USER_NOT_REGISTERED));
     }
 
+    public List<User> users() {
+        return Collections.unmodifiableList(users);
+    }
 }

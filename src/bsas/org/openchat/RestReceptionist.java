@@ -1,11 +1,13 @@
 package bsas.org.openchat;
 
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.eclipse.jetty.http.HttpStatus.*;
 
@@ -72,5 +74,15 @@ public class RestReceptionist {
 
         JsonObject responseAsJson = userResponseAsJson(authenticatedUser, id);
         return new ReceptionistResponse(OK_200,responseAsJson.toString());
+    }
+
+    public ReceptionistResponse users() {
+        JsonArray usersAsJsonArray = new JsonArray();
+
+        system.users().stream()
+                .map(user->userResponseAsJson(user,idsByUser.get(user)))
+                .forEach(userAsJson->usersAsJsonArray.add(userAsJson));
+
+        return new ReceptionistResponse(OK_200,usersAsJsonArray.toString());
     }
 }

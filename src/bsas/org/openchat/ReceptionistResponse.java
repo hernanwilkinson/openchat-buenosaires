@@ -1,6 +1,7 @@
 package bsas.org.openchat;
 
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import spark.Response;
 
@@ -26,12 +27,17 @@ public class ReceptionistResponse {
     }
 
     JsonObject responseBodyAsJson() {
-        return Json.parse(responseBody()).asObject();
+        return Json.parse(responseBody).asObject();
     }
 
     public String toResponseInto(Response response) {
         response.status(status());
         response.type("application/json");
-        return responseBody();
+
+        return responseBody;
+    }
+
+    public JsonArray responseBodyAsJsonArray() {
+        return Json.parse(responseBody).asArray();
     }
 }
