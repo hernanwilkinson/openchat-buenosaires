@@ -71,17 +71,11 @@ public class OpenChatSystem {
     }
 
     private <T> T withPublisherForUserNamed(String userName, Function<Publisher, T> publisherClosure) {
-        AtomicReference<T> value = new AtomicReference<>();
-
-        users.stream().
+        return users.stream().
                 filter(user->user.isNamed(userName))
                 .findFirst()
-                .ifPresentOrElse(
-                        user-> value.set(publisherClosure.apply(publisherByUser.get(user))),
-                        ()->{throw new RuntimeException(USER_NOT_REGISTERED);}
-                );
-
-        return value.get();
+                .map(user-> publisherClosure.apply(publisherByUser.get(user)))
+                .orElseThrow(()->new RuntimeException(USER_NOT_REGISTERED));
     }
 
     public void followForUserNamed(String followerUserName, String followeeUserName) {
