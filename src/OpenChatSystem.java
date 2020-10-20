@@ -96,4 +96,9 @@ public class OpenChatSystem {
                         .collect(Collectors.toList()));
     }
 
+    public List<Publication> wallForUserNamed(String userName) {
+        return withPublisherForUserNamed(
+                userName,
+                publisher->publisher.wall());
+    }
 }

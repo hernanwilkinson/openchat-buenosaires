@@ -129,5 +129,19 @@ public class OpenChatSystemTest {
 
         assertEquals(Arrays.asList(followee),followees);
     }
+    @Test
+    public void canGetWallOfRegisteredUser() {
+        OpenChatSystem system = new OpenChatSystem();
+        system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
+        system.register(PublisherTest.JUAN_PEREZ_NAME,PublisherTest.JUAN_PEREZ_PASSWORD,"about");
+        system.followForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.JUAN_PEREZ_NAME);
+
+        Publication followerPublication = system.publishForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,"hello");
+        Publication followeePublication = system.publishForUserNamed(PublisherTest.JUAN_PEREZ_NAME,"bye");
+
+        List<Publication> wall = system.wallForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME);
+
+        assertEquals(Arrays.asList(followerPublication,followeePublication),wall);
+    }
 
 }
