@@ -8,15 +8,20 @@ import static org.junit.jupiter.api.Assertions.*;
 public class OpenChatSystemTest {
     @Test
     public void createSystemHasNoUsers() {
-        OpenChatSystem system = new OpenChatSystem();
+        OpenChatSystem system = createSystem();
 
         assertFalse(system.hasUsers());
         assertFalse(system.hasUserNamed(PublisherTest.PEPE_SANCHEZ_NAME));
         assertEquals(0,system.numberOfUsers());
     }
+
+    private OpenChatSystem createSystem() {
+        return new OpenChatSystem();
+    }
+
     @Test
     public void canRegisterUser() {
-        OpenChatSystem system = new OpenChatSystem();
+        OpenChatSystem system = createSystem();
 
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
 
@@ -26,7 +31,7 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canRegisterManyUsers() {
-        OpenChatSystem system = new OpenChatSystem();
+        OpenChatSystem system = createSystem();
 
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
         system.register(PublisherTest.JUAN_PEREZ_NAME,PublisherTest.JUAN_PEREZ_PASSWORD,"about");
@@ -38,7 +43,7 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canNotRegisterSameUserTwice() {
-        OpenChatSystem system = new OpenChatSystem();
+        OpenChatSystem system = createSystem();
 
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
 
@@ -53,10 +58,10 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canWorkWithAuthenticatedUser() {
-        OpenChatSystem system = new OpenChatSystem();
+        OpenChatSystem system = createSystem();
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
 
-        final Object token = new Object();
+        final Object token = createSystem();
         final Object authenticatedToken = system.withAuthenticatedUserDo(
                 PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,
                 user->token,
@@ -66,20 +71,19 @@ public class OpenChatSystemTest {
     }
     @Test
     public void notRegisteredUserIsNotAuthenticated() {
-        final OpenChatSystem system = new OpenChatSystem();
+        final OpenChatSystem system = createSystem();
         assertCanNotAuthenticateWith(system, PublisherTest.PEPE_SANCHEZ_PASSWORD);
     }
-
     @Test
     public void canNotAuthenticateWithInvalidPassword() {
-        OpenChatSystem system = new OpenChatSystem();
+        OpenChatSystem system = createSystem();
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
 
         assertCanNotAuthenticateWith(system, PublisherTest.PEPE_SANCHEZ_PASSWORD+"something");
     }
     @Test
     public void registeredUserCanPublish() {
-        OpenChatSystem system = new OpenChatSystem();
+        OpenChatSystem system = createSystem();
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
 
         Publication publication = system.publishForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,"hello");
@@ -90,7 +94,7 @@ public class OpenChatSystemTest {
     }
     @Test
     public void noRegisteredUserCanNotPublish() {
-        OpenChatSystem system = new OpenChatSystem();
+        OpenChatSystem system = createSystem();
 
         PublisherTest.assertThrowsWithErrorMessage(
                 RuntimeException.class,
@@ -100,7 +104,7 @@ public class OpenChatSystemTest {
     }
     @Test
     public void noRegisteredUserCanAskItsTimeline() {
-        OpenChatSystem system = new OpenChatSystem();
+        OpenChatSystem system = createSystem();
 
         PublisherTest.assertThrowsWithErrorMessage(
                 RuntimeException.class,
@@ -110,7 +114,7 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canFollowRegisteredUser() {
-        OpenChatSystem system = new OpenChatSystem();
+        OpenChatSystem system = createSystem();
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
         User followee = system.register(PublisherTest.JUAN_PEREZ_NAME,PublisherTest.JUAN_PEREZ_PASSWORD,"about");
 
@@ -122,7 +126,7 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canGetWallOfRegisteredUser() {
-        OpenChatSystem system = new OpenChatSystem();
+        OpenChatSystem system = createSystem();
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
         system.register(PublisherTest.JUAN_PEREZ_NAME,PublisherTest.JUAN_PEREZ_PASSWORD,"about");
         system.followForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.JUAN_PEREZ_NAME);
@@ -136,7 +140,7 @@ public class OpenChatSystemTest {
     }
 
     private void assertCanNotAuthenticateWith(OpenChatSystem system, String password) {
-        final Object token = new Object();
+        final Object token = createSystem();
         final Object notAuthenticatedToken = system.withAuthenticatedUserDo(
                 PublisherTest.PEPE_SANCHEZ_NAME, password,
                 user->fail(),
