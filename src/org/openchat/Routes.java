@@ -23,7 +23,7 @@ public class Routes {
         get("status", (req, res) -> "OpenChat: OK!");
         post("users", (req, res) -> registerUser(req,res));
         post("login", (req, res) -> login(req,res));
-        get("users", (req, res) -> "Implementar!");
+        get("users", (req, res) -> users(req,res));
         post("users/:userId/timeline", (req, res) -> "Implementar!");
         get("users/:userId/timeline", (req, res) -> "Implementar!");
         post("followings", (req, res) -> "Implementar!");
@@ -31,15 +31,19 @@ public class Routes {
         get("users/:userId/wall", (req, res) -> "Implementar!");
     }
 
+    private String users(Request request, Response response) {
+        return receptionistDo(()->receptionist.users(), response);
+    }
+
     private String login(Request request, Response response) {
-        return receptionistDo(response, () -> receptionist.login(request.body()));
+        return receptionistDo(() -> receptionist.login(request.body()), response);
     }
 
     private String registerUser(Request request, Response response) {
-        return receptionistDo(response,()-> receptionist.registerUser(request.body()));
+        return receptionistDo(()-> receptionist.registerUser(request.body()), response);
     }
 
-    private String receptionistDo(Response response, Supplier<ReceptionistResponse> action) {
+    private String receptionistDo(Supplier<ReceptionistResponse> action, Response response) {
         ReceptionistResponse receptionistResponse = action.get();
 
         return receptionistResponse.toResponseInto(response);
