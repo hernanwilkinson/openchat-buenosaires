@@ -35,7 +35,7 @@ public class PublisherTest {
     public void createdPublisherHasNoFollowees() {
         Publisher createdPublisher = createPepeSanchez();
 
-        assertTrue(createdPublisher.hasNoFollowees());
+        assertFalse(createdPublisher.hasFollowees());
     }
     @Test
     public void publisherCanFollowOtherPublisher() {
@@ -44,7 +44,7 @@ public class PublisherTest {
 
         follower.follow(followee);
 
-        assertFalse(follower.hasNoFollowees());
+        assertTrue(follower.hasFollowees());
         assertTrue(follower.doesFollow(followee));
         assertEquals(1,follower.numberOfFollowees());
     }
@@ -57,7 +57,7 @@ public class PublisherTest {
                 ()->follower.follow(follower));
 
         assertEquals(Publisher.CAN_NOT_FOLLOW_SELF,error.getMessage());
-        assertTrue(follower.hasNoFollowees());
+        assertFalse(follower.hasFollowees());
     }
     @Test
     public void publisherCanNotFollowSamePublisherTwice() {
@@ -70,7 +70,7 @@ public class PublisherTest {
                 ()->follower.follow(followee));
 
         assertEquals(Publisher.CAN_NOT_FOLLOW_TWICE,error.getMessage());
-        assertFalse(follower.hasNoFollowees());
+        assertTrue(follower.hasFollowees());
         assertTrue(follower.doesFollow(followee));
         assertEquals(1,follower.numberOfFollowees());
     }

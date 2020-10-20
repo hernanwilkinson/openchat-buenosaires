@@ -29,8 +29,8 @@ public class Publisher {
         return name.equals(potentialName);
     }
 
-    public boolean hasNoFollowees() {
-        return followees.isEmpty();
+    public boolean hasFollowees() {
+        return !followees.isEmpty();
     }
 
     public void follow(Publisher potentialFollowee) {
