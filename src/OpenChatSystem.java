@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class OpenChatSystem {
     public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Cannot register same user twice";
+    public static final String USER_NOT_REGISTERED = "User not registered";
     private final List<User> users = new ArrayList<>();
     private final Map<User,String> passwordsByUser = new HashMap<>();
     private final Map<User,Publisher> publisherByUser = new HashMap<>();
@@ -57,12 +57,16 @@ public class OpenChatSystem {
     }
 
     public Publication publishForUserNamed(String userName, String message) {
-        User foundUser = users.stream().
-                filter(user->user.isNamed(userName))
-                .findFirst()
-                .get();
+        AtomicReference<Publication> publication = new AtomicReference<>();
 
-        return publisherByUser.get(foundUser).publish(message,LocalDateTime.now());
+        users.stream().
+            filter(user->user.isNamed(userName))
+            .findFirst()
+            .ifPresentOrElse(
+                    user-> publication.set(publisherByUser.get(user).publish(message, LocalDateTime.now())),
+                    ()-> { throw new RuntimeException(USER_NOT_REGISTERED);});
+
+        return publication.get();
     }
 
     public List<Publication> timeLineForUserNamed(String userName) {

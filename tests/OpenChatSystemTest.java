@@ -97,5 +97,15 @@ public class OpenChatSystemTest {
 
         assertEquals(Arrays.asList(publication),timeLine);
     }
+    @Test
+    public void noRegisteredUserCanNotPublish() {
+        OpenChatSystem system = new OpenChatSystem();
+
+        PublisherTest.assertThrowsWithErrorMessage(
+                RuntimeException.class,
+                ()->system.publishForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,"hello"),
+                OpenChatSystem.USER_NOT_REGISTERED);
+
+    }
 
 }
