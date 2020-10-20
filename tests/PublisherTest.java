@@ -91,6 +91,8 @@ public class PublisherTest {
         assertTrue(createdPublisher.hasPublications());
         assertTrue(publication.hasMessage(message));
         assertTrue(publication.hasPublishAt(publicationTime));
+
+        assertFalse(publication.hasMessage(message + "something"));
     }
     @Test
     public void timelineHasPublisherPublicationsSortedByPublicationTime() {
