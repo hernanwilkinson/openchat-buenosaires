@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 
 public class OpenChatSystem {
     public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Cannot register same user twice";
-    private final List<Publisher> users = new ArrayList<>();
+    private final List<User> users = new ArrayList<>();
 
     public boolean hasUsers() {
         return !users.isEmpty();
@@ -13,7 +13,7 @@ public class OpenChatSystem {
     public void register(String userName, String password, String about) {
         assertIsNotDupilcated(userName);
 
-        users.add(Publisher.named(userName,password,about));
+        users.add(User.named(userName,password,about));
     }
 
     private void assertIsNotDupilcated(String userName) {
@@ -29,7 +29,7 @@ public class OpenChatSystem {
     }
 
     public void withAuthenticatedUserDo(String userName, String password,
-            Consumer<Publisher> authenticatedClosure, Runnable failedClosure) {
+            Consumer<User> authenticatedClosure, Runnable failedClosure) {
         authenticatedClosure.accept(users.get(0));
     }
 }

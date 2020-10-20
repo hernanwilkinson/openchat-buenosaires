@@ -4,29 +4,26 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Publisher {
-    public static final String NAME_CANNOT_BE_BLANK = "Name can not be blank";
     public static final String CAN_NOT_FOLLOW_SELF = "Can not follow self";
     public static final String CAN_NOT_FOLLOW_TWICE = "Can not follow publisher twice";
-    private final String name;
     private final List<Publisher> followees = new ArrayList<>();
     private final List<Publication> publications = new ArrayList<>();
+    private final User user;
 
-    public Publisher(String name) {
-        this.name = name;
+    private Publisher(User user) {
+        this.user = user;
     }
 
-    public static Publisher named(String name, String password, String about) {
-        assertNameIsNotBlank(name);
-
-        return new Publisher(name);
+    public static Publisher relatedTo(User user){
+        return new Publisher(user);
     }
 
     private static void assertNameIsNotBlank(String name) {
-        if(name.isBlank()) throw new RuntimeException(NAME_CANNOT_BE_BLANK);
+        if(name.isBlank()) throw new RuntimeException(User.NAME_CANNOT_BE_BLANK);
     }
 
     public boolean isNamed(String potentialName) {
-        return name.equals(potentialName);
+        return user.isNamed(potentialName);
     }
 
     public boolean hasFollowees() {

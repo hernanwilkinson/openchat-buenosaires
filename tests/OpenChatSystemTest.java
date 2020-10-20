@@ -55,7 +55,7 @@ public class OpenChatSystemTest {
 
         system.withAuthenticatedUserDo(
                 PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,
-                (Publisher user)->assertTrue(user.isNamed(PublisherTest.PEPE_SANCHEZ_NAME)),
+                user->assertTrue(user.isNamed(PublisherTest.PEPE_SANCHEZ_NAME)),
                 ()->fail());
     }
 

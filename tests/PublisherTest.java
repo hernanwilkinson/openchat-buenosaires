@@ -25,7 +25,7 @@ public class PublisherTest {
 
     @Test
     public void canNotCreatePublisherWithBlankName() {
-        assertThrowsWithErrorMessage(RuntimeException.class, () -> Publisher.named(" ", "password", "about"), Publisher.NAME_CANNOT_BE_BLANK);
+        assertThrowsWithErrorMessage(RuntimeException.class, () -> User.named(" ", "password", "about"), User.NAME_CANNOT_BE_BLANK);
     }
 
     @Test
@@ -197,14 +197,12 @@ public class PublisherTest {
                         Publication.INAPPROPRIATE_WORD));
     }
 
-
-
     private Publisher createJuanPerez() {
-        return Publisher.named(JUAN_PEREZ_NAME, JUAN_PEREZ_PASSWORD,"about");
+        return Publisher.relatedTo(User.named(JUAN_PEREZ_NAME, JUAN_PEREZ_PASSWORD,"about"));
     }
 
     private Publisher createPepeSanchez() {
-        return Publisher.named(PEPE_SANCHEZ_NAME, PEPE_SANCHEZ_PASSWORD,"about");
+        return Publisher.relatedTo(User.named(PEPE_SANCHEZ_NAME, PEPE_SANCHEZ_PASSWORD,"about"));
     }
 
 }
