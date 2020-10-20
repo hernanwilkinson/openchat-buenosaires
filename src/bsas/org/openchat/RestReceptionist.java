@@ -140,11 +140,7 @@ public class RestReceptionist {
             String publicationId = UUID.randomUUID().toString();
             idsByPublication.put(publication, publicationId);
 
-            JsonObject pubicationAsJson = new JsonObject()
-                    .add(POST_ID_KEY, publicationId)
-                    .add(USER_ID_KEY, userId)
-                    .add(TEXT_KEY, publication.message())
-                    .add(DATE_TIME_KEY, formatDateTime(publication.publicationTime()));
+            JsonObject pubicationAsJson = publicationAsJson(userId, publication, publicationId);
 
             return new ReceptionistResponse(CREATED_201, pubicationAsJson.toString());
         } catch (RuntimeException error){
@@ -152,7 +148,25 @@ public class RestReceptionist {
         }
     }
 
+    private JsonObject publicationAsJson(String userId, Publication publication, String publicationId) {
+        return new JsonObject()
+                .add(POST_ID_KEY, publicationId)
+                .add(USER_ID_KEY, userId)
+                .add(TEXT_KEY, publication.message())
+                .add(DATE_TIME_KEY, formatDateTime(publication.publicationTime()));
+    }
+
     private String formatDateTime(LocalDateTime dateTimeToFormat) {
         return DATE_TIME_FORMATTER.format(dateTimeToFormat);
+    }
+
+    public ReceptionistResponse timelineOf(String userId) {
+        List<Publication> timeLine = system.timeLineForUserNamed(userIdentifiedAs(userId).name());
+        JsonArray publicationsAsJsonObject = new JsonArray();
+        timeLine.stream()
+                .map(publication -> publicationAsJson(userId, publication, idsByPublication.get(publication)))
+                .forEach(userAsJson -> publicationsAsJsonObject.add(userAsJson));
+
+        return new ReceptionistResponse(OK_200, publicationsAsJsonObject.toString());
     }
 }

@@ -4,8 +4,6 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.junit.jupiter.api.Test;
 
-import java.time.format.DateTimeFormatter;
-
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.eclipse.jetty.http.HttpStatus.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -153,10 +151,8 @@ public class RestReceptionistTest {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
         ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBody());
 
-        final String publicationMessage = "Hello";
-        String messageBody = new JsonObject()
-                .add(RestReceptionist.TEXT_KEY, publicationMessage)
-                .toString();
+        final String publicationMessage = "hello";
+        String messageBody = messageBodyFor(publicationMessage);
         final String registeredUserId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
         ReceptionistResponse publicationInfo = receptionist.addPublication(
                 registeredUserId,
@@ -174,10 +170,7 @@ public class RestReceptionistTest {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
         ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBody());
 
-        final String publicationMessage = "elephant";
-        String messageBody = new JsonObject()
-                .add(RestReceptionist.TEXT_KEY, publicationMessage)
-                .toString();
+        String messageBody = messageBodyFor("elephant");
         final String registeredUserId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
         ReceptionistResponse publicationInfo = receptionist.addPublication(
                 registeredUserId,
@@ -187,6 +180,34 @@ public class RestReceptionistTest {
         assertEquals(Publication.INAPPROPRIATE_WORD,publicationInfo.responseBody());
     }
 
+    private String messageBodyFor(String message) {
+        final String publicationMessage = message;
+        String messageBody = new JsonObject()
+                .add(RestReceptionist.TEXT_KEY, publicationMessage)
+                .toString();
+        return messageBody;
+    }
+
+    @Test
+    public void timelineReturns200WithUserPublications() {
+        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
+        ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBody());
+
+        String messageBody = messageBodyFor("Hello");
+        final String followerId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
+        ReceptionistResponse publicationResponse = receptionist.addPublication(
+                followerId,
+                messageBody);
+
+        ReceptionistResponse timelineResponse = receptionist.timelineOf(followerId);
+        assertTrue(timelineResponse.isStatus(OK_200));
+        JsonArray timelineBody = timelineResponse.responseBodyAsJsonArray();
+        assertEquals(1,timelineBody.size());
+
+        JsonObject publicationAsJson = publicationResponse.responseBodyAsJson();
+        JsonObject timelinePublicationAsJson = timelineBody.get(0).asObject();
+        assertEquals(publicationAsJson,timelinePublicationAsJson);
+    }
     private String formattedNow() {
         return ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").format(testObjects.fixedNowClock().now());
     }
