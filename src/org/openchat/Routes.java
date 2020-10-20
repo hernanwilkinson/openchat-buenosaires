@@ -6,6 +6,8 @@ import bsas.org.openchat.RestReceptionist;
 import spark.Request;
 import spark.Response;
 
+import java.util.function.Supplier;
+
 import static spark.Spark.get;
 import static spark.Spark.post;
 
@@ -30,18 +32,17 @@ public class Routes {
     }
 
     private String login(Request request, Response response) {
-        ReceptionistResponse receptionistResponse = receptionist.login(request.body());
-
-        response.status(receptionistResponse.status());
-        response.type("application/json");
-        return receptionistResponse.responseBody();
+        return receptionistDo(response, () -> receptionist.login(request.body()));
     }
 
     private String registerUser(Request request, Response response) {
-        ReceptionistResponse receptionistResponse = receptionist.registerUser(request.body());
-
-        response.status(receptionistResponse.status());
-        response.type("application/json");
-        return receptionistResponse.responseBody();
+        return receptionistDo(response,()-> receptionist.registerUser(request.body()));
     }
+
+    private String receptionistDo(Response response, Supplier<ReceptionistResponse> action) {
+        ReceptionistResponse receptionistResponse = action.get();
+
+        return receptionistResponse.toResponseInto(response);
+    }
+
 }

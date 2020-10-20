@@ -2,6 +2,7 @@ package bsas.org.openchat;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import spark.Response;
 
 public class ReceptionistResponse {
     private final int status;
@@ -26,5 +27,11 @@ public class ReceptionistResponse {
 
     JsonObject responseBodyAsJson() {
         return Json.parse(responseBody()).asObject();
+    }
+
+    public String toResponseInto(Response response) {
+        response.status(status());
+        response.type("application/json");
+        return responseBody();
     }
 }
