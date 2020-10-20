@@ -56,35 +56,38 @@ public class OpenChatSystemTest {
         OpenChatSystem system = new OpenChatSystem();
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
 
-        system.withAuthenticatedUserDo(
+        final Object token = new Object();
+        final Object authenticatedToken = system.withAuthenticatedUserDo(
                 PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,
-                user->assertTrue(user.isNamed(PublisherTest.PEPE_SANCHEZ_NAME)),
+                user->token,
                 ()->fail());
+
+        assertEquals(token,authenticatedToken);
     }
     @Test
     public void notRegisteredUserIsNotAuthenticated() {
         OpenChatSystem system = new OpenChatSystem();
-        final boolean[] notAuthenticated = {false};
 
-        system.withAuthenticatedUserDo(
+        final Object token = new Object();
+        final Object notAuthenticatedToken = system.withAuthenticatedUserDo(
                 PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,
                 user->fail(),
-                ()-> notAuthenticated[0] = true);
+                ()-> token);
 
-        assertTrue(notAuthenticated[0]);
+        assertEquals(token,notAuthenticatedToken);
     }
     @Test
     public void canNotAuthenticateWithInvalidPassword() {
         OpenChatSystem system = new OpenChatSystem();
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
-        final boolean[] notAuthenticated = {false};
 
-        system.withAuthenticatedUserDo(
+        final Object token = new Object();
+        final Object notAuthenticatedToken = system.withAuthenticatedUserDo(
                 PublisherTest.PEPE_SANCHEZ_NAME,"",
                 user->fail(),
-                ()-> notAuthenticated[0] = true);
+                ()-> token);
 
-        assertTrue(notAuthenticated[0]);
+        assertEquals(token,notAuthenticatedToken);
     }
     @Test
     public void registeredUserCanPublish() {

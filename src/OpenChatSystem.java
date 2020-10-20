@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class OpenChatSystem {
@@ -42,22 +43,22 @@ public class OpenChatSystem {
         return users.size();
     }
 
-    public void withAuthenticatedUserDo(String userName, String password,
-            Consumer<User> authenticatedClosure, Runnable failedClosure) {
-        users.stream()
+    public <T> T withAuthenticatedUserDo(String userName, String password,
+            Function<User,T> authenticatedClosure, Supplier<T> failedClosure) {
+
+        return users.stream()
                 .filter(user->user.isNamed(userName))
                 .findFirst()
-                .ifPresentOrElse(
-                        user->ifValidPasswordDo(user, password, authenticatedClosure, failedClosure),
-                        failedClosure
-                );
+                .map(user->ifValidPasswordDo(user,password,authenticatedClosure,failedClosure))
+                .orElseGet(failedClosure);
     }
 
-    private void ifValidPasswordDo(User user, String password, Consumer<User> authenticatedClosure, Runnable failedClosure) {
+    private <T> T ifValidPasswordDo(User user, String password,
+           Function<User,T> authenticatedClosure, Supplier<T> failedClosure) {
         if(passwordsByUser.get(user).equals(password))
-            authenticatedClosure.accept(user);
+            return authenticatedClosure.apply(user);
         else
-            failedClosure.run();
+            return failedClosure.get();
     }
 
     public Publication publishForUserNamed(String userName, String message) {
