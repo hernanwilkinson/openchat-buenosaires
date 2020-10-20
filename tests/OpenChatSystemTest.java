@@ -66,28 +66,15 @@ public class OpenChatSystemTest {
     }
     @Test
     public void notRegisteredUserIsNotAuthenticated() {
-        OpenChatSystem system = new OpenChatSystem();
-
-        final Object token = new Object();
-        final Object notAuthenticatedToken = system.withAuthenticatedUserDo(
-                PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,
-                user->fail(),
-                ()-> token);
-
-        assertEquals(token,notAuthenticatedToken);
+        assertCanNotAuthenticateWith(PublisherTest.PEPE_SANCHEZ_PASSWORD);
     }
+
     @Test
     public void canNotAuthenticateWithInvalidPassword() {
         OpenChatSystem system = new OpenChatSystem();
         system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
 
-        final Object token = new Object();
-        final Object notAuthenticatedToken = system.withAuthenticatedUserDo(
-                PublisherTest.PEPE_SANCHEZ_NAME,"",
-                user->fail(),
-                ()-> token);
-
-        assertEquals(token,notAuthenticatedToken);
+        assertCanNotAuthenticateWith("");
     }
     @Test
     public void registeredUserCanPublish() {
@@ -147,4 +134,15 @@ public class OpenChatSystemTest {
         assertEquals(Arrays.asList(followerPublication,followeePublication),wall);
     }
 
+    private void assertCanNotAuthenticateWith(String password) {
+        OpenChatSystem system = new OpenChatSystem();
+
+        final Object token = new Object();
+        final Object notAuthenticatedToken = system.withAuthenticatedUserDo(
+                PublisherTest.PEPE_SANCHEZ_NAME, password,
+                user->fail(),
+                ()-> token);
+
+        assertEquals(token,notAuthenticatedToken);
+    }
 }
