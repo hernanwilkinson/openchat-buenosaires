@@ -10,10 +10,12 @@ public class Publication {
     public static final List<String> inappropriateWords =
             Collections.unmodifiableList(Arrays.asList("elephant","ice cream","orange"));
 
+    private final Publisher publisher;
     private final String message;
     private final LocalDateTime publicationTime;
 
     public Publication(Publisher publisher, String message, LocalDateTime publicationTime) {
+        this.publisher = publisher;
         this.message = message;
         this.publicationTime = publicationTime;
     }
@@ -54,5 +56,9 @@ public class Publication {
 
     public String message() {
         return message;
+    }
+
+    public User publisherRelatedUser(){
+        return publisher.relatedUser();
     }
 }

@@ -208,6 +208,43 @@ public class RestReceptionistTest {
         JsonObject timelinePublicationAsJson = timelineBody.get(0).asObject();
         assertEquals(publicationAsJson,timelinePublicationAsJson);
     }
+    @Test
+    public void wallReturns200WithFollwerAndFolloweePublications() {
+        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
+        ReceptionistResponse followerResponse = receptionist.registerUser(pepeSanchezRegistrationBody());
+        ReceptionistResponse followeeResponse = receptionist.registerUser(juanPerezRegistrationBody());
+        String followinsBody = new JsonObject()
+                .add(RestReceptionist.FOLLOWER_ID, followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
+                .add(RestReceptionist.FOLLOWEE_ID, followeeResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
+                .toString();
+
+        receptionist.followings(followinsBody);
+
+        String followerMessageBody = messageBodyFor("Hello");
+        final String followerId = followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
+        ReceptionistResponse followerPublicationResponse = receptionist.addPublication(
+                followerId,
+                followerMessageBody);
+        String followeeMessageBody = messageBodyFor("Bye");
+        final String followeeId = followeeResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
+        ReceptionistResponse followeePublicationResponse = receptionist.addPublication(
+                followeeId,
+                followeeMessageBody);
+
+        ReceptionistResponse wallInfo = receptionist.wallOf(followerId);
+        assertTrue(wallInfo.isStatus(OK_200));
+        JsonArray timelineBody = wallInfo.responseBodyAsJsonArray();
+        assertEquals(2,timelineBody.size());
+
+        JsonObject followerPublicationAsJson = followerPublicationResponse.responseBodyAsJson();
+        JsonObject wallFirstPublicationAsJson = timelineBody.get(0).asObject();
+        assertEquals(followerPublicationAsJson,wallFirstPublicationAsJson);
+
+        JsonObject followeePublicationAsJson = followeePublicationResponse.responseBodyAsJson();
+        JsonObject wallSecondPublicationAsJson = timelineBody.get(1).asObject();
+        assertEquals(followeePublicationAsJson,wallSecondPublicationAsJson);
+    }
+
     private String formattedNow() {
         return ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").format(testObjects.fixedNowClock().now());
     }

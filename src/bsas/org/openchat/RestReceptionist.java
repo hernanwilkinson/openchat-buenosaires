@@ -169,4 +169,16 @@ public class RestReceptionist {
 
         return new ReceptionistResponse(OK_200, publicationsAsJsonObject.toString());
     }
+
+    public ReceptionistResponse wallOf(String userId) {
+        List<Publication> wall = system.wallForUserNamed(userIdentifiedAs(userId).name());
+        JsonArray publicationsAsJsonObject = new JsonArray();
+        wall.stream()
+                .map(publication -> publicationAsJson(
+                        idsByUser.get(publication.publisherRelatedUser()),
+                        publication, idsByPublication.get(publication)))
+                .forEach(userAsJson -> publicationsAsJsonObject.add(userAsJson));
+
+        return new ReceptionistResponse(OK_200, publicationsAsJsonObject.toString());
+    }
 }
