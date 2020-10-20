@@ -1,9 +1,17 @@
+package org.openchat.test;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openchat.model.OpenChatSystem;
+import org.openchat.model.Publication;
+import org.openchat.model.User;
+import org.openchat.test.TestObjectsBucket;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.openchat.test.TestObjectsBucket.assertThrowsWithErrorMessage;
 
 public class OpenChatSystemTest {
 
@@ -13,18 +21,18 @@ public class OpenChatSystemTest {
     public void createSystemHasNoUsers() {
         system = createSystem();
 
-        assertFalse(system.hasUsers());
-        assertFalse(system.hasUserNamed(PublisherTest.PEPE_SANCHEZ_NAME));
-        assertEquals(0, system.numberOfUsers());
+        Assertions.assertFalse(system.hasUsers());
+        Assertions.assertFalse(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
+        Assertions.assertEquals(0, system.numberOfUsers());
     }
     @Test
     public void canRegisterUser() {
         system = createSystem();
         registerPepeSanchez();
 
-        assertTrue(system.hasUsers());
-        assertTrue(system.hasUserNamed(PublisherTest.PEPE_SANCHEZ_NAME));
-        assertEquals(1,system.numberOfUsers());
+        Assertions.assertTrue(system.hasUsers());
+        Assertions.assertTrue(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
+        Assertions.assertEquals(1,system.numberOfUsers());
     }
     @Test
     public void canRegisterManyUsers() {
@@ -32,24 +40,24 @@ public class OpenChatSystemTest {
         registerPepeSanchez();
         registerJuanPerez();
 
-        assertTrue(system.hasUsers());
-        assertTrue(system.hasUserNamed(PublisherTest.PEPE_SANCHEZ_NAME));
-        assertTrue(system.hasUserNamed(PublisherTest.JUAN_PEREZ_NAME));
-        assertEquals(2,system.numberOfUsers());
+        Assertions.assertTrue(system.hasUsers());
+        Assertions.assertTrue(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
+        Assertions.assertTrue(system.hasUserNamed(TestObjectsBucket.JUAN_PEREZ_NAME));
+        Assertions.assertEquals(2,system.numberOfUsers());
     }
     @Test
     public void canNotRegisterSameUserTwice() {
         system = createSystem();
         registerPepeSanchez();
 
-        PublisherTest.assertThrowsWithErrorMessage(
+        assertThrowsWithErrorMessage(
                 RuntimeException.class,
-                ()->system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about"),
+                ()->registerPepeSanchez(),
                 OpenChatSystem.CANNOT_REGISTER_SAME_USER_TWICE);
 
-        assertTrue(system.hasUsers());
-        assertTrue(system.hasUserNamed(PublisherTest.PEPE_SANCHEZ_NAME));
-        assertEquals(1,system.numberOfUsers());
+        Assertions.assertTrue(system.hasUsers());
+        Assertions.assertTrue(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
+        Assertions.assertEquals(1,system.numberOfUsers());
     }
     @Test
     public void canWorkWithAuthenticatedUser() {
@@ -58,7 +66,7 @@ public class OpenChatSystemTest {
 
         final Object token = createSystem();
         final Object authenticatedToken = system.withAuthenticatedUserDo(
-                PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,
+                TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.PEPE_SANCHEZ_PASSWORD,
                 user->token,
                 ()->fail());
 
@@ -67,41 +75,41 @@ public class OpenChatSystemTest {
     @Test
     public void notRegisteredUserIsNotAuthenticated() {
         system = createSystem();
-        assertCanNotAuthenticateWith(system, PublisherTest.PEPE_SANCHEZ_PASSWORD);
+        assertCanNotAuthenticateWith(system, TestObjectsBucket.PEPE_SANCHEZ_PASSWORD);
     }
     @Test
     public void canNotAuthenticateWithInvalidPassword() {
         system = createSystem();
         registerPepeSanchez();
 
-        assertCanNotAuthenticateWith(system, PublisherTest.PEPE_SANCHEZ_PASSWORD+"something");
+        assertCanNotAuthenticateWith(system, TestObjectsBucket.PEPE_SANCHEZ_PASSWORD+"something");
     }
     @Test
     public void registeredUserCanPublish() {
         system = createSystem();
         registerPepeSanchez();
 
-        Publication publication = system.publishForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,"hello");
+        Publication publication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
 
-        List<Publication> timeLine = system.timeLineForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME);
+        List<Publication> timeLine = system.timeLineForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME);
         assertEquals(Arrays.asList(publication),timeLine);
     }
     @Test
     public void noRegisteredUserCanNotPublish() {
         system = createSystem();
 
-        PublisherTest.assertThrowsWithErrorMessage(
+        assertThrowsWithErrorMessage(
                 RuntimeException.class,
-                ()->system.publishForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,"hello"),
+                ()->system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello"),
                 OpenChatSystem.USER_NOT_REGISTERED);
     }
     @Test
     public void noRegisteredUserCanAskItsTimeline() {
         system = createSystem();
 
-        PublisherTest.assertThrowsWithErrorMessage(
+        assertThrowsWithErrorMessage(
                 RuntimeException.class,
-                ()->system.timeLineForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME),
+                ()->system.timeLineForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME),
                 OpenChatSystem.USER_NOT_REGISTERED);
     }
     @Test
@@ -110,9 +118,9 @@ public class OpenChatSystemTest {
         registerPepeSanchez();
         User followee = registerJuanPerez();
 
-        system.followForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.JUAN_PEREZ_NAME);
+        system.followForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.JUAN_PEREZ_NAME);
 
-        List<User> followees = system.followeesOfUserNamed(PublisherTest.PEPE_SANCHEZ_NAME);
+        List<User> followees = system.followeesOfUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME);
         assertEquals(Arrays.asList(followee),followees);
     }
     @Test
@@ -120,19 +128,19 @@ public class OpenChatSystemTest {
         system = createSystem();
         registerPepeSanchez();
         registerJuanPerez();
-        system.followForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.JUAN_PEREZ_NAME);
+        system.followForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.JUAN_PEREZ_NAME);
 
-        Publication followerPublication = system.publishForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME,"hello");
-        Publication followeePublication = system.publishForUserNamed(PublisherTest.JUAN_PEREZ_NAME,"bye");
+        Publication followerPublication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
+        Publication followeePublication = system.publishForUserNamed(TestObjectsBucket.JUAN_PEREZ_NAME,"bye");
 
-        List<Publication> wall = system.wallForUserNamed(PublisherTest.PEPE_SANCHEZ_NAME);
+        List<Publication> wall = system.wallForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME);
         assertEquals(Arrays.asList(followerPublication,followeePublication),wall);
     }
 
     private void assertCanNotAuthenticateWith(OpenChatSystem system, String password) {
         final Object token = createSystem();
         final Object notAuthenticatedToken = system.withAuthenticatedUserDo(
-                PublisherTest.PEPE_SANCHEZ_NAME, password,
+                TestObjectsBucket.PEPE_SANCHEZ_NAME, password,
                 user->fail(),
                 ()-> token);
 
@@ -144,12 +152,10 @@ public class OpenChatSystemTest {
     }
 
     private User registerPepeSanchez() {
-        return system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
+        return system.register(TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.PEPE_SANCHEZ_PASSWORD,"about");
     }
 
     private User registerJuanPerez() {
-        return system.register(PublisherTest.JUAN_PEREZ_NAME,PublisherTest.JUAN_PEREZ_PASSWORD,"about");
+        return system.register(TestObjectsBucket.JUAN_PEREZ_NAME, TestObjectsBucket.JUAN_PEREZ_PASSWORD,"about");
     }
-
-
 }

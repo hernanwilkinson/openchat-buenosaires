@@ -1,27 +1,21 @@
+package org.openchat.test;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
+import org.openchat.model.Publication;
+import org.openchat.model.Publisher;
+import org.openchat.model.User;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.openchat.test.TestObjectsBucket.assertThrowsWithErrorMessage;
 
 public class PublisherTest {
 
-    public static final String PEPE_SANCHEZ_NAME = "Pepe Sanchez";
-    public static final String PEPE_SANCHEZ_PASSWORD = "password";
-    public static final String JUAN_PEREZ_NAME = "Juan Perez";
-    public static final String JUAN_PEREZ_PASSWORD = "";
-
-    public static <T extends Throwable> void assertThrowsWithErrorMessage(
-            Class<T> expectedType, Executable closureToFail, String errorMessage) {
-        T error = assertThrows(
-                expectedType,
-                closureToFail);
-
-        assertEquals(errorMessage,error.getMessage());
-    }
+    private final TestObjectsBucket testObjects = new TestObjectsBucket();
 
     @Test
     public void canNotCreatePublisherWithBlankName() {
@@ -32,19 +26,19 @@ public class PublisherTest {
     public void canCreatePublisherWithNoBlankName() {
         Publisher createdPublisher = createPepeSanchez();
 
-        assertTrue(createdPublisher.isNamed(PEPE_SANCHEZ_NAME));
+        Assertions.assertTrue(createdPublisher.isNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
     }
     @Test
     public void isNamedReturnsFalseWhenAskedWithOtherName() {
         Publisher createdPublisher = createPepeSanchez();
 
-        assertFalse(createdPublisher.isNamed("Juan"));
+        Assertions.assertFalse(createdPublisher.isNamed("Juan"));
     }
     @Test
     public void createdPublisherHasNoFollowees() {
         Publisher createdPublisher = createPepeSanchez();
 
-        assertFalse(createdPublisher.hasFollowees());
+        Assertions.assertFalse(createdPublisher.hasFollowees());
     }
     @Test
     public void publisherCanFollowOtherPublisher() {
@@ -53,16 +47,16 @@ public class PublisherTest {
 
         follower.follow(followee);
 
-        assertTrue(follower.hasFollowees());
-        assertTrue(follower.doesFollow(followee));
-        assertEquals(1,follower.numberOfFollowees());
+        Assertions.assertTrue(follower.hasFollowees());
+        Assertions.assertTrue(follower.doesFollow(followee));
+        Assertions.assertEquals(1,follower.numberOfFollowees());
     }
     @Test
     public void publisherCanNotFollowSelf() {
         Publisher follower = createPepeSanchez();
 
         assertThrowsWithErrorMessage(RuntimeException.class, ()->follower.follow(follower), Publisher.CANNOT_FOLLOW_SELF);
-        assertFalse(follower.hasFollowees());
+        Assertions.assertFalse(follower.hasFollowees());
     }
     @Test
     public void publisherCanNotFollowSamePublisherTwice() {
@@ -71,15 +65,15 @@ public class PublisherTest {
         follower.follow(followee);
 
         assertThrowsWithErrorMessage(RuntimeException.class, ()->follower.follow(followee), Publisher.CANNOT_FOLLOW_TWICE);
-        assertTrue(follower.hasFollowees());
-        assertTrue(follower.doesFollow(followee));
-        assertEquals(1,follower.numberOfFollowees());
+        Assertions.assertTrue(follower.hasFollowees());
+        Assertions.assertTrue(follower.doesFollow(followee));
+        Assertions.assertEquals(1,follower.numberOfFollowees());
     }
     @Test
     public void createdPusblisherHasNoPublications() {
         Publisher createdPublisher = createPepeSanchez();
 
-        assertFalse(createdPublisher.hasPublications());
+        Assertions.assertFalse(createdPublisher.hasPublications());
     }
     @Test
     public void publisherCanPublishMessages() {
@@ -89,12 +83,12 @@ public class PublisherTest {
         final String message = "a message";
         Publication publication = createdPublisher.publish(message, publicationTime);
 
-        assertTrue(createdPublisher.hasPublications());
-        assertTrue(publication.hasMessage(message));
-        assertTrue(publication.hasPublishAt(publicationTime));
+        Assertions.assertTrue(createdPublisher.hasPublications());
+        Assertions.assertTrue(publication.hasMessage(message));
+        Assertions.assertTrue(publication.hasPublishAt(publicationTime));
 
-        assertFalse(publication.hasMessage(message + "something"));
-        assertFalse(publication.hasPublishAt(publicationTime.plusSeconds(1)));
+        Assertions.assertFalse(publication.hasMessage(message + "something"));
+        Assertions.assertFalse(publication.hasPublishAt(publicationTime.plusSeconds(1)));
     }
     @Test
     public void timelineHasPublisherPublicationsSortedByPublicationTime() {
@@ -198,11 +192,11 @@ public class PublisherTest {
     }
 
     private Publisher createJuanPerez() {
-        return Publisher.relatedTo(User.named(JUAN_PEREZ_NAME, JUAN_PEREZ_PASSWORD,"about"));
+        return Publisher.relatedTo(testObjects.createUserJuanPerez());
     }
 
     private Publisher createPepeSanchez() {
-        return Publisher.relatedTo(User.named(PEPE_SANCHEZ_NAME, PEPE_SANCHEZ_PASSWORD,"about"));
+        return Publisher.relatedTo(testObjects.createUserPepeSanchez());
     }
 
 }
