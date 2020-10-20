@@ -30,7 +30,17 @@ public class Routes {
         get("users/:userId/timeline", (req, res) -> timeLine(req,res));
         post("followings", (req, res) -> followings(req,res));
         get("followings/:followerId/followees", (req, res) -> followees(req,res));
-        get("users/:userId/wall", (req, res) -> "Implementar!");
+        get("users/:userId/wall", (req, res) -> wall(req,res));
+    }
+
+    private String wall(Request request, Response response) {
+        return receptionistDo(
+                ()->receptionist.wallOf(userIdFrom(request)),
+                response);
+    }
+
+    private String userIdFrom(Request request) {
+        return request.params("userId");
     }
 
     private String followees(Request request, Response response) {
@@ -47,13 +57,13 @@ public class Routes {
 
     private String timeLine(Request request, Response response) {
         return receptionistDo(
-                ()->receptionist.timelineOf(request.params("userid")),
+                ()->receptionist.timelineOf(userIdFrom(request)),
                 response);
     }
 
     private String publish(Request request, Response response) {
         return receptionistDo(
-                ()->receptionist.addPublication(request.params("userid"),request.body()),
+                ()->receptionist.addPublication(userIdFrom(request),request.body()),
                 response);
     }
 
