@@ -10,6 +10,7 @@ public class TestObjectsBucket {
     public static final String PEPE_SANCHEZ_PASSWORD = "password";
     public static final String JUAN_PEREZ_NAME = "Juan Perez";
     public static final String JUAN_PEREZ_PASSWORD = "otherPassword";
+    public static final String JUAN_PEREZ_ABOUT = "about";
 
     public static <T extends Throwable> void assertThrowsWithErrorMessage(
             Class<T> expectedType, Executable closureToFail, String errorMessage) {
