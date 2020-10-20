@@ -26,11 +26,17 @@ public class Routes {
         post("users", (req, res) -> registerUser(req,res));
         post("login", (req, res) -> login(req,res));
         get("users", (req, res) -> users(req,res));
-        post("users/:userId/timeline", (req, res) -> "Implementar!");
+        post("users/:userId/timeline", (req, res) -> publish(req,res));
         get("users/:userId/timeline", (req, res) -> "Implementar!");
         post("followings", (req, res) -> "Implementar!");
         get("followings/:followerId/followees", (req, res) -> "Implementar!");
         get("users/:userId/wall", (req, res) -> "Implementar!");
+    }
+
+    private String publish(Request request, Response response) {
+        return receptionistDo(
+                ()->receptionist.addPublication(request.params("userid"),request.body()),
+                response);
     }
 
     private String users(Request request, Response response) {
