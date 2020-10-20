@@ -14,6 +14,7 @@ public class RestReceptionist {
     public static final String PASSWORD_KEY = "password";
     public static final String ABOUT_KEY = "about";
     public static final String ID_KEY = "id";
+    public static final String INVALID_CREDENTIALS = "Invalid credentials.";
     private final OpenChatSystem system;
     private final Map<User,String> idsByUser = new HashMap<>();
 
@@ -48,7 +49,7 @@ public class RestReceptionist {
                 userNameFrom(loginBodyAsJson),
                 passwordFrom(loginBodyAsJson),
             authenticatedUser->authenticatedUserResponse(authenticatedUser),
-            ()-> {return null;});
+            ()-> {return new ReceptionistResponse(NOT_FOUND_404,INVALID_CREDENTIALS);});
     }
 
     private String passwordFrom(JsonObject registrationAsJson) {

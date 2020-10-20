@@ -52,6 +52,19 @@ public class RestReceptionistTest {
 
         assertJuanPerezOk(response);
     }
+    @Test
+    public void loginOfRegisteredUserReturns400WithInvalidCredentials() {
+        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem());
+        receptionist.registerUser(juanPerezRegistrationBody());
+
+        final JsonObject juanPerezLoginBodyAsJson = juanPerezLoginBodyAsJson();
+        juanPerezLoginBodyAsJson.add(RestReceptionist.PASSWORD_KEY,TestObjectsBucket.JUAN_PEREZ_PASSWORD+"x");
+
+        ReceptionistResponse response = receptionist.login(juanPerezLoginBodyAsJson.toString());
+
+        assertTrue(response.isStatus(NOT_FOUND_404));
+        assertEquals(RestReceptionist.INVALID_CREDENTIALS,response.responseBody());
+    }
 
     private JsonObject juanPerezLoginBodyAsJson() {
         return new JsonObject()
