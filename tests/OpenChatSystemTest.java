@@ -33,5 +33,20 @@ public class OpenChatSystemTest {
         assertTrue(system.hasUserNamed(PublisherTest.JUAN_PEREZ_NAME));
         assertEquals(2,system.numberOfUsers());
     }
+    @Test
+    public void canNotRegisterSameUserTwice() {
+        OpenChatSystem system = new OpenChatSystem();
+
+        system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about");
+
+        PublisherTest.assertThrowsWithErrorMessage(
+                RuntimeException.class,
+                ()->system.register(PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,"about"),
+                OpenChatSystem.CANNOT_REGISTER_SAME_USER_TWICE);
+
+        assertTrue(system.hasUsers());
+        assertTrue(system.hasUserNamed(PublisherTest.PEPE_SANCHEZ_NAME));
+        assertEquals(1,system.numberOfUsers());
+    }
 
 }

@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OpenChatSystem {
+    public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Cannot register same user twice";
     private final List<Publisher> users = new ArrayList<>();
 
     public boolean hasUsers() {
@@ -9,7 +10,13 @@ public class OpenChatSystem {
     }
 
     public void register(String userName, String password, String about) {
+        assertIsNotDupilcated(userName);
+
         users.add(Publisher.named(userName,password,about));
+    }
+
+    private void assertIsNotDupilcated(String userName) {
+        if(hasUserNamed(userName)) throw new RuntimeException(CANNOT_REGISTER_SAME_USER_TWICE);
     }
 
     public boolean hasUserNamed(String potentialUserName) {
