@@ -58,5 +58,17 @@ public class OpenChatSystemTest {
                 user->assertTrue(user.isNamed(PublisherTest.PEPE_SANCHEZ_NAME)),
                 ()->fail());
     }
+    @Test
+    public void notRegisteredUserIsNotAuthenticated() {
+        OpenChatSystem system = new OpenChatSystem();
+        final boolean[] notAuthenticated = {false};
+
+        system.withAuthenticatedUserDo(
+                PublisherTest.PEPE_SANCHEZ_NAME,PublisherTest.PEPE_SANCHEZ_PASSWORD,
+                user->fail(),
+                ()-> notAuthenticated[0] = true);
+
+        assertTrue(notAuthenticated[0]);
+    }
 
 }

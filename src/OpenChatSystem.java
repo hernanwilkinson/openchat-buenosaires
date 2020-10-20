@@ -30,6 +30,12 @@ public class OpenChatSystem {
 
     public void withAuthenticatedUserDo(String userName, String password,
             Consumer<User> authenticatedClosure, Runnable failedClosure) {
-        authenticatedClosure.accept(users.get(0));
+        users.stream()
+                .filter(user->user.isNamed(userName))
+                .findFirst()
+                .ifPresentOrElse(
+                        authenticatedClosure,
+                        failedClosure
+                );
     }
 }
