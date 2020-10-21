@@ -71,7 +71,7 @@ public class PublisherTest {
         Assertions.assertFalse(publication.hasPublishAt(publicationTime.plusSeconds(1)));
     }
     @Test
-    public void timelineHasPublisherPublicationsSortedByPublicationTime() {
+    public void timelineHasPublisherPublicationsSortedWithLatestPublicationsFirst() {
         Publisher createdPublisher = createPepeSanchez();
 
         final LocalDateTime publicationTime = LocalDateTime.now();
@@ -81,7 +81,7 @@ public class PublisherTest {
 
         List<Publication> timeLine = createdPublisher.timeLine();
 
-        assertEquals(Arrays.asList(firstPublication,secondPublication),timeLine);
+        assertEquals(Arrays.asList(secondPublication,firstPublication),timeLine);
     }
     @Test
     public void wallContainsPublisherPublications() {
@@ -111,7 +111,7 @@ public class PublisherTest {
     }
 
     @Test
-    public void wallContainsFolloweesPublicationsInOrder() {
+    public void wallContainsFolloweesPublicationsWithLatestPublicationsFirst() {
         Publisher follower = createPepeSanchez();
         Publisher followee = createJuanPerez();
 
@@ -124,7 +124,7 @@ public class PublisherTest {
 
         List<Publication> wall = follower.wall();
 
-        assertEquals(Arrays.asList(firstPublication,secondPublication,thirdPublication),wall);
+        assertEquals(Arrays.asList(thirdPublication, secondPublication, firstPublication),wall);
     }
     @Test
     public void canNotPublishWithInappropriateWord() {
