@@ -103,34 +103,16 @@ public class RestReceptionist {
         }
     }
 
-    private JsonObject publicationAsJson(String userId, Publication publication, String publicationId) {
-        return new JsonObject()
-                .add(POST_ID_KEY, publicationId)
-                .add(USER_ID_KEY, userId)
-                .add(TEXT_KEY, publication.message())
-                .add(DATE_TIME_KEY, formatDateTime(publication.publicationTime()));
-    }
-
-    private String formatDateTime(LocalDateTime dateTimeToFormat) {
-        return DATE_TIME_FORMATTER.format(dateTimeToFormat);
-    }
-
     public ReceptionistResponse timelineOf(String userId) {
-        List<Publication> timeLine = system.timeLineForUserNamed(userNameIdentifiedAs(userId));
+        List<Publication> timeLine =
+                system.timeLineForUserNamed(userNameIdentifiedAs(userId));
+
         return publicationsAsJson(timeLine);
-    }
-
-    private ReceptionistResponse publicationsAsJson(List<Publication> timeLine) {
-        JsonArray publicationsAsJsonObject = new JsonArray();
-        timeLine.stream()
-                .map(publication -> publicationAsJson(idsByUser.get(publication.publisherRelatedUser()), publication, idsByPublication.get(publication)))
-                .forEach(userAsJson -> publicationsAsJsonObject.add(userAsJson));
-
-        return new ReceptionistResponse(OK_200, publicationsAsJsonObject.toString());
     }
 
     public ReceptionistResponse wallOf(String userId) {
         List<Publication> wall = system.wallForUserNamed(userNameIdentifiedAs(userId));
+
         return publicationsAsJson(wall);
     }
 
@@ -154,9 +136,10 @@ public class RestReceptionist {
     }
 
     private ReceptionistResponse authenticatedUserResponse(User authenticatedUser) {
-        String id = idsByUser.get(authenticatedUser);
+        JsonObject responseAsJson = userResponseAsJson(
+                authenticatedUser,
+                userIdFor(authenticatedUser));
 
-        JsonObject responseAsJson = userResponseAsJson(authenticatedUser, id);
         return new ReceptionistResponse(OK_200,responseAsJson.toString());
     }
 
@@ -169,8 +152,9 @@ public class RestReceptionist {
 
     private ReceptionistResponse okResponseWithUserArrayFrom(List<User> users) {
         JsonArray usersAsJsonArray = new JsonArray();
+
         users.stream()
-                .map(user -> userResponseAsJson(user, idsByUser.get(user)))
+                .map(user -> userResponseAsJson(user, userIdFor(user)))
                 .forEach(userAsJson -> usersAsJsonArray.add(userAsJson));
 
         return new ReceptionistResponse(OK_200, usersAsJsonArray.toString());
@@ -179,4 +163,38 @@ public class RestReceptionist {
     private String userNameIdentifiedAs(String userId) {
         return userIdentifiedAs(userId).name();
     }
+
+    private JsonObject publicationAsJson(String userId, Publication publication, String publicationId) {
+        return new JsonObject()
+                .add(POST_ID_KEY, publicationId)
+                .add(USER_ID_KEY, userId)
+                .add(TEXT_KEY, publication.message())
+                .add(DATE_TIME_KEY, formatDateTime(publication.publicationTime()));
+    }
+
+    private String formatDateTime(LocalDateTime dateTimeToFormat) {
+        return DATE_TIME_FORMATTER.format(dateTimeToFormat);
+    }
+
+    private ReceptionistResponse publicationsAsJson(List<Publication> timeLine) {
+        JsonArray publicationsAsJsonObject = new JsonArray();
+
+        timeLine.stream()
+                .map(publication -> publicationAsJson(
+                        userIdFor(publication.publisherRelatedUser()),
+                        publication,
+                        publicationIdFor(publication)))
+                .forEach(userAsJson -> publicationsAsJsonObject.add(userAsJson));
+
+        return new ReceptionistResponse(OK_200, publicationsAsJsonObject.toString());
+    }
+
+    private String publicationIdFor(Publication publication) {
+        return idsByPublication.get(publication);
+    }
+
+    private String userIdFor(User user) {
+        return idsByUser.get(user);
+    }
+
 }
