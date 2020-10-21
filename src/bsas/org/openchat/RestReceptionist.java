@@ -38,12 +38,11 @@ public class RestReceptionist {
     }
 
     public ReceptionistResponse registerUser(JsonObject registrationAsJson) {
-
         try {
             User registeredUser = system.register(
                     userNameFrom(registrationAsJson),
                     passwordFrom(registrationAsJson),
-                    registrationAsJson.getString(ABOUT_KEY, ""));
+                    aboutFrom(registrationAsJson));
 
             final String registeredUserId = UUID.randomUUID().toString();
             idsByUser.put(registeredUser,registeredUserId);
@@ -56,36 +55,12 @@ public class RestReceptionist {
         }
     }
 
-    public ReceptionistResponse login(String loginBody) {
-        JsonObject loginBodyAsJson = Json.parse(loginBody).asObject();
-
+    public ReceptionistResponse login(JsonObject loginBodyAsJson) {
         return system.withAuthenticatedUserDo(
                 userNameFrom(loginBodyAsJson),
                 passwordFrom(loginBodyAsJson),
             authenticatedUser->authenticatedUserResponse(authenticatedUser),
-            ()-> {return new ReceptionistResponse(NOT_FOUND_404,INVALID_CREDENTIALS);});
-    }
-
-    private String passwordFrom(JsonObject registrationAsJson) {
-        return registrationAsJson.getString(PASSWORD_KEY, "");
-    }
-
-    private String userNameFrom(JsonObject registrationAsJson) {
-        return registrationAsJson.getString(USERNAME_KEY, "");
-    }
-
-    private JsonObject userResponseAsJson(User registeredUser, String registeredUserId) {
-        return new JsonObject()
-                .add(ID_KEY, registeredUserId)
-                .add(USERNAME_KEY, registeredUser.name())
-                .add(ABOUT_KEY, registeredUser.about());
-    }
-
-    private ReceptionistResponse authenticatedUserResponse(User authenticatedUser) {
-        String id = idsByUser.get(authenticatedUser);
-
-        JsonObject responseAsJson = userResponseAsJson(authenticatedUser, id);
-        return new ReceptionistResponse(OK_200,responseAsJson.toString());
+            ()-> new ReceptionistResponse(NOT_FOUND_404,INVALID_CREDENTIALS));
     }
 
     public ReceptionistResponse users() {
@@ -176,4 +151,31 @@ public class RestReceptionist {
         List<Publication> wall = system.wallForUserNamed(userIdentifiedAs(userId).name());
         return publicationsAsJson(wall);
     }
+
+    private String passwordFrom(JsonObject registrationAsJson) {
+        return registrationAsJson.getString(PASSWORD_KEY, "");
+    }
+
+    private String userNameFrom(JsonObject registrationAsJson) {
+        return registrationAsJson.getString(USERNAME_KEY, "");
+    }
+
+    private String aboutFrom(JsonObject registrationAsJson) {
+        return registrationAsJson.getString(ABOUT_KEY, "");
+    }
+
+    private JsonObject userResponseAsJson(User registeredUser, String registeredUserId) {
+        return new JsonObject()
+                .add(ID_KEY, registeredUserId)
+                .add(USERNAME_KEY, registeredUser.name())
+                .add(ABOUT_KEY, registeredUser.about());
+    }
+
+    private ReceptionistResponse authenticatedUserResponse(User authenticatedUser) {
+        String id = idsByUser.get(authenticatedUser);
+
+        JsonObject responseAsJson = userResponseAsJson(authenticatedUser, id);
+        return new ReceptionistResponse(OK_200,responseAsJson.toString());
+    }
+
 }

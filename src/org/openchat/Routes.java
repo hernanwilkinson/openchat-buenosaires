@@ -73,7 +73,7 @@ public class Routes {
     }
 
     private String login(Request request, Response response) {
-        return receptionistDo(() -> receptionist.login(request.body()), response);
+        return receptionistDo(() -> receptionist.login(Json.parse(request.body()).asObject()), response);
     }
 
     private String registerUser(Request request, Response response) {
