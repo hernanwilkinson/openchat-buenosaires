@@ -30,4 +30,10 @@ public class IT_UsersAPI {
         assertAllUsersAreReturned(response, asList(SANDRO, MASH, STEVE, PEDRO));
     }
 
+    @Test
+    public void when_there_are_no_users() throws Exception {
+        Response response = when().get(BASE_URL + "/users");
+        assertAllUsersAreReturned(response, asList());
+    }
+
 }

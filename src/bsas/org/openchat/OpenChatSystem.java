@@ -12,6 +12,7 @@ public class OpenChatSystem {
     private final List<User> users = new ArrayList<>();
     private final Map<User,String> passwordsByUser = new HashMap<>();
     private final Map<User,Publisher> publisherByUser = new HashMap<>();
+    private final Map<User,UserCard> userCards = new HashMap<>();
     private final Clock clock;
 
     public OpenChatSystem(Clock clock){
@@ -28,7 +29,9 @@ public class OpenChatSystem {
         final User newUser = User.named(userName, password, about);
         users.add(newUser);
         passwordsByUser.put(newUser,password);
-        publisherByUser.put(newUser,Publisher.relatedTo(newUser));
+        final Publisher publisher = Publisher.relatedTo(newUser);
+        publisherByUser.put(newUser, publisher);
+        userCards.put(newUser,UserCard.of(newUser,password,publisher));
 
         return newUser;
     }
@@ -101,5 +104,21 @@ public class OpenChatSystem {
 
     public List<User> users() {
         return Collections.unmodifiableList(users);
+    }
+
+    private static class UserCard {
+        private final User user;
+        private final String password;
+        private final Publisher publisher;
+
+        public UserCard(User user, String password, Publisher publisher) {
+            this.user = user;
+            this.password = password;
+            this.publisher = publisher;
+        }
+
+        public static UserCard of(User user, String password, Publisher publisher) {
+            return new UserCard(user,password,publisher);
+        }
     }
 }
