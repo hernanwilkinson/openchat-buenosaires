@@ -14,6 +14,7 @@ public class TestObjectsBucket {
     public static final String JUAN_PEREZ_PASSWORD = "otherPassword";
     public static final String JUAN_PEREZ_ABOUT = "about";
     public static final String PEPE_SANCHEZ_ABOUT = "anotherAbout";
+    private final LocalDateTime now = LocalDateTime.now();
 
     public static <T extends Throwable> void assertThrowsWithErrorMessage(
             Class<T> expectedType, Executable closureToFail, String errorMessage) {
@@ -33,7 +34,6 @@ public class TestObjectsBucket {
     }
 
     public Clock fixedNowClock(){
-        final LocalDateTime now = LocalDateTime.now();
-        return ()->now;
+        return ()-> now;
     }
 }
