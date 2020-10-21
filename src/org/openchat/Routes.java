@@ -3,6 +3,7 @@ package org.openchat;
 import bsas.org.openchat.OpenChatSystem;
 import bsas.org.openchat.ReceptionistResponse;
 import bsas.org.openchat.RestReceptionist;
+import com.eclipsesource.json.Json;
 import spark.Request;
 import spark.Response;
 
@@ -76,7 +77,7 @@ public class Routes {
     }
 
     private String registerUser(Request request, Response response) {
-        return receptionistDo(()-> receptionist.registerUser(request.body()), response);
+        return receptionistDo(()-> receptionist.registerUser(Json.parse(request.body()).asObject()), response);
     }
 
     private String receptionistDo(Supplier<ReceptionistResponse> action, Response response) {

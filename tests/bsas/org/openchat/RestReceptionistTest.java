@@ -1,5 +1,6 @@
 package bsas.org.openchat;
 
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ public class RestReceptionistTest {
     public void canRegisterUserWithValidData() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
 
-        ReceptionistResponse response = receptionist.registerUser(juanPerezRegistrationBody());
+        ReceptionistResponse response = receptionist.registerUser(Json.parse(juanPerezRegistrationBody()).asObject());
 
         assertJuanPerezOk(response, CREATED_201);
     }
@@ -50,8 +51,8 @@ public class RestReceptionistTest {
     public void returns400WithDuplicatedUser() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
 
-        receptionist.registerUser(juanPerezRegistrationBody());
-        ReceptionistResponse response = receptionist.registerUser(juanPerezRegistrationBody());
+        receptionist.registerUser(Json.parse(juanPerezRegistrationBody()).asObject());
+        ReceptionistResponse response = receptionist.registerUser(Json.parse(juanPerezRegistrationBody()).asObject());
 
         assertTrue(response.isStatus(BAD_REQUEST_400));
         assertEquals(OpenChatSystem.CANNOT_REGISTER_SAME_USER_TWICE,response.responseBody());
@@ -59,7 +60,7 @@ public class RestReceptionistTest {
     @Test
     public void validLoginsReturns200WithUserData() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
-        receptionist.registerUser(juanPerezRegistrationBody());
+        receptionist.registerUser(Json.parse(juanPerezRegistrationBody()).asObject());
 
         ReceptionistResponse response = receptionist.login(juanPerezLoginBodyAsJson().toString());
 
@@ -68,7 +69,7 @@ public class RestReceptionistTest {
     @Test
     public void loginOfRegisteredUserReturns400WithInvalidCredentials() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
-        receptionist.registerUser(juanPerezRegistrationBody());
+        receptionist.registerUser(Json.parse(juanPerezRegistrationBody()).asObject());
 
         final JsonObject juanPerezLoginBodyAsJson = juanPerezLoginBodyAsJson();
         juanPerezLoginBodyAsJson.add(RestReceptionist.PASSWORD_KEY,TestObjectsBucket.JUAN_PEREZ_PASSWORD+"x");
@@ -81,7 +82,7 @@ public class RestReceptionistTest {
     @Test
     public void usersReturns200WithAllRegisteredUsers() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
-        receptionist.registerUser(juanPerezRegistrationBody());
+        receptionist.registerUser(Json.parse(juanPerezRegistrationBody()).asObject());
 
         ReceptionistResponse response = receptionist.users();
 
@@ -108,8 +109,8 @@ public class RestReceptionistTest {
     private void makePepeSanchezFollowJuanPerezAndAssert(
            FollowingsAssertion assertions) {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
-        ReceptionistResponse followerResponse = receptionist.registerUser(pepeSanchezRegistrationBody());
-        ReceptionistResponse followeeResponse = receptionist.registerUser(juanPerezRegistrationBody());
+        ReceptionistResponse followerResponse = receptionist.registerUser(Json.parse(pepeSanchezRegistrationBody()).asObject());
+        ReceptionistResponse followeeResponse = receptionist.registerUser(Json.parse(juanPerezRegistrationBody()).asObject());
 
         String followinsBody = new JsonObject()
                 .add(RestReceptionist.FOLLOWER_ID, followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
@@ -145,7 +146,7 @@ public class RestReceptionistTest {
     @Test
     public void publishReturns200WithPublicationInfo() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
-        ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBody());
+        ReceptionistResponse registeredUserResponse = receptionist.registerUser(Json.parse(juanPerezRegistrationBody()).asObject());
 
         final String publicationMessage = "hello";
         String messageBody = messageBodyFor(publicationMessage);
@@ -164,7 +165,7 @@ public class RestReceptionistTest {
     @Test
     public void publishReturns400WithInappropriateWords() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
-        ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBody());
+        ReceptionistResponse registeredUserResponse = receptionist.registerUser(Json.parse(juanPerezRegistrationBody()).asObject());
 
         String messageBody = messageBodyFor("elephant");
         final String registeredUserId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
@@ -187,7 +188,7 @@ public class RestReceptionistTest {
     @Test
     public void timelineReturns200WithUserPublications() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
-        ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBody());
+        ReceptionistResponse registeredUserResponse = receptionist.registerUser(Json.parse(juanPerezRegistrationBody()).asObject());
 
         String messageBody = messageBodyFor("Hello");
         final String followerId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");

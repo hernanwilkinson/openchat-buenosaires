@@ -23,11 +23,11 @@ public class RestReceptionist {
     public static final String FOLLOWING_CREATED = "Following created.";
     public static final String FOLLOWER_ID = "followerId";
     public static final String FOLLOWEE_ID = "followeeId";
-    public static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
     public static final String POST_ID_KEY = "postId";
     public static final String USER_ID_KEY = "userId";
     public static final String TEXT_KEY = "text";
     public static final String DATE_TIME_KEY = "dateTime";
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     private final OpenChatSystem system;
     private final Map<User,String> idsByUser = new HashMap<>();
@@ -37,8 +37,7 @@ public class RestReceptionist {
         this.system = system;
     }
 
-    public ReceptionistResponse registerUser(String registrationBody) {
-        JsonObject registrationAsJson = Json.parse(registrationBody).asObject();
+    public ReceptionistResponse registerUser(JsonObject registrationAsJson) {
 
         try {
             User registeredUser = system.register(
