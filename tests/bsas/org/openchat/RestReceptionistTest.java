@@ -23,7 +23,7 @@ public class RestReceptionistTest {
     }
 
     @Test
-    public void returns400WithDuplicatedUser() {
+    public void canNotRegisterDuplicatedUser() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
 
         receptionist.registerUser(juanPerezRegistrationBodyAsJson());
@@ -33,7 +33,7 @@ public class RestReceptionistTest {
         assertEquals(OpenChatSystem.CANNOT_REGISTER_SAME_USER_TWICE,response.responseBody());
     }
     @Test
-    public void validLoginsReturns200WithUserData() {
+    public void canLoginRegisteredUserWithValidCredentials() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
         receptionist.registerUser(juanPerezRegistrationBodyAsJson());
 
@@ -42,7 +42,7 @@ public class RestReceptionistTest {
         assertJuanPerezOk(response, OK_200);
     }
     @Test
-    public void loginOfRegisteredUserReturns400WithInvalidCredentials() {
+    public void canNotLoginWithInvalidCredentials() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
         receptionist.registerUser(juanPerezRegistrationBodyAsJson());
 
@@ -55,7 +55,7 @@ public class RestReceptionistTest {
         assertEquals(RestReceptionist.INVALID_CREDENTIALS,response.responseBody());
     }
     @Test
-    public void usersReturns200WithAllRegisteredUsers() {
+    public void usersReturnsAllRegisteredUsers() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
         receptionist.registerUser(juanPerezRegistrationBodyAsJson());
 
@@ -69,56 +69,37 @@ public class RestReceptionistTest {
         assertJuanPerezJson(userJson);
     }
     @Test
-    public void followingsReturns201WhenFollowerCanFollowFollowee() {
+    public void registeredUserCanFollowAnotherRegisteredUser() {
         makePepeSanchezFollowJuanPerezAndAssert(
-                (receptionist,response,followingsBody,followerResponse,followeeResponse)-> {
-                    assertTrue(response.isStatus(CREATED_201));
-                    assertEquals(RestReceptionist.FOLLOWING_CREATED,response.responseBody()); });
-    }
-
-    interface FollowingsAssertion {
-        void accept(RestReceptionist receptionist, ReceptionistResponse response,
-                    JsonObject followingsBodyAsJson,ReceptionistResponse followerResponse,
-                    ReceptionistResponse followeeResponse);
-    }
-    private void makePepeSanchezFollowJuanPerezAndAssert(
-           FollowingsAssertion assertions) {
-        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
-        ReceptionistResponse followerResponse = receptionist.registerUser(pepeSanchezRegistrationBodyAsJson());
-        ReceptionistResponse followeeResponse = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
-
-        JsonObject followingsBodyAsJson = new JsonObject()
-                .add(RestReceptionist.FOLLOWER_ID_KEY, followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
-                .add(RestReceptionist.FOLLOWEE_ID_KEY, followeeResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
-
-        ReceptionistResponse response = receptionist.followings(followingsBodyAsJson);
-        assertions.accept(receptionist,response,followingsBodyAsJson,followerResponse,followeeResponse);
+            (receptionist,response,followingsBody,followerResponse,followeeResponse)-> {
+                assertTrue(response.isStatus(CREATED_201));
+                assertEquals(RestReceptionist.FOLLOWING_CREATED,response.responseBody()); });
     }
 
     @Test
-    public void followingsReturns400WhenAlreadyFollowing() {
+    public void canNotFollowAnAlreadyFolloweeUser() {
         makePepeSanchezFollowJuanPerezAndAssert(
-                (receptionist,firstResponse,followingsBodyAsJson,followerResponse,followeeResponse)-> {
-                    ReceptionistResponse response = receptionist.followings(followingsBodyAsJson);
+            (receptionist,firstResponse,followingsBodyAsJson,followerResponse,followeeResponse)-> {
+                ReceptionistResponse response = receptionist.followings(followingsBodyAsJson);
 
-                    assertTrue(response.isStatus(BAD_REQUEST_400));
-                    assertEquals(Publisher.CANNOT_FOLLOW_TWICE,response.responseBody()); });
+                assertTrue(response.isStatus(BAD_REQUEST_400));
+                assertEquals(Publisher.CANNOT_FOLLOW_TWICE,response.responseBody()); });
     }
     @Test
-    public void followeesReturns200WithUserFollowees() {
+    public void followeesReturnsUserFollowees() {
         makePepeSanchezFollowJuanPerezAndAssert(
-                (receptionist,firstResponse,followingsBody,followerResponse,followeeResponse)-> {
-                    ReceptionistResponse response = receptionist.followeesOf(followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
+            (receptionist,firstResponse,followingsBody,followerResponse,followeeResponse)-> {
+                ReceptionistResponse response = receptionist.followeesOf(followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
 
-                    assertTrue(response.isStatus(OK_200));
+                assertTrue(response.isStatus(OK_200));
 
-                    JsonArray responseBody = response.responseBodyAsJsonArray();
-                    assertEquals(1,responseBody.size());
-                    JsonObject userJson = responseBody.values().get(0).asObject();
-                    assertJuanPerezJson(userJson);});
+                JsonArray responseBody = response.responseBodyAsJsonArray();
+                assertEquals(1,responseBody.size());
+                JsonObject userJson = responseBody.values().get(0).asObject();
+                assertJuanPerezJson(userJson);});
     }
     @Test
-    public void publishReturns200WithPublicationInfo() {
+    public void registeredUserCanPublishAppropriateMessage() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
         ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
 
@@ -136,7 +117,7 @@ public class RestReceptionistTest {
         assertEquals(formattedNow(),responseBody.getString(RestReceptionist.DATE_TIME_KEY,""));
     }
     @Test
-    public void publishReturns400WithInappropriateWords() {
+    public void canNotPublishInappropriateWords() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
         ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
 
@@ -149,7 +130,7 @@ public class RestReceptionistTest {
         assertEquals(Publication.INAPPROPRIATE_WORD,publicationResponse.responseBody());
     }
     @Test
-    public void invalidUserCanNotPublishReturns() {
+    public void invalidUserCanNotPublish() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
 
         ReceptionistResponse publicationResponse = receptionist.addPublication(
@@ -159,22 +140,15 @@ public class RestReceptionistTest {
         assertTrue(publicationResponse.isStatus(BAD_REQUEST_400));
         assertEquals(RestReceptionist.INVALID_CREDENTIALS,publicationResponse.responseBody());
     }
-
-    private JsonObject messageBodyAsJsonFor(String message) {
-        return new JsonObject()
-                .add(RestReceptionist.TEXT_KEY, message);
-    }
-
     @Test
-    public void timelineReturns200WithUserPublications() {
+    public void timelineReturnsUserPublications() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
         ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
 
-        JsonObject messageBodyAsJson = messageBodyAsJsonFor("Hello");
         final String followerId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
         ReceptionistResponse publicationResponse = receptionist.addPublication(
                 followerId,
-                messageBodyAsJson);
+                messageBodyAsJsonFor("Hello"));
 
         ReceptionistResponse timelineResponse = receptionist.timelineOf(followerId);
         assertTrue(timelineResponse.isStatus(OK_200));
@@ -186,33 +160,30 @@ public class RestReceptionistTest {
         assertEquals(publicationAsJson,timelinePublicationAsJson);
     }
     @Test
-    public void wallReturns200WithFollowerAndFolloweePublications() {
+    public void wallReturnsFollowerAndFolloweePublications() {
         makePepeSanchezFollowJuanPerezAndAssert(
-                (receptionist,firstResponse,followingsBody,followerResponse,followeeResponse)-> {
+            (receptionist,firstResponse,followingsBody,followerResponse,followeeResponse)-> {
+                final String followerId = followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
+                ReceptionistResponse followerPublicationResponse = receptionist.addPublication(
+                        followerId,
+                        messageBodyAsJsonFor("Hello"));
+                final String followeeId = followeeResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
+                ReceptionistResponse followeePublicationResponse = receptionist.addPublication(
+                        followeeId,
+                        messageBodyAsJsonFor("Bye"));
 
-            JsonObject followerMessageBodyAsJson = messageBodyAsJsonFor("Hello");
-            final String followerId = followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
-            ReceptionistResponse followerPublicationResponse = receptionist.addPublication(
-                    followerId,
-                    followerMessageBodyAsJson);
-            JsonObject followeeMessageBodyAsJson = messageBodyAsJsonFor("Bye");
-            final String followeeId = followeeResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
-            ReceptionistResponse followeePublicationResponse = receptionist.addPublication(
-                    followeeId,
-                    followeeMessageBodyAsJson);
+                ReceptionistResponse wallInfo = receptionist.wallOf(followerId);
+                assertTrue(wallInfo.isStatus(OK_200));
+                JsonArray timelineBody = wallInfo.responseBodyAsJsonArray();
+                assertEquals(2,timelineBody.size());
 
-            ReceptionistResponse wallInfo = receptionist.wallOf(followerId);
-            assertTrue(wallInfo.isStatus(OK_200));
-            JsonArray timelineBody = wallInfo.responseBodyAsJsonArray();
-            assertEquals(2,timelineBody.size());
+                JsonObject followerPublicationAsJson = followerPublicationResponse.responseBodyAsJson();
+                JsonObject wallFirstPublicationAsJson = timelineBody.get(0).asObject();
+                assertEquals(followerPublicationAsJson,wallFirstPublicationAsJson);
 
-            JsonObject followerPublicationAsJson = followerPublicationResponse.responseBodyAsJson();
-            JsonObject wallFirstPublicationAsJson = timelineBody.get(0).asObject();
-            assertEquals(followerPublicationAsJson,wallFirstPublicationAsJson);
-
-            JsonObject followeePublicationAsJson = followeePublicationResponse.responseBodyAsJson();
-            JsonObject wallSecondPublicationAsJson = timelineBody.get(1).asObject();
-            assertEquals(followeePublicationAsJson,wallSecondPublicationAsJson);});
+                JsonObject followeePublicationAsJson = followeePublicationResponse.responseBodyAsJson();
+                JsonObject wallSecondPublicationAsJson = timelineBody.get(1).asObject();
+                assertEquals(followeePublicationAsJson,wallSecondPublicationAsJson);});
     }
 
     private String formattedNow() {
@@ -255,4 +226,30 @@ public class RestReceptionistTest {
                 TestObjectsBucket.JUAN_PEREZ_PASSWORD + "x",
                 responseBodyAsJson.getString(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.JUAN_PEREZ_PASSWORD + "x"));
     }
+
+    interface FollowingsAssertion {
+        void accept(RestReceptionist receptionist, ReceptionistResponse response,
+                    JsonObject followingsBodyAsJson,ReceptionistResponse followerResponse,
+                    ReceptionistResponse followeeResponse);
+    }
+
+    private void makePepeSanchezFollowJuanPerezAndAssert(
+            FollowingsAssertion assertions) {
+        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
+        ReceptionistResponse followerResponse = receptionist.registerUser(pepeSanchezRegistrationBodyAsJson());
+        ReceptionistResponse followeeResponse = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
+
+        JsonObject followingsBodyAsJson = new JsonObject()
+                .add(RestReceptionist.FOLLOWER_ID_KEY, followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
+                .add(RestReceptionist.FOLLOWEE_ID_KEY, followeeResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
+
+        ReceptionistResponse response = receptionist.followings(followingsBodyAsJson);
+        assertions.accept(receptionist,response,followingsBodyAsJson,followerResponse,followeeResponse);
+    }
+
+    private JsonObject messageBodyAsJsonFor(String message) {
+        return new JsonObject()
+                .add(RestReceptionist.TEXT_KEY, message);
+    }
+
 }
