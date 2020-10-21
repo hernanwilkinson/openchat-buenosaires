@@ -1,5 +1,6 @@
 package bsas.org.openchat;
 
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class RestReceptionistTest {
 
-    private TestObjectsBucket testObjects = new TestObjectsBucket();
+    private final TestObjectsBucket testObjects = new TestObjectsBucket();
 
     @Test
     public void canRegisterUserWithValidData() {
@@ -77,7 +78,7 @@ public class RestReceptionistTest {
 
     interface FollowingsAssertion {
         void accept(RestReceptionist receptionist, ReceptionistResponse response,
-                    String followinsBody,ReceptionistResponse followerResponse,
+                    JsonObject followinsBodyAsJson,ReceptionistResponse followerResponse,
                     ReceptionistResponse followeeResponse);
     }
     private void makePepeSanchezFollowJuanPerezAndAssert(
@@ -86,20 +87,19 @@ public class RestReceptionistTest {
         ReceptionistResponse followerResponse = receptionist.registerUser(pepeSanchezRegistrationBodyAsJson());
         ReceptionistResponse followeeResponse = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
 
-        String followinsBody = new JsonObject()
+        JsonObject followinsBodyAsJson = new JsonObject()
                 .add(RestReceptionist.FOLLOWER_ID, followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
-                .add(RestReceptionist.FOLLOWEE_ID, followeeResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
-                .toString();
+                .add(RestReceptionist.FOLLOWEE_ID, followeeResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
 
-        ReceptionistResponse response = receptionist.followings(followinsBody);
-        assertions.accept(receptionist,response,followinsBody,followerResponse,followeeResponse);
+        ReceptionistResponse response = receptionist.followings(followinsBodyAsJson);
+        assertions.accept(receptionist,response,followinsBodyAsJson,followerResponse,followeeResponse);
     }
 
     @Test
     public void followingsReturns400WhenAlreadyFollowing() {
         makePepeSanchezFollowJuanPerezAndAssert(
-                (receptionist,firstResponse,followingsBody,followerResponse,followeeReponse)-> {
-                    ReceptionistResponse response = receptionist.followings(followingsBody);
+                (receptionist,firstResponse,followingsBodyAsJson,followerResponse,followeeReponse)-> {
+                    ReceptionistResponse response = receptionist.followings(followingsBodyAsJson);
 
                     assertTrue(response.isStatus(BAD_REQUEST_400));
                     assertEquals(Publisher.CANNOT_FOLLOW_TWICE,response.responseBody()); });

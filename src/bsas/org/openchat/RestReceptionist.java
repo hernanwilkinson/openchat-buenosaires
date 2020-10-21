@@ -37,12 +37,12 @@ public class RestReceptionist {
         this.system = system;
     }
 
-    public ReceptionistResponse registerUser(JsonObject registrationAsJson) {
+    public ReceptionistResponse registerUser(JsonObject registrationBodyAsJson) {
         try {
             User registeredUser = system.register(
-                    userNameFrom(registrationAsJson),
-                    passwordFrom(registrationAsJson),
-                    aboutFrom(registrationAsJson));
+                    userNameFrom(registrationBodyAsJson),
+                    passwordFrom(registrationBodyAsJson),
+                    aboutFrom(registrationBodyAsJson));
 
             final String registeredUserId = UUID.randomUUID().toString();
             idsByUser.put(registeredUser,registeredUserId);
@@ -67,8 +67,7 @@ public class RestReceptionist {
         return okResponseWithUserArrayFrom(system.users());
     }
 
-    public ReceptionistResponse followings(String followinsBody) {
-        JsonObject followingsBodyAsJson = Json.parse(followinsBody).asObject();
+    public ReceptionistResponse followings(JsonObject followingsBodyAsJson) {
 
         String followerId = followingsBodyAsJson.getString(FOLLOWER_ID,"");
         String followeeId = followingsBodyAsJson.getString(FOLLOWEE_ID,"");

@@ -52,7 +52,7 @@ public class Routes {
 
     private String followings(Request request, Response response) {
         return receptionistDo(
-                ()->receptionist.followings(request.body()),
+                ()->receptionist.followings(Json.parse(request.body()).asObject()),
                 response);
     }
 
