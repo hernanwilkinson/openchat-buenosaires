@@ -72,43 +72,29 @@ public class RestReceptionist {
         String followerId = followingsBodyAsJson.getString(FOLLOWER_ID,"");
         String followeeId = followingsBodyAsJson.getString(FOLLOWEE_ID,"");
 
-        User followerUser = userIdentifiedAs(followerId);
-        User followeeUser = userIdentifiedAs(followeeId);
-
         try {
-            system.followForUserNamed(followerUser.name(), followeeUser.name());
+            system.followForUserNamed(
+                    userNameIdentifiedAs(followerId),
+                    userNameIdentifiedAs(followeeId));
+
             return new ReceptionistResponse(CREATED_201, FOLLOWING_CREATED);
         } catch (RuntimeException error){
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }
     }
 
-    private User userIdentifiedAs(String userId) {
-        return idsByUser.entrySet().stream()
-                .filter(userAndId->userAndId.getValue().equals(userId))
-                .findFirst()
-                .get().getKey();
-    }
-
     public ReceptionistResponse followeesOf(String userId) {
-        final List<User> followees = system.followeesOfUserNamed(userIdentifiedAs(userId).name());
+        final List<User> followees =
+                system.followeesOfUserNamed(userNameIdentifiedAs(userId));
+
         return okResponseWithUserArrayFrom(followees);
-    }
-
-    private ReceptionistResponse okResponseWithUserArrayFrom(List<User> users) {
-        JsonArray usersAsJsonArray = new JsonArray();
-        users.stream()
-                .map(user -> userResponseAsJson(user, idsByUser.get(user)))
-                .forEach(userAsJson -> usersAsJsonArray.add(userAsJson));
-
-        return new ReceptionistResponse(OK_200, usersAsJsonArray.toString());
     }
 
     public ReceptionistResponse addPublication(String userId, String messageBody) {
         JsonObject messageBodyAsJson = Json.parse(messageBody).asObject();
 
         try {
-            Publication publication = system.publishForUserNamed(userIdentifiedAs(userId).name(), messageBodyAsJson.getString("text", ""));
+            Publication publication = system.publishForUserNamed(userNameIdentifiedAs(userId), messageBodyAsJson.getString("text", ""));
             String publicationId = UUID.randomUUID().toString();
             idsByPublication.put(publication, publicationId);
 
@@ -133,7 +119,7 @@ public class RestReceptionist {
     }
 
     public ReceptionistResponse timelineOf(String userId) {
-        List<Publication> timeLine = system.timeLineForUserNamed(userIdentifiedAs(userId).name());
+        List<Publication> timeLine = system.timeLineForUserNamed(userNameIdentifiedAs(userId));
         return publicationsAsJson(timeLine);
     }
 
@@ -147,7 +133,7 @@ public class RestReceptionist {
     }
 
     public ReceptionistResponse wallOf(String userId) {
-        List<Publication> wall = system.wallForUserNamed(userIdentifiedAs(userId).name());
+        List<Publication> wall = system.wallForUserNamed(userNameIdentifiedAs(userId));
         return publicationsAsJson(wall);
     }
 
@@ -177,4 +163,23 @@ public class RestReceptionist {
         return new ReceptionistResponse(OK_200,responseAsJson.toString());
     }
 
+    private User userIdentifiedAs(String userId) {
+        return idsByUser.entrySet().stream()
+                .filter(userAndId->userAndId.getValue().equals(userId))
+                .findFirst()
+                .get().getKey();
+    }
+
+    private ReceptionistResponse okResponseWithUserArrayFrom(List<User> users) {
+        JsonArray usersAsJsonArray = new JsonArray();
+        users.stream()
+                .map(user -> userResponseAsJson(user, idsByUser.get(user)))
+                .forEach(userAsJson -> usersAsJsonArray.add(userAsJson));
+
+        return new ReceptionistResponse(OK_200, usersAsJsonArray.toString());
+    }
+
+    private String userNameIdentifiedAs(String userId) {
+        return userIdentifiedAs(userId).name();
+    }
 }
