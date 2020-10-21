@@ -1,6 +1,5 @@
 package bsas.org.openchat;
 
-import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
@@ -90,17 +89,15 @@ public class RestReceptionist {
         return okResponseWithUserArrayFrom(followees);
     }
 
-    public ReceptionistResponse addPublication(String userId, String messageBody) {
-        JsonObject messageBodyAsJson = Json.parse(messageBody).asObject();
-
+    public ReceptionistResponse addPublication(String userId, JsonObject messageBodyAsJson) {
         try {
             Publication publication = system.publishForUserNamed(userNameIdentifiedAs(userId), messageBodyAsJson.getString("text", ""));
             String publicationId = UUID.randomUUID().toString();
             idsByPublication.put(publication, publicationId);
 
-            JsonObject pubicationAsJson = publicationAsJson(userId, publication, publicationId);
+            JsonObject publicationAsJson = publicationAsJson(userId, publication, publicationId);
 
-            return new ReceptionistResponse(CREATED_201, pubicationAsJson.toString());
+            return new ReceptionistResponse(CREATED_201, publicationAsJson.toString());
         } catch (RuntimeException error){
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }

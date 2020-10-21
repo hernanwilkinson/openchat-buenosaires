@@ -64,7 +64,7 @@ public class Routes {
 
     private String publish(Request request, Response response) {
         return receptionistDo(
-                ()->receptionist.addPublication(userIdFrom(request),request.body()),
+                ()->receptionist.addPublication(userIdFrom(request), Json.parse(request.body()).asObject()),
                 response);
     }
 
