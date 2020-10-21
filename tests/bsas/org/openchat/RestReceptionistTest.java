@@ -22,26 +22,6 @@ public class RestReceptionistTest {
         assertJuanPerezOk(response, CREATED_201);
     }
 
-    private JsonObject juanPerezRegistrationAsJson() {
-        return juanPerezLoginBodyAsJson()
-                .add(RestReceptionist.ABOUT_KEY, TestObjectsBucket.JUAN_PEREZ_ABOUT);
-    }
-
-    private void assertJuanPerezOk(ReceptionistResponse response, int status) {
-        assertTrue(response.isStatus(status));
-        JsonObject responseBodyAsJson = response.responseBodyAsJson();
-        assertJuanPerezJson(responseBodyAsJson);
-    }
-
-    private void assertJuanPerezJson(JsonObject responseBodyAsJson) {
-        assertFalse(responseBodyAsJson.getString(RestReceptionist.ID_KEY, "").isBlank());
-        assertEquals(TestObjectsBucket.JUAN_PEREZ_NAME, responseBodyAsJson.getString(RestReceptionist.USERNAME_KEY, ""));
-        assertEquals(TestObjectsBucket.JUAN_PEREZ_ABOUT, responseBodyAsJson.getString(RestReceptionist.ABOUT_KEY, ""));
-        assertEquals(
-                TestObjectsBucket.JUAN_PEREZ_PASSWORD + "x",
-                responseBodyAsJson.getString(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.JUAN_PEREZ_PASSWORD + "x"));
-    }
-
     @Test
     public void returns400WithDuplicatedUser() {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
@@ -114,11 +94,6 @@ public class RestReceptionistTest {
 
         ReceptionistResponse response = receptionist.followings(followinsBody);
         assertions.accept(receptionist,response,followinsBody,followerResponse,followeeResponse);
-    }
-
-    private JsonObject pepeSanchezRegistrationAsJson() {
-        return pepeSanchezLoginBodyAsJson()
-                .add(RestReceptionist.ABOUT_KEY, TestObjectsBucket.PEPE_SANCHEZ_ABOUT);
     }
 
     @Test
@@ -244,9 +219,35 @@ public class RestReceptionistTest {
                 .add(RestReceptionist.USERNAME_KEY, TestObjectsBucket.JUAN_PEREZ_NAME)
                 .add(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.JUAN_PEREZ_PASSWORD);
     }
+
     private JsonObject pepeSanchezLoginBodyAsJson() {
         return new JsonObject()
                 .add(RestReceptionist.USERNAME_KEY, TestObjectsBucket.PEPE_SANCHEZ_NAME)
                 .add(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.PEPE_SANCHEZ_PASSWORD);
+    }
+
+    private JsonObject juanPerezRegistrationAsJson() {
+        return juanPerezLoginBodyAsJson()
+                .add(RestReceptionist.ABOUT_KEY, TestObjectsBucket.JUAN_PEREZ_ABOUT);
+    }
+
+    private JsonObject pepeSanchezRegistrationAsJson() {
+        return pepeSanchezLoginBodyAsJson()
+                .add(RestReceptionist.ABOUT_KEY, TestObjectsBucket.PEPE_SANCHEZ_ABOUT);
+    }
+
+    private void assertJuanPerezOk(ReceptionistResponse response, int status) {
+        assertTrue(response.isStatus(status));
+        JsonObject responseBodyAsJson = response.responseBodyAsJson();
+        assertJuanPerezJson(responseBodyAsJson);
+    }
+
+    private void assertJuanPerezJson(JsonObject responseBodyAsJson) {
+        assertFalse(responseBodyAsJson.getString(RestReceptionist.ID_KEY, "").isBlank());
+        assertEquals(TestObjectsBucket.JUAN_PEREZ_NAME, responseBodyAsJson.getString(RestReceptionist.USERNAME_KEY, ""));
+        assertEquals(TestObjectsBucket.JUAN_PEREZ_ABOUT, responseBodyAsJson.getString(RestReceptionist.ABOUT_KEY, ""));
+        assertEquals(
+                TestObjectsBucket.JUAN_PEREZ_PASSWORD + "x",
+                responseBodyAsJson.getString(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.JUAN_PEREZ_PASSWORD + "x"));
     }
 }
