@@ -20,8 +20,8 @@ public class RestReceptionist {
     public static final String ID_KEY = "id";
     public static final String INVALID_CREDENTIALS = "Invalid credentials.";
     public static final String FOLLOWING_CREATED = "Following created.";
-    public static final String FOLLOWER_ID = "followerId";
-    public static final String FOLLOWEE_ID = "followeeId";
+    public static final String FOLLOWER_ID_KEY = "followerId";
+    public static final String FOLLOWEE_ID_KEY = "followeeId";
     public static final String POST_ID_KEY = "postId";
     public static final String USER_ID_KEY = "userId";
     public static final String TEXT_KEY = "text";
@@ -68,8 +68,8 @@ public class RestReceptionist {
 
     public ReceptionistResponse followings(JsonObject followingsBodyAsJson) {
 
-        String followerId = followingsBodyAsJson.getString(FOLLOWER_ID,"");
-        String followeeId = followingsBodyAsJson.getString(FOLLOWEE_ID,"");
+        String followerId = followingsBodyAsJson.getString(FOLLOWER_ID_KEY,"");
+        String followeeId = followingsBodyAsJson.getString(FOLLOWEE_ID_KEY,"");
 
         try {
             system.followForUserNamed(

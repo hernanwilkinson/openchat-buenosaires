@@ -4,6 +4,7 @@ import bsas.org.openchat.OpenChatSystem;
 import bsas.org.openchat.ReceptionistResponse;
 import bsas.org.openchat.RestReceptionist;
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
 import spark.Request;
 import spark.Response;
 
@@ -26,7 +27,7 @@ public class Routes {
         get("status", (req, res) -> "OpenChat: OK!");
         post("users", (req, res) -> registerUser(req,res));
         post("login", (req, res) -> login(req,res));
-        get("users", (req, res) -> users(req,res));
+        get("users", (req, res) -> users(res));
         post("users/:userId/timeline", (req, res) -> publish(req,res));
         get("users/:userId/timeline", (req, res) -> timeLine(req,res));
         post("followings", (req, res) -> followings(req,res));
@@ -36,48 +37,48 @@ public class Routes {
 
     private String wall(Request request, Response response) {
         return receptionistDo(
-                ()->receptionist.wallOf(userIdFrom(request)),
+                ()->receptionist.wallOf(userIdFromParamsOf(request)),
                 response);
-    }
-
-    private String userIdFrom(Request request) {
-        return request.params("userId");
     }
 
     private String followees(Request request, Response response) {
         return receptionistDo(
-                ()->receptionist.followeesOf(request.params("followerId")),
+                ()->receptionist.followeesOf(followerIdFromParamsOf(request)),
                 response);
     }
 
     private String followings(Request request, Response response) {
         return receptionistDo(
-                ()->receptionist.followings(Json.parse(request.body()).asObject()),
+                ()->receptionist.followings(requestBodyAsJson(request)),
                 response);
     }
 
     private String timeLine(Request request, Response response) {
         return receptionistDo(
-                ()->receptionist.timelineOf(userIdFrom(request)),
+                ()->receptionist.timelineOf(userIdFromParamsOf(request)),
                 response);
     }
 
     private String publish(Request request, Response response) {
         return receptionistDo(
-                ()->receptionist.addPublication(userIdFrom(request), Json.parse(request.body()).asObject()),
+                ()->receptionist.addPublication(userIdFromParamsOf(request), requestBodyAsJson(request)),
                 response);
     }
 
-    private String users(Request request, Response response) {
+    private String users(Response response) {
         return receptionistDo(()->receptionist.users(), response);
     }
 
     private String login(Request request, Response response) {
-        return receptionistDo(() -> receptionist.login(Json.parse(request.body()).asObject()), response);
+        return receptionistDo(
+                () -> receptionist.login(requestBodyAsJson(request)),
+                response);
     }
 
     private String registerUser(Request request, Response response) {
-        return receptionistDo(()-> receptionist.registerUser(Json.parse(request.body()).asObject()), response);
+        return receptionistDo(
+                ()-> receptionist.registerUser(requestBodyAsJson(request)),
+                response);
     }
 
     private String receptionistDo(Supplier<ReceptionistResponse> action, Response response) {
@@ -88,4 +89,15 @@ public class Routes {
         return receptionistResponse.responseBody();
     }
 
+    private String userIdFromParamsOf(Request request) {
+        return request.params(RestReceptionist.USER_ID_KEY);
+    }
+
+    private String followerIdFromParamsOf(Request request) {
+        return request.params(RestReceptionist.FOLLOWER_ID_KEY);
+    }
+
+    private JsonObject requestBodyAsJson(Request request) {
+        return Json.parse(request.body()).asObject();
+    }
 }

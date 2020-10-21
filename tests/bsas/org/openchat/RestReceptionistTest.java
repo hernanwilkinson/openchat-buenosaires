@@ -87,8 +87,8 @@ public class RestReceptionistTest {
         ReceptionistResponse followeeResponse = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
 
         JsonObject followingsBodyAsJson = new JsonObject()
-                .add(RestReceptionist.FOLLOWER_ID, followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
-                .add(RestReceptionist.FOLLOWEE_ID, followeeResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
+                .add(RestReceptionist.FOLLOWER_ID_KEY, followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
+                .add(RestReceptionist.FOLLOWEE_ID_KEY, followeeResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
 
         ReceptionistResponse response = receptionist.followings(followingsBodyAsJson);
         assertions.accept(receptionist,response,followingsBodyAsJson,followerResponse,followeeResponse);
