@@ -1,5 +1,6 @@
 package bsas.org.openchat;
 
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
@@ -18,14 +19,14 @@ public class RestReceptionist {
     public static final String PASSWORD_KEY = "password";
     public static final String ABOUT_KEY = "about";
     public static final String ID_KEY = "id";
-    public static final String INVALID_CREDENTIALS = "Invalid credentials.";
-    public static final String FOLLOWING_CREATED = "Following created.";
     public static final String FOLLOWER_ID_KEY = "followerId";
     public static final String FOLLOWEE_ID_KEY = "followeeId";
     public static final String POST_ID_KEY = "postId";
     public static final String USER_ID_KEY = "userId";
     public static final String TEXT_KEY = "text";
     public static final String DATE_TIME_KEY = "dateTime";
+    public static final String INVALID_CREDENTIALS = "Invalid credentials.";
+    public static final String FOLLOWING_CREATED = "Following created.";
     public static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     private final OpenChatSystem system;
@@ -46,9 +47,9 @@ public class RestReceptionist {
             final String registeredUserId = UUID.randomUUID().toString();
             idsByUser.put(registeredUser,registeredUserId);
 
-            JsonObject responseAsJson = userResponseAsJson(registeredUser, registeredUserId);
-
-            return new ReceptionistResponse(CREATED_201, responseAsJson.toString());
+            return new ReceptionistResponse(
+                    CREATED_201,
+                    userResponseAsJson(registeredUser, registeredUserId));
         } catch (RuntimeException error){
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }
@@ -59,7 +60,8 @@ public class RestReceptionist {
                 userNameFrom(loginBodyAsJson),
                 passwordFrom(loginBodyAsJson),
             authenticatedUser->authenticatedUserResponse(authenticatedUser),
-            ()-> new ReceptionistResponse(NOT_FOUND_404,INVALID_CREDENTIALS));
+            ()-> new ReceptionistResponse(NOT_FOUND_404, INVALID_CREDENTIALS));
+
     }
 
     public ReceptionistResponse users() {
@@ -95,9 +97,9 @@ public class RestReceptionist {
             String publicationId = UUID.randomUUID().toString();
             idsByPublication.put(publication, publicationId);
 
-            JsonObject publicationAsJson = publicationAsJson(userId, publication, publicationId);
-
-            return new ReceptionistResponse(CREATED_201, publicationAsJson.toString());
+            return new ReceptionistResponse(
+                    CREATED_201,
+                    publicationAsJson(userId, publication, publicationId));
         } catch (RuntimeException error){
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }
@@ -147,7 +149,8 @@ public class RestReceptionist {
         return idsByUser.entrySet().stream()
                 .filter(userAndId->userAndId.getValue().equals(userId))
                 .findFirst()
-                .get().getKey();
+                .map(userAndId->userAndId.getKey())
+                .orElseThrow(()->new RuntimeException(INVALID_CREDENTIALS));
     }
 
     private ReceptionistResponse okResponseWithUserArrayFrom(List<User> users) {
@@ -157,7 +160,7 @@ public class RestReceptionist {
                 .map(user -> userResponseAsJson(user, userIdFor(user)))
                 .forEach(userAsJson -> usersAsJsonArray.add(userAsJson));
 
-        return new ReceptionistResponse(OK_200, usersAsJsonArray.toString());
+        return new ReceptionistResponse(OK_200, usersAsJsonArray);
     }
 
     private String userNameIdentifiedAs(String userId) {
@@ -186,7 +189,7 @@ public class RestReceptionist {
                         publicationIdFor(publication)))
                 .forEach(userAsJson -> publicationsAsJsonObject.add(userAsJson));
 
-        return new ReceptionistResponse(OK_200, publicationsAsJsonObject.toString());
+        return new ReceptionistResponse(OK_200, publicationsAsJsonObject);
     }
 
     private String publicationIdFor(Publication publication) {

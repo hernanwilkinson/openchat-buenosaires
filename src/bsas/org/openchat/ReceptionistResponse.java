@@ -3,6 +3,7 @@ package bsas.org.openchat;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 
 public class ReceptionistResponse {
     private final int status;
@@ -11,6 +12,14 @@ public class ReceptionistResponse {
     public ReceptionistResponse(int status, String responseBody) {
         this.status = status;
         this.responseBody = responseBody;
+    }
+
+    /* Lamentablemente no se puede usar solo un Json como responseBody
+     * porque hay API que devuelven un String que no es un Json string
+     * como cuando se produce un error o followings, etc - Hernan
+     */
+    public ReceptionistResponse(int status, JsonValue bodyAsJson) {
+        this(status,bodyAsJson.toString());
     }
 
     public boolean isStatus(int potentialStatus) {
@@ -25,7 +34,7 @@ public class ReceptionistResponse {
         return status;
     }
 
-    JsonObject responseBodyAsJson() {
+    public JsonObject responseBodyAsJson() {
         return Json.parse(responseBody).asObject();
     }
 

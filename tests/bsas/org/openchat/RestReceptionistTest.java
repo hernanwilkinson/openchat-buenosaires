@@ -1,5 +1,6 @@
 package bsas.org.openchat;
 
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.junit.jupiter.api.Test;
@@ -122,14 +123,13 @@ public class RestReceptionistTest {
         ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
 
         final String publicationMessage = "hello";
-        JsonObject messageBodyAsJson = messageBodyAsJsonFor(publicationMessage);
         final String registeredUserId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
-        ReceptionistResponse publicationInfo = receptionist.addPublication(
+        ReceptionistResponse publicationResponse = receptionist.addPublication(
                 registeredUserId,
-                messageBodyAsJson);
+                messageBodyAsJsonFor(publicationMessage));
 
-        assertTrue(publicationInfo.isStatus(CREATED_201));
-        JsonObject responseBody = publicationInfo.responseBodyAsJson();
+        assertTrue(publicationResponse.isStatus(CREATED_201));
+        JsonObject responseBody = publicationResponse.responseBodyAsJson();
         assertFalse(responseBody.getString(RestReceptionist.POST_ID_KEY,"").isBlank());
         assertEquals(registeredUserId, responseBody.getString(RestReceptionist.USER_ID_KEY,""));
         assertEquals(publicationMessage, responseBody.getString(RestReceptionist.TEXT_KEY,""));
@@ -140,14 +140,24 @@ public class RestReceptionistTest {
         RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
         ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
 
-        JsonObject messageBodyAsJson = messageBodyAsJsonFor("elephant");
         final String registeredUserId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
-        ReceptionistResponse publicationInfo = receptionist.addPublication(
+        ReceptionistResponse publicationResponse = receptionist.addPublication(
                 registeredUserId,
-                messageBodyAsJson);
+                messageBodyAsJsonFor("elephant"));
 
-        assertTrue(publicationInfo.isStatus(BAD_REQUEST_400));
-        assertEquals(Publication.INAPPROPRIATE_WORD,publicationInfo.responseBody());
+        assertTrue(publicationResponse.isStatus(BAD_REQUEST_400));
+        assertEquals(Publication.INAPPROPRIATE_WORD,publicationResponse.responseBody());
+    }
+    @Test
+    public void invalidUserCanNotPublishReturns() {
+        RestReceptionist receptionist = new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
+
+        ReceptionistResponse publicationResponse = receptionist.addPublication(
+                "",
+                messageBodyAsJsonFor("something"));
+
+        assertTrue(publicationResponse.isStatus(BAD_REQUEST_400));
+        assertEquals(RestReceptionist.INVALID_CREDENTIALS,publicationResponse.responseBody());
     }
 
     private JsonObject messageBodyAsJsonFor(String message) {

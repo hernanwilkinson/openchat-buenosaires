@@ -26,6 +26,20 @@ public class IT_RegistrationAPI {
                 .body("about", is("About Lucy"));
     }
 
+    @Test
+    public void register_a_duplicate_user() throws Exception {
+        given()
+                .body(withJsonContaining("username", "password", "about"))
+                .post(BASE_URL+"/users");
+        given()
+                .body(withJsonContaining("username", "xyzzy", "about"))
+                .when()
+                .post(BASE_URL + "/users")
+                .then()
+                .statusCode(400)
+                .assertThat().body(is("Username already in use."));
+    }
+
     private String withJsonContaining(String username, String password, String about) {
         return new JsonObject()
                         .add("username", username)

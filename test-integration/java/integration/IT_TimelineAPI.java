@@ -2,35 +2,39 @@ package integration;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
+import com.eclipsesource.json.JsonObject;
 import integration.dsl.OpenChatTestDSL;
 import integration.dsl.PostDSL.ITPost;
 import integration.dsl.UserDSL.ITUser;
 import io.restassured.response.Response;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.collect.Lists.reverse;
-import static integration.APITestSuit.BASE_URL;
-import static integration.dsl.OpenChatTestDSL.assertThatJsonPostMatchesPost;
-import static integration.dsl.OpenChatTestDSL.register;
+import static integration.APITestSuit.*;
+import static integration.dsl.OpenChatTestDSL.*;
 import static integration.dsl.PostDSL.ITPostBuilder.aPost;
 import static integration.dsl.UserDSL.ITUserBuilder.aUser;
+import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static io.restassured.http.ContentType.JSON;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.matchesPattern;
 
 public class IT_TimelineAPI {
 
     private static ITUser DAVID = aUser().withUsername("David").build();
 
     private JsonArray timeline;
-    private List<ITPost> POSTS;
+    private static List<ITPost> POSTS;
 
-    @Before
-    public void initialise() {
+    @BeforeClass
+    public static void initialise() {
         DAVID = register(DAVID);
         POSTS = createPostsFor(DAVID, 2);
     }
@@ -43,14 +47,45 @@ public class IT_TimelineAPI {
 
         thenHeShouldSee(reverse(POSTS));
     }
+    @Test
+    public void can_add_one_post() throws Exception {
+        ITPost post = aPost().withUserId(DAVID.id()).build();
+        given()
+                .body(withPostJsonContaining(post.text()))
+                .when()
+                .post(BASE_URL + "/users/" + post.userId() + "/timeline")
+                .then()
+                .statusCode(201)
+                .contentType(JSON)
+                .body("postId", matchesPattern(UUID_PATTERN))
+                .body("userId", is(post.userId()))
+                .body("text", is(post.text()))
+                .body("dateTime", matchesPattern(DATE_PATTERN));
+    }
 
-    private List<ITPost> createPostsFor(ITUser user, int numberOfPosts) {
+    @Test
+    public void cannot_add_one_inappropriate_post() throws Exception {
+        ITPost post = aPost().withUserId(DAVID.id()).build();
+        given()
+                .body(withPostJsonContaining("orange"))
+                .when()
+                .post(BASE_URL + "/users/" + post.userId() + "/timeline")
+                .then()
+                .statusCode(400)
+                .body(is("Post contains inappropriate language."));
+    }
+
+    private static List<ITPost> createPostsFor(ITUser user, int numberOfPosts) {
         List<ITPost> posts = new ArrayList<>();
         for (int i = 0; i < numberOfPosts; i++) {
             ITPost post = aPost().withUserId(user.id()).withText("Post " + i).build();
             posts.add(post);
         }
         return posts;
+    }
+
+    public static String withPostJsonContaining(String text) {
+        return new JsonObject().add("text", text).toString();
     }
 
     private void givenDavidPosts(List<ITPost> posts) {

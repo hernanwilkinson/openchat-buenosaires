@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class OpenChatSystem {
-    public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Cannot register same user twice";
+    public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Username already in use.";
     public static final String USER_NOT_REGISTERED = "User not registered";
 
     private final List<User> users = new ArrayList<>();
