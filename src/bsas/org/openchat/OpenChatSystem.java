@@ -27,11 +27,11 @@ public class OpenChatSystem {
         assertIsNotDuplicated(userName);
 
         final User newUser = User.named(userName, password, about);
-        //users.add(newUser);
+
         passwordsByUser.put(newUser,password);
         final Publisher publisher = Publisher.relatedTo(newUser);
         publisherByUser.put(newUser, publisher);
-        userCards.put(userName,UserCard.of(newUser,password,publisher));
+        userCards.put(userName,ValidUserCard.of(newUser,password,publisher));
 
         return newUser;
     }
@@ -52,7 +52,7 @@ public class OpenChatSystem {
     public <T> T withAuthenticatedUserDo(String userName, String password,
             Function<User,T> authenticatedClosure, Supplier<T> failedClosure) {
         return userCards
-                .getOrDefault(userName,UserCard.NULL_USER_CARD)
+                .getOrDefault(userName,InvalidUserCard.NULL_INSTANCE)
                 .ifValidPasswordDo(password,authenticatedClosure,failedClosure);
     }
 
@@ -86,7 +86,7 @@ public class OpenChatSystem {
 
     private <T> T withPublisherForUserNamed(String userName, Function<Publisher, T> publisherClosure) {
         return userCards
-                .getOrDefault(userName,UserCard.NULL_USER_CARD)
+                .getOrDefault(userName,InvalidUserCard.NULL_INSTANCE)
                 .withPublisherDo(publisherClosure);
     }
 
@@ -96,52 +96,91 @@ public class OpenChatSystem {
                 .collect(Collectors.toList());
     }
 
-    private static class UserCard {
-        public static UserCard NULL_USER_CARD = UserCard.createNullCard();
+    private interface UserCard {
+        boolean isOfUserNamed(String potentialUserName);
+        boolean isPassword(String potentialPassword);
+        <T> T ifValidPasswordDo(String potentialPassword,
+            Function<User, T> authenticatedClosure, Supplier<T> failedClosure);
+        <T> T withPublisherDo(Function<Publisher, T> publisherClosure);
+        User user();
+    }
 
+    private static class ValidUserCard implements UserCard {
         private final User user;
         private final String password;
         private final Publisher publisher;
 
-        public UserCard(User user, String password, Publisher publisher) {
+        public ValidUserCard(User user, String password, Publisher publisher) {
             this.user = user;
             this.password = password;
             this.publisher = publisher;
         }
 
-        public static UserCard of(User user, String password, Publisher publisher) {
-            return new UserCard(user,password,publisher);
+        public static ValidUserCard of(User user, String password, Publisher publisher) {
+            return new ValidUserCard(user,password,publisher);
         }
 
-        private static UserCard createNullCard() {
-            return of(null,null,null);
-        }
-
+        @Override
         public boolean isOfUserNamed(String potentialUserName) {
             return user.isNamed(potentialUserName);
         }
 
+        @Override
         public User user() {
             return user;
         }
 
+        @Override
         public boolean isPassword(String potentialPassword) {
-            return password!=null && password.equals(potentialPassword);
+            return password.equals(potentialPassword);
         }
 
-        private <T> T ifValidPasswordDo(String potentialPassword,
-            Function<User, T> authenticatedClosure, Supplier<T> failedClosure) {
+        @Override
+        public <T> T ifValidPasswordDo(String potentialPassword,
+                                        Function<User, T> authenticatedClosure, Supplier<T> failedClosure) {
             if( isPassword(potentialPassword))
-                return authenticatedClosure.apply(user());
+                return authenticatedClosure.apply(user);
             else
                 return failedClosure.get();
         }
 
+        @Override
         public <T> T withPublisherDo(Function<Publisher, T> publisherClosure) {
-            if(publisher==null)
-                throw new RuntimeException(USER_NOT_REGISTERED);
-
             return publisherClosure.apply(publisher);
+        }
+    }
+
+    private static class InvalidUserCard implements UserCard{
+
+        public static final InvalidUserCard NULL_INSTANCE = new InvalidUserCard();
+
+        @Override
+        public boolean isOfUserNamed(String potentialUserName) {
+            return false;
+        }
+
+        @Override
+        public boolean isPassword(String potentialPassword) {
+            return false;
+        }
+
+        @Override
+        public <T> T ifValidPasswordDo(String potentialPassword, Function<User, T> authenticatedClosure, Supplier<T> failedClosure) {
+            return failedClosure.get();
+        }
+
+        @Override
+        public <T> T withPublisherDo(Function<Publisher, T> publisherClosure) {
+            return throwUserNotRegistered();
+        }
+
+        @Override
+        public User user() {
+            return throwUserNotRegistered();
+        }
+
+        private <T> T throwUserNotRegistered() {
+            throw new RuntimeException(OpenChatSystem.USER_NOT_REGISTERED);
         }
     }
 }
