@@ -9,9 +9,6 @@ public class OpenChatSystem {
     public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Username already in use.";
     public static final String USER_NOT_REGISTERED = "User not registered";
 
-    private final List<User> users = new ArrayList<>();
-    private final Map<User,String> passwordsByUser = new HashMap<>();
-    private final Map<User,Publisher> publisherByUser = new HashMap<>();
     private final Map<String,UserCard> userCards = new HashMap<>();
     private final Clock clock;
 
@@ -27,11 +24,8 @@ public class OpenChatSystem {
         assertIsNotDuplicated(userName);
 
         final User newUser = User.named(userName, password, about);
-
-        passwordsByUser.put(newUser,password);
-        final Publisher publisher = Publisher.relatedTo(newUser);
-        publisherByUser.put(newUser, publisher);
-        userCards.put(userName,ValidUserCard.of(newUser,password,publisher));
+        userCards.put(userName,ValidUserCard.of(
+                newUser,password, Publisher.relatedTo(newUser)));
 
         return newUser;
     }
