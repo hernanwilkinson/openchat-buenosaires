@@ -114,10 +114,6 @@ public class OpenChatSystem {
             return new UserCard(user,password,publisher);
         }
 
-        public boolean isOfUserNamed(String potentialUserName) {
-            return user.isNamed(potentialUserName);
-        }
-
         public User user() {
             return user;
         }

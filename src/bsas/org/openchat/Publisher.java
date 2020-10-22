@@ -22,10 +22,6 @@ public class Publisher {
         this.user = user;
     }
 
-    public boolean isNamed(String potentialName) {
-        return user.isNamed(potentialName);
-    }
-
     public boolean hasFollowees() {
         return !followees.isEmpty();
     }
