@@ -16,10 +16,10 @@ public class TestObjectsBucket {
     public static final String PEPE_SANCHEZ_ABOUT = "anotherAbout";
     private final LocalDateTime now = LocalDateTime.now();
 
-    public static <T extends Throwable> void assertThrowsWithErrorMessage(
-            Class<T> expectedType, Executable closureToFail, String errorMessage) {
-        T error = assertThrows(
-                expectedType,
+    public static <T extends Throwable> void assertThrowsModelExceptionWithErrorMessage(
+            Executable closureToFail, String errorMessage) {
+        ModelException error = assertThrows(
+                ModelException.class,
                 closureToFail);
 
         assertEquals(errorMessage,error.getMessage());

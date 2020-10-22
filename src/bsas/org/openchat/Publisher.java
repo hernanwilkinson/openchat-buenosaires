@@ -75,11 +75,11 @@ public class Publisher {
     }
 
     private void assertCanNotFollowTwice(Publisher potentialFollowee) {
-        if(doesFollow(potentialFollowee)) throw new RuntimeException(CANNOT_FOLLOW_TWICE);
+        if(doesFollow(potentialFollowee)) throw new ModelException(CANNOT_FOLLOW_TWICE);
     }
 
     private void assertCanNotFollowSelf(Publisher potentialFollowee) {
-        if(this.equals(potentialFollowee)) throw new RuntimeException(CANNOT_FOLLOW_SELF);
+        if(this.equals(potentialFollowee)) throw new ModelException(CANNOT_FOLLOW_SELF);
     }
 
     private List<Publication> sortedPublications(List<Publication> publications) {

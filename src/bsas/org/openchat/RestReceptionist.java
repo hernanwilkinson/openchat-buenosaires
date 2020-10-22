@@ -50,7 +50,7 @@ public class RestReceptionist {
             return new ReceptionistResponse(
                     CREATED_201,
                     userResponseAsJson(registeredUser, registeredUserId));
-        } catch (RuntimeException error){
+        } catch (ModelException error){
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }
     }
@@ -79,7 +79,7 @@ public class RestReceptionist {
                     userNameIdentifiedAs(followeeId));
 
             return new ReceptionistResponse(CREATED_201, FOLLOWING_CREATED);
-        } catch (RuntimeException error){
+        } catch (ModelException error){
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }
     }
@@ -100,7 +100,7 @@ public class RestReceptionist {
             return new ReceptionistResponse(
                     CREATED_201,
                     publicationAsJson(userId, publication, publicationId));
-        } catch (RuntimeException error){
+        } catch (ModelException error){
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }
     }
@@ -150,7 +150,7 @@ public class RestReceptionist {
                 .filter(userAndId->userAndId.getValue().equals(userId))
                 .findFirst()
                 .map(userAndId->userAndId.getKey())
-                .orElseThrow(()->new RuntimeException(INVALID_CREDENTIALS));
+                .orElseThrow(()->new ModelException(INVALID_CREDENTIALS));
     }
 
     private ReceptionistResponse okResponseWithUserArrayFrom(List<User> users) {

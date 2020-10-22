@@ -28,7 +28,7 @@ public class Publication {
 
     private static void assertIsAppropriate(String message) {
         if(isInappropriate(message))
-            throw new RuntimeException(INAPPROPRIATE_WORD);
+            throw new ModelException(INAPPROPRIATE_WORD);
     }
 
     private static boolean isInappropriate(String message) {

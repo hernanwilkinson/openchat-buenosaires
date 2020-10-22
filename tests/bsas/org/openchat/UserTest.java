@@ -3,15 +3,14 @@ package bsas.org.openchat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static bsas.org.openchat.TestObjectsBucket.assertThrowsWithErrorMessage;
+import static bsas.org.openchat.TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage;
 
 public class UserTest {
     private final TestObjectsBucket testObjects = new TestObjectsBucket();
 
     @Test
     public void canNotCreateUserWithBlankName() {
-        assertThrowsWithErrorMessage(
-                RuntimeException.class,
+        assertThrowsModelExceptionWithErrorMessage(
                 () -> User.named(" ", "password", "about"),
                 User.NAME_CANNOT_BE_BLANK);
     }

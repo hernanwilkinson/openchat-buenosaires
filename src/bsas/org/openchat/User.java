@@ -13,7 +13,7 @@ public class User {
     }
 
     static void assertNameIsNotBlank(String name) {
-        if(name.isBlank()) throw new RuntimeException(NAME_CANNOT_BE_BLANK);
+        if(name.isBlank()) throw new ModelException(NAME_CANNOT_BE_BLANK);
     }
 
     private User(String name, String about) {

@@ -46,8 +46,7 @@ public class OpenChatSystemTest {
         system = createSystem();
         registerPepeSanchez();
 
-        TestObjectsBucket.assertThrowsWithErrorMessage(
-                RuntimeException.class,
+        TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
                 ()->registerPepeSanchez(),
                 OpenChatSystem.CANNOT_REGISTER_SAME_USER_TWICE);
 
@@ -94,8 +93,7 @@ public class OpenChatSystemTest {
     public void noRegisteredUserCanNotPublish() {
         system = createSystem();
 
-        TestObjectsBucket.assertThrowsWithErrorMessage(
-                RuntimeException.class,
+        TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
                 ()->system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello"),
                 OpenChatSystem.USER_NOT_REGISTERED);
     }
@@ -103,8 +101,7 @@ public class OpenChatSystemTest {
     public void noRegisteredUserCanAskItsTimeline() {
         system = createSystem();
 
-        TestObjectsBucket.assertThrowsWithErrorMessage(
-                RuntimeException.class,
+        TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
                 ()->system.timeLineForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME),
                 OpenChatSystem.USER_NOT_REGISTERED);
     }

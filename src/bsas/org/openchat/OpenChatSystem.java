@@ -32,7 +32,7 @@ public class OpenChatSystem {
 
     private void assertIsNotDuplicated(String userName) {
         if(hasUserNamed(userName))
-            throw new RuntimeException(CANNOT_REGISTER_SAME_USER_TWICE);
+            throw new ModelException(CANNOT_REGISTER_SAME_USER_TWICE);
     }
 
     public boolean hasUserNamed(String potentialUserName) {
@@ -174,7 +174,7 @@ public class OpenChatSystem {
         }
 
         private <T> T throwUserNotRegistered() {
-            throw new RuntimeException(OpenChatSystem.USER_NOT_REGISTERED);
+            throw new ModelException(OpenChatSystem.USER_NOT_REGISTERED);
         }
     }
 }

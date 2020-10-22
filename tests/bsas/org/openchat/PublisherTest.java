@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static bsas.org.openchat.TestObjectsBucket.assertThrowsWithErrorMessage;
+import static bsas.org.openchat.TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PublisherTest {
@@ -35,7 +35,7 @@ public class PublisherTest {
     public void publisherCanNotFollowSelf() {
         Publisher follower = createPepeSanchez();
 
-        assertThrowsWithErrorMessage(RuntimeException.class, ()->follower.follow(follower), Publisher.CANNOT_FOLLOW_SELF);
+        assertThrowsModelExceptionWithErrorMessage(()->follower.follow(follower), Publisher.CANNOT_FOLLOW_SELF);
         Assertions.assertFalse(follower.hasFollowees());
     }
     @Test
@@ -44,7 +44,7 @@ public class PublisherTest {
         Publisher followee = createJuanPerez();
         follower.follow(followee);
 
-        assertThrowsWithErrorMessage(RuntimeException.class, ()->follower.follow(followee), Publisher.CANNOT_FOLLOW_TWICE);
+        assertThrowsModelExceptionWithErrorMessage(()->follower.follow(followee), Publisher.CANNOT_FOLLOW_TWICE);
         Assertions.assertTrue(follower.hasFollowees());
         Assertions.assertTrue(follower.doesFollow(followee));
         assertEquals(1,follower.numberOfFollowees());
@@ -132,8 +132,7 @@ public class PublisherTest {
 
         final LocalDateTime publicationTime = LocalDateTime.now();
         final String message = "elephant";
-        assertThrowsWithErrorMessage(
-                RuntimeException.class,
+        assertThrowsModelExceptionWithErrorMessage(
                 ()->follower.publish(message, publicationTime),
                 Publication.INAPPROPRIATE_WORD);
     }
@@ -143,8 +142,7 @@ public class PublisherTest {
 
         final LocalDateTime publicationTime = LocalDateTime.now();
         final String message = "ELEPHANT";
-        assertThrowsWithErrorMessage(
-                RuntimeException.class,
+        assertThrowsModelExceptionWithErrorMessage(
                 ()->follower.publish(message, publicationTime),
                 Publication.INAPPROPRIATE_WORD);
     }
@@ -154,8 +152,7 @@ public class PublisherTest {
 
         final LocalDateTime publicationTime = LocalDateTime.now();
         final String message = "abc ELEPHANT xx";
-        assertThrowsWithErrorMessage(
-                RuntimeException.class,
+        assertThrowsModelExceptionWithErrorMessage(
                 ()->follower.publish(message, publicationTime),
                 Publication.INAPPROPRIATE_WORD);
     }
@@ -165,8 +162,7 @@ public class PublisherTest {
 
         final LocalDateTime publicationTime = LocalDateTime.now();
         Arrays.asList("elephant","ice cream","orange").forEach(
-                message-> assertThrowsWithErrorMessage(
-                        RuntimeException.class,
+                message-> assertThrowsModelExceptionWithErrorMessage(
                         ()->follower.publish(message, publicationTime),
                         Publication.INAPPROPRIATE_WORD));
     }
