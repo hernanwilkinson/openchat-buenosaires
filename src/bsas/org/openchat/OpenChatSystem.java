@@ -44,38 +44,35 @@ public class OpenChatSystem {
     }
 
     public <T> T withAuthenticatedUserDo(String userName, String password,
-                                         Function<User,T> authenticatedClosure, Supplier<T> failedClosure) {
-        return withUserCardDo(userName,
-                foundCard -> foundCard.ifValidPasswordDo(password,authenticatedClosure,failedClosure),
-                failedClosure);
+                                         Function<User,T> authenticatedClosure,
+                                         Supplier<T> failedClosure) {
+        return authenticatedUser(userName, password)
+                .map(authenticatedClosure)
+                .orElseGet(failedClosure);
     }
 
     public Publication publishForUserNamed(String userName, String message) {
-        return withPublisherForUserNamed(userName,
-                publisher -> publisher.publish(message, clock.now()));
+        return publisherForUserNamed(userName).publish(message, clock.now());
     }
 
     public List<Publication> timeLineForUserNamed(String userName) {
-        return withPublisherForUserNamed(userName, publisher->publisher.timeLine());
+        return publisherForUserNamed(userName).timeLine();
     }
 
     public void followForUserNamed(String followerUserName, String followeeUserName) {
-        withPublisherForUserNamed(followerUserName,
-                follower->withPublisherForUserNamed(followeeUserName,
-                        followee->{ follower.follow(followee); return 1;}));
+        Publisher follower = publisherForUserNamed(followerUserName);
+        Publisher followee = publisherForUserNamed(followeeUserName);
+        follower.follow(followee);
     }
 
     public List<User> followeesOfUserNamed(String userName) {
-        return withPublisherForUserNamed(userName,
-                follower->follower.followees().stream()
-                        .map(publisher->publisher.relatedUser())
-                        .collect(Collectors.toList()));
+        return publisherForUserNamed(userName).followees().stream()
+                .map(publisher -> publisher.relatedUser())
+                .collect(Collectors.toList());
     }
 
     public List<Publication> wallForUserNamed(String userName) {
-        return withPublisherForUserNamed(
-                userName,
-                publisher->publisher.wall());
+        return publisherForUserNamed(userName).wall();
     }
 
     public List<User> users() {
@@ -84,22 +81,24 @@ public class OpenChatSystem {
                 .collect(Collectors.toList());
     }
 
-    private <T> T withUserCardDo(String userName,
-                                 Function<UserCard,T> userCardAction, Supplier<T> failedClosure) {
-        UserCard foundCard = userCards.get(userName);
-        if(foundCard!=null)
-            return userCardAction.apply(foundCard);
-        else
-            return failedClosure.get();
+    private Optional<User> authenticatedUser(String userName, String password) {
+        return userCardForUserName(userName)
+                .filter(foundCard -> foundCard.isPassword(password))
+                .map(foundCard -> foundCard.user());
     }
 
-    private <T> T withPublisherForUserNamed(String userName, Function<Publisher, T> publisherClosure) {
-        return withUserCardDo(userName,
-                foundCard -> foundCard.withPublisherDo(publisherClosure),
-                ()-> {throw new ModelException(USER_NOT_REGISTERED);});
+    private Optional<UserCard> userCardForUserName(String userName) {
+        return Optional.ofNullable(userCards.get(userName));
+    }
+
+    private Publisher publisherForUserNamed(String userName) {
+        return userCardForUserName(userName)
+                .map(userCard -> userCard.publisher())
+                .orElseThrow(()-> new ModelException(USER_NOT_REGISTERED));
     }
 
     private static class UserCard {
+
         private final User user;
         private final String password;
         private final Publisher publisher;
@@ -122,16 +121,8 @@ public class OpenChatSystem {
             return password.equals(potentialPassword);
         }
 
-        public <T> T ifValidPasswordDo(String potentialPassword,
-                                        Function<User, T> authenticatedClosure, Supplier<T> failedClosure) {
-            if( isPassword(potentialPassword))
-                return authenticatedClosure.apply(user);
-            else
-                return failedClosure.get();
-        }
-
-        public <T> T withPublisherDo(Function<Publisher, T> publisherClosure) {
-            return publisherClosure.apply(publisher);
+        public Publisher publisher() {
+            return publisher;
         }
     }
 }
