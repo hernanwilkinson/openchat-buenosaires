@@ -15,6 +15,8 @@ public class OpenChatSystemTest {
 
     @Test
     public void createSystemHasNoUsers() {
+        //No lo inicializo en el setup por si quiero hacer restart del
+        //contexto mientras debuggeo
         system = createSystem();
 
         Assertions.assertFalse(system.hasUsers());
@@ -145,10 +147,16 @@ public class OpenChatSystemTest {
     }
 
     private User registerPepeSanchez() {
-        return system.register(TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.PEPE_SANCHEZ_PASSWORD,"about");
+        return system.register(
+                TestObjectsBucket.PEPE_SANCHEZ_NAME,
+                TestObjectsBucket.PEPE_SANCHEZ_PASSWORD,
+                TestObjectsBucket.PEPE_SANCHEZ_ABOUT);
     }
 
     private User registerJuanPerez() {
-        return system.register(TestObjectsBucket.JUAN_PEREZ_NAME, TestObjectsBucket.JUAN_PEREZ_PASSWORD,"about");
+        return system.register(
+                TestObjectsBucket.JUAN_PEREZ_NAME,
+                TestObjectsBucket.JUAN_PEREZ_PASSWORD,
+                TestObjectsBucket.JUAN_PEREZ_ABOUT);
     }
 }
