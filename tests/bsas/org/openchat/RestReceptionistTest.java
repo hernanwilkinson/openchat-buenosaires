@@ -1,6 +1,5 @@
 package bsas.org.openchat;
 
-import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.junit.jupiter.api.Test;
@@ -24,11 +23,6 @@ public class RestReceptionistTest {
 
         assertJuanPerezOk(response, CREATED_201);
     }
-
-    private ReceptionistResponse registerJuanPerez() {
-        return receptionist.registerUser(juanPerezRegistrationBodyAsJson());
-    }
-
     @Test
     public void canNotRegisterDuplicatedUser() {
         receptionist = createReceptionist();
@@ -54,7 +48,9 @@ public class RestReceptionistTest {
         registerJuanPerez();
 
         final JsonObject invalidJuanPerezLoginBodyAsJson = juanPerezLoginBodyAsJson();
-        invalidJuanPerezLoginBodyAsJson.add(RestReceptionist.PASSWORD_KEY,TestObjectsBucket.JUAN_PEREZ_PASSWORD+"x");
+        invalidJuanPerezLoginBodyAsJson
+                .remove(RestReceptionist.PASSWORD_KEY)
+                .add(RestReceptionist.PASSWORD_KEY,TestObjectsBucket.JUAN_PEREZ_PASSWORD+"x");
 
         ReceptionistResponse response = receptionist.login(invalidJuanPerezLoginBodyAsJson);
 
@@ -68,13 +64,9 @@ public class RestReceptionistTest {
 
         ReceptionistResponse response = receptionist.users();
 
-        assertTrue(response.isStatus(OK_200));
-
-        JsonArray responseBody = response.responseBodyAsJsonArray();
-        assertEquals(1,responseBody.size());
-        JsonObject userJson = responseBody.values().get(0).asObject();
-        assertJuanPerezJson(userJson);
+        assertIsArrayWithJuanPerezOnly(response);
     }
+
     @Test
     public void registeredUserCanFollowAnotherRegisteredUser() {
         makePepeSanchezFollowJuanPerezAndAssert(
@@ -98,12 +90,8 @@ public class RestReceptionistTest {
             (receptionist,firstResponse,followingsBody,followerResponse,followeeResponse)-> {
                 ReceptionistResponse response = receptionist.followeesOf(followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
 
-                assertTrue(response.isStatus(OK_200));
-
-                JsonArray responseBody = response.responseBodyAsJsonArray();
-                assertEquals(1,responseBody.size());
-                JsonObject userJson = responseBody.values().get(0).asObject();
-                assertJuanPerezJson(userJson);});
+                assertIsArrayWithJuanPerezOnly(response);
+            });
     }
     @Test
     public void registeredUserCanPublishAppropriateMessage() {
@@ -197,6 +185,10 @@ public class RestReceptionistTest {
         return new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
     }
 
+    private ReceptionistResponse registerJuanPerez() {
+        return receptionist.registerUser(juanPerezRegistrationBodyAsJson());
+    }
+
     private String formattedNow() {
         return ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").format(testObjects.fixedNowClock().now());
     }
@@ -236,6 +228,14 @@ public class RestReceptionistTest {
         assertEquals(
                 TestObjectsBucket.JUAN_PEREZ_PASSWORD + "x",
                 responseBodyAsJson.getString(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.JUAN_PEREZ_PASSWORD + "x"));
+    }
+
+    private void assertIsArrayWithJuanPerezOnly(ReceptionistResponse response) {
+        assertTrue(response.isStatus(OK_200));
+        JsonArray responseBody = response.responseBodyAsJsonArray();
+        assertEquals(1, responseBody.size());
+        JsonObject userJson = responseBody.values().get(0).asObject();
+        assertJuanPerezJson(userJson);
     }
 
     interface FollowingsAssertion {
