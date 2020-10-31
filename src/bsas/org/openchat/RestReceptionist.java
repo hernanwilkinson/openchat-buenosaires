@@ -43,7 +43,8 @@ public class RestReceptionist {
             User registeredUser = system.register(
                     userNameFrom(registrationBodyAsJson),
                     passwordFrom(registrationBodyAsJson),
-                    aboutFrom(registrationBodyAsJson));
+                    aboutFrom(registrationBodyAsJson),
+                    urlFrom(registrationBodyAsJson));
 
             final String registeredUserId = UUID.randomUUID().toString();
             idsByUser.put(registeredUser,registeredUserId);
@@ -131,11 +132,16 @@ public class RestReceptionist {
         return registrationAsJson.getString(ABOUT_KEY, "");
     }
 
+    private String urlFrom(JsonObject registrationAsJson) {
+        return registrationAsJson.getString(URL_KEY, "");
+    }
+
     private JsonObject userResponseAsJson(User registeredUser, String registeredUserId) {
         return new JsonObject()
                 .add(ID_KEY, registeredUserId)
                 .add(USERNAME_KEY, registeredUser.name())
-                .add(ABOUT_KEY, registeredUser.about());
+                .add(ABOUT_KEY, registeredUser.about())
+                .add(URL_KEY, registeredUser.url());
     }
 
     private ReceptionistResponse authenticatedUserResponse(User authenticatedUser) {
