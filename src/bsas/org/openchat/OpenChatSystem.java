@@ -20,10 +20,6 @@ public class OpenChatSystem {
         return !userCards.isEmpty();
     }
 
-    public User register(String userName, String password, String about) {
-        return register(userName, password, about, "not defined url");
-    }
-
     public User register(String userName, String password, String about, String url) {
         assertIsNotDuplicated(userName);
 
