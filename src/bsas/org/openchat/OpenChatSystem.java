@@ -24,19 +24,17 @@ public class OpenChatSystem {
         assertIsNotDuplicated(userName);
 
         final User newUser = User.named(userName, password, about);
-        userCards.put(userName, UserCard.of(
-                newUser,password, Publisher.relatedTo(newUser)));
+        userCards.put(
+                userName,
+                UserCard.of(newUser,password, Publisher.relatedTo(newUser)));
 
         return newUser;
     }
 
-    private void assertIsNotDuplicated(String userName) {
-        if(hasUserNamed(userName))
-            throw new ModelException(CANNOT_REGISTER_SAME_USER_TWICE);
-    }
-
     public boolean hasUserNamed(String potentialUserName) {
-        return userCards.get(potentialUserName)!=null;
+        //Uso userCardForUserName en vez de hacer userCards.get
+        //para que la búsqueda por nombre esté en un solo lugar
+        return userCardForUserName(potentialUserName).isPresent();
     }
 
     public int numberOfUsers() {
@@ -62,6 +60,7 @@ public class OpenChatSystem {
     public void followForUserNamed(String followerUserName, String followeeUserName) {
         Publisher follower = publisherForUserNamed(followerUserName);
         Publisher followee = publisherForUserNamed(followeeUserName);
+
         follower.follow(followee);
     }
 
@@ -79,6 +78,11 @@ public class OpenChatSystem {
         return userCards.values().stream()
                 .map(userCard->userCard.user())
                 .collect(Collectors.toList());
+    }
+
+    private void assertIsNotDuplicated(String userName) {
+        if(hasUserNamed(userName))
+            throw new ModelException(CANNOT_REGISTER_SAME_USER_TWICE);
     }
 
     private Optional<User> authenticatedUser(String userName, String password) {
