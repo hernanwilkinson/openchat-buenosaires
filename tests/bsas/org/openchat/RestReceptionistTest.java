@@ -20,17 +20,21 @@ public class RestReceptionistTest {
         //del contexto cuando debuggeo
         receptionist = createReceptionist();
 
-        ReceptionistResponse response = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
+        ReceptionistResponse response = registerJuanPerez();
 
         assertJuanPerezOk(response, CREATED_201);
+    }
+
+    private ReceptionistResponse registerJuanPerez() {
+        return receptionist.registerUser(juanPerezRegistrationBodyAsJson());
     }
 
     @Test
     public void canNotRegisterDuplicatedUser() {
         receptionist = createReceptionist();
 
-        receptionist.registerUser(juanPerezRegistrationBodyAsJson());
-        ReceptionistResponse response = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
+        registerJuanPerez();
+        ReceptionistResponse response = registerJuanPerez();
 
         assertTrue(response.isStatus(BAD_REQUEST_400));
         assertEquals(OpenChatSystem.CANNOT_REGISTER_SAME_USER_TWICE,response.responseBody());
@@ -38,7 +42,7 @@ public class RestReceptionistTest {
     @Test
     public void canLoginRegisteredUserWithValidCredentials() {
         receptionist = createReceptionist();
-        receptionist.registerUser(juanPerezRegistrationBodyAsJson());
+        registerJuanPerez();
 
         ReceptionistResponse response = receptionist.login(juanPerezLoginBodyAsJson());
 
@@ -47,7 +51,7 @@ public class RestReceptionistTest {
     @Test
     public void canNotLoginWithInvalidCredentials() {
         receptionist = createReceptionist();
-        receptionist.registerUser(juanPerezRegistrationBodyAsJson());
+        registerJuanPerez();
 
         final JsonObject invalidJuanPerezLoginBodyAsJson = juanPerezLoginBodyAsJson();
         invalidJuanPerezLoginBodyAsJson.add(RestReceptionist.PASSWORD_KEY,TestObjectsBucket.JUAN_PEREZ_PASSWORD+"x");
@@ -60,7 +64,7 @@ public class RestReceptionistTest {
     @Test
     public void usersReturnsAllRegisteredUsers() {
         receptionist = createReceptionist();
-        receptionist.registerUser(juanPerezRegistrationBodyAsJson());
+        registerJuanPerez();
 
         ReceptionistResponse response = receptionist.users();
 
@@ -104,7 +108,7 @@ public class RestReceptionistTest {
     @Test
     public void registeredUserCanPublishAppropriateMessage() {
         receptionist = createReceptionist();
-        ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
+        ReceptionistResponse registeredUserResponse = registerJuanPerez();
 
         final String publicationMessage = "hello";
         final String registeredUserId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
@@ -122,7 +126,7 @@ public class RestReceptionistTest {
     @Test
     public void canNotPublishInappropriateWords() {
         receptionist = createReceptionist();
-        ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
+        ReceptionistResponse registeredUserResponse = registerJuanPerez();
 
         final String registeredUserId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
         ReceptionistResponse publicationResponse = receptionist.addPublication(
@@ -146,7 +150,7 @@ public class RestReceptionistTest {
     @Test
     public void timelineReturnsUserPublications() {
         receptionist = createReceptionist();
-        ReceptionistResponse registeredUserResponse = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
+        ReceptionistResponse registeredUserResponse = registerJuanPerez();
 
         final String followerId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
         ReceptionistResponse publicationResponse = receptionist.addPublication(
@@ -244,7 +248,7 @@ public class RestReceptionistTest {
             FollowingsAssertion assertions) {
         receptionist = createReceptionist();
         ReceptionistResponse followerResponse = receptionist.registerUser(pepeSanchezRegistrationBodyAsJson());
-        ReceptionistResponse followeeResponse = receptionist.registerUser(juanPerezRegistrationBodyAsJson());
+        ReceptionistResponse followeeResponse = registerJuanPerez();
 
         JsonObject followingsBodyAsJson = new JsonObject()
                 .add(RestReceptionist.FOLLOWER_ID_KEY, followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
