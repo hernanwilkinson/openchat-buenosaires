@@ -150,7 +150,8 @@ public class OpenChatSystemTest {
         return system.register(
                 TestObjectsBucket.PEPE_SANCHEZ_NAME,
                 TestObjectsBucket.PEPE_SANCHEZ_PASSWORD,
-                TestObjectsBucket.PEPE_SANCHEZ_ABOUT);
+                TestObjectsBucket.PEPE_SANCHEZ_ABOUT,
+                TestObjectsBucket.PEPE_SANCHEZ_URL);
     }
 
     private User registerJuanPerez() {

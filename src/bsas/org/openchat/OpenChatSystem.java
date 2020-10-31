@@ -21,9 +21,13 @@ public class OpenChatSystem {
     }
 
     public User register(String userName, String password, String about) {
+        return register(userName, password, about, "not defined url");
+    }
+
+    public User register(String userName, String password, String about, String url) {
         assertIsNotDuplicated(userName);
 
-        final User newUser = User.named(userName, password, about);
+        final User newUser = User.named(userName, password, about, url);
         userCards.put(
                 userName,
                 UserCard.of(newUser,password, Publisher.relatedTo(newUser)));
