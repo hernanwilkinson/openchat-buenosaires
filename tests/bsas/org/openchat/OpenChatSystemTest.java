@@ -25,11 +25,12 @@ public class OpenChatSystemTest {
     @Test
     public void canRegisterUser() {
         system = createSystem();
-        registerPepeSanchez();
+        User registeredUser = registerPepeSanchez();
 
         assertTrue(system.hasUsers());
         assertTrue(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
         assertEquals(1,system.numberOfUsers());
+        assertEquals(TestObjectsBucket.PEPE_SANCHEZ_URL,registeredUser.url());
     }
     @Test
     public void canRegisterManyUsers() {
