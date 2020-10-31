@@ -14,12 +14,14 @@ public class UserDSL {
         private final String username;
         private final String about;
         private final String password;
+        private final String url;
 
-        ITUser(String id, String username, String password, String about) {
+        ITUser(String id, String username, String password, String about, String url) {
             this.id = id;
             this.username = username;
             this.password = password;
             this.about = about;
+            this.url = url;
         }
 
         public String id() {
@@ -47,6 +49,10 @@ public class UserDSL {
         public String toString() {
             return reflectionToString(this, MULTI_LINE_STYLE);
         }
+
+        public String url() {
+            return url;
+        }
     }
 
     public static class ITUserBuilder {
@@ -55,6 +61,7 @@ public class UserDSL {
         private String username = "Alice";
         private String password = "lask3424";
         private String about = "About Alice";
+        private String url = "www.google.com";
 
         public static ITUserBuilder aUser() {
             return new ITUserBuilder();
@@ -79,6 +86,10 @@ public class UserDSL {
             this.about = about;
             return this;
         }
+        public ITUserBuilder withUrl(String url) {
+            this.url = url;
+            return this;
+        }
 
         public ITUserBuilder clonedFrom(ITUser anotherUser) {
             this.userId = anotherUser.id();
@@ -89,7 +100,7 @@ public class UserDSL {
         }
 
         public ITUser build() {
-            return new ITUser(userId, username, password, about);
+            return new ITUser(userId, username, password, about, url);
         }
 
     }
