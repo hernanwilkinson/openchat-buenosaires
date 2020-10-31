@@ -208,7 +208,8 @@ public class RestReceptionistTest {
 
     private JsonObject juanPerezRegistrationBodyAsJson() {
         return juanPerezLoginBodyAsJson()
-                .add(RestReceptionist.ABOUT_KEY, TestObjectsBucket.JUAN_PEREZ_ABOUT);
+                .add(RestReceptionist.ABOUT_KEY, TestObjectsBucket.JUAN_PEREZ_ABOUT)
+                .add(RestReceptionist.URL_KEY, TestObjectsBucket.JUAN_PEREZ_URL);
     }
 
     private JsonObject pepeSanchezRegistrationBodyAsJson() {
@@ -226,6 +227,7 @@ public class RestReceptionistTest {
         assertFalse(responseBodyAsJson.getString(RestReceptionist.ID_KEY, "").isBlank());
         assertEquals(TestObjectsBucket.JUAN_PEREZ_NAME, responseBodyAsJson.getString(RestReceptionist.USERNAME_KEY, ""));
         assertEquals(TestObjectsBucket.JUAN_PEREZ_ABOUT, responseBodyAsJson.getString(RestReceptionist.ABOUT_KEY, ""));
+        assertEquals(TestObjectsBucket.JUAN_PEREZ_URL, responseBodyAsJson.getString(RestReceptionist.URL_KEY, ""));
         assertEquals(
                 TestObjectsBucket.JUAN_PEREZ_PASSWORD + "x",
                 responseBodyAsJson.getString(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.JUAN_PEREZ_PASSWORD + "x"));

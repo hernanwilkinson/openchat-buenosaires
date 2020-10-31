@@ -18,6 +18,7 @@ public class RestReceptionist {
     public static final String USERNAME_KEY = "username";
     public static final String PASSWORD_KEY = "password";
     public static final String ABOUT_KEY = "about";
+    public static final String URL_KEY = "url";
     public static final String ID_KEY = "id";
     public static final String FOLLOWER_ID_KEY = "followerId";
     public static final String FOLLOWEE_ID_KEY = "followeeId";
