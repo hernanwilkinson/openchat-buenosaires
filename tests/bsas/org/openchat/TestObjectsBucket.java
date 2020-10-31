@@ -30,11 +30,19 @@ public class TestObjectsBucket {
     }
 
     public User createUserJuanPerez() {
-        return User.named(JUAN_PEREZ_NAME, JUAN_PEREZ_PASSWORD,"about");
+        return User.named(
+                JUAN_PEREZ_NAME,
+                JUAN_PEREZ_PASSWORD,
+                JUAN_PEREZ_ABOUT,
+                JUAN_PEREZ_URL);
     }
 
     public User createPepeSanchez() {
-        return User.named(PEPE_SANCHEZ_NAME, PEPE_SANCHEZ_PASSWORD,PEPE_SANCHEZ_ABOUT,PEPE_SANCHEZ_URL);
+        return User.named(
+                PEPE_SANCHEZ_NAME,
+                PEPE_SANCHEZ_PASSWORD,
+                PEPE_SANCHEZ_ABOUT,
+                PEPE_SANCHEZ_URL);
     }
 
     public Clock fixedNowClock(){
