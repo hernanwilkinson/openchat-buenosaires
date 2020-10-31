@@ -12,6 +12,10 @@ public class User {
         return new User(name, about);
     }
 
+    public static User named(String name, String password, String about, String url) {
+        return named(name,password,about);
+    }
+
     static void assertNameIsNotBlank(String name) {
         if(name.isBlank()) throw new ModelException(NAME_CANNOT_BE_BLANK);
     }
@@ -31,5 +35,9 @@ public class User {
 
     public String about() {
         return about;
+    }
+
+    public String url() {
+        throw new RuntimeException();
     }
 }
