@@ -23,7 +23,7 @@ public class OpenChatSystem {
     public User register(String userName, String password, String about, String url) {
         assertIsNotDuplicated(userName);
 
-        final User newUser = User.named(userName, password, about,url);
+        final User newUser = User.named(userName, about,url);
         userCards.put(
                 userName,
                 UserCard.of(newUser,password, Publisher.relatedTo(newUser)));

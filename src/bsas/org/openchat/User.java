@@ -7,7 +7,7 @@ public class User {
     private final String about;
     private final String url;
 
-    public static User named(String name, String password, String about, String url) {
+    public static User named(String name, String about, String url) {
         assertNameIsNotBlank(name);
 
         return new User(name, about,url);

@@ -11,7 +11,7 @@ public class UserTest {
     @Test
     public void canNotCreateUserWithBlankName() {
         assertThrowsModelExceptionWithErrorMessage(
-                () -> User.named(" ", "password", "about","www.10pines.com"),
+                () -> User.named(" ", "about","www.10pines.com"),
                 User.NAME_CANNOT_BE_BLANK);
     }
 
