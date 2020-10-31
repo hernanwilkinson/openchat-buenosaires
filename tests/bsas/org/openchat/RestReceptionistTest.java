@@ -128,8 +128,9 @@ public class RestReceptionistTest {
     public void invalidUserCanNotPublish() {
         receptionist = createReceptionist();
 
+        final String invalidUserId = "";
         ReceptionistResponse publicationResponse = receptionist.addPublication(
-                "",
+                invalidUserId,
                 messageBodyAsJsonFor("something"));
 
         assertTrue(publicationResponse.isStatus(BAD_REQUEST_400));
@@ -140,12 +141,12 @@ public class RestReceptionistTest {
         receptionist = createReceptionist();
         ReceptionistResponse registeredUserResponse = registerJuanPerez();
 
-        final String followerId = idOfRegisteredUser(registeredUserResponse);
+        final String registereduserId = idOfRegisteredUser(registeredUserResponse);
         ReceptionistResponse publicationResponse = receptionist.addPublication(
-                followerId,
+                registereduserId,
                 messageBodyAsJsonFor("Hello"));
 
-        ReceptionistResponse timelineResponse = receptionist.timelineOf(followerId);
+        ReceptionistResponse timelineResponse = receptionist.timelineOf(registereduserId);
         assertTrue(timelineResponse.isStatus(OK_200));
         JsonArray timelineBody = timelineResponse.responseBodyAsJsonArray();
         assertEquals(1,timelineBody.size());
