@@ -88,7 +88,7 @@ public class RestReceptionistTest {
     public void followeesReturnsUserFollowees() {
         makePepeSanchezFollowJuanPerezAndAssert(
             (receptionist,firstResponse,followingsBody,followerResponse,followeeResponse)-> {
-                ReceptionistResponse response = receptionist.followeesOf(followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
+                ReceptionistResponse response = receptionist.followeesOf(idOfRegisteredUser(followerResponse));
 
                 assertIsArrayWithJuanPerezOnly(response);
             });
@@ -99,7 +99,7 @@ public class RestReceptionistTest {
         ReceptionistResponse registeredUserResponse = registerJuanPerez();
 
         final String publicationMessage = "hello";
-        final String registeredUserId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
+        final String registeredUserId = idOfRegisteredUser(registeredUserResponse);
         ReceptionistResponse publicationResponse = receptionist.addPublication(
                 registeredUserId,
                 messageBodyAsJsonFor(publicationMessage));
@@ -111,14 +111,14 @@ public class RestReceptionistTest {
         assertEquals(publicationMessage, responseBody.getString(RestReceptionist.TEXT_KEY,""));
         assertEquals(formattedNow(),responseBody.getString(RestReceptionist.DATE_TIME_KEY,""));
     }
+
     @Test
     public void canNotPublishInappropriateWords() {
         receptionist = createReceptionist();
         ReceptionistResponse registeredUserResponse = registerJuanPerez();
 
-        final String registeredUserId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
         ReceptionistResponse publicationResponse = receptionist.addPublication(
-                registeredUserId,
+                idOfRegisteredUser(registeredUserResponse),
                 messageBodyAsJsonFor("elephant"));
 
         assertTrue(publicationResponse.isStatus(BAD_REQUEST_400));
@@ -140,7 +140,7 @@ public class RestReceptionistTest {
         receptionist = createReceptionist();
         ReceptionistResponse registeredUserResponse = registerJuanPerez();
 
-        final String followerId = registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
+        final String followerId = idOfRegisteredUser(registeredUserResponse);
         ReceptionistResponse publicationResponse = receptionist.addPublication(
                 followerId,
                 messageBodyAsJsonFor("Hello"));
@@ -158,11 +158,11 @@ public class RestReceptionistTest {
     public void wallReturnsFollowerAndFolloweePublications() {
         makePepeSanchezFollowJuanPerezAndAssert(
             (receptionist,firstResponse,followingsBody,followerResponse,followeeResponse)-> {
-                final String followerId = followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
+                final String followerId = idOfRegisteredUser(followerResponse);
                 ReceptionistResponse followerPublicationResponse = receptionist.addPublication(
                         followerId,
                         messageBodyAsJsonFor("Hello"));
-                final String followeeId = followeeResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
+                final String followeeId = idOfRegisteredUser(followeeResponse);
                 ReceptionistResponse followeePublicationResponse = receptionist.addPublication(
                         followeeId,
                         messageBodyAsJsonFor("Bye"));
@@ -251,8 +251,8 @@ public class RestReceptionistTest {
         ReceptionistResponse followeeResponse = registerJuanPerez();
 
         JsonObject followingsBodyAsJson = new JsonObject()
-                .add(RestReceptionist.FOLLOWER_ID_KEY, followerResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""))
-                .add(RestReceptionist.FOLLOWEE_ID_KEY, followeeResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
+                .add(RestReceptionist.FOLLOWER_ID_KEY, idOfRegisteredUser(followerResponse))
+                .add(RestReceptionist.FOLLOWEE_ID_KEY, idOfRegisteredUser(followeeResponse));
 
         ReceptionistResponse response = receptionist.followings(followingsBodyAsJson);
         assertions.accept(receptionist,response,followingsBodyAsJson,followerResponse,followeeResponse);
@@ -263,4 +263,7 @@ public class RestReceptionistTest {
                 .add(RestReceptionist.TEXT_KEY, message);
     }
 
+    private String idOfRegisteredUser(ReceptionistResponse registeredUserResponse) {
+        return registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
+    }
 }
