@@ -32,4 +32,8 @@ public class User {
     public String about() {
         return about;
     }
+
+    public String url() {
+        throw new RuntimeException();
+    }
 }

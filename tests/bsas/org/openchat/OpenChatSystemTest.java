@@ -25,11 +25,16 @@ public class OpenChatSystemTest {
     @Test
     public void canRegisterUser() {
         system = createSystem();
-        registerPepeSanchez();
+        User registeredUser = registerPepeSanchez();
 
         assertTrue(system.hasUsers());
         assertTrue(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
         assertEquals(1,system.numberOfUsers());
+
+        assertTrue(registeredUser.isNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
+        assertEquals(TestObjectsBucket.PEPE_SANCHEZ_ABOUT,registeredUser.about());
+        assertEquals(TestObjectsBucket.PEPE_SANCHEZ_URL,registeredUser.url());
+        assertNotEquals(TestObjectsBucket.PEPE_SANCHEZ_URL+"x",registeredUser.url());
     }
     @Test
     public void canRegisterManyUsers() {
@@ -149,7 +154,8 @@ public class OpenChatSystemTest {
         return system.register(
                 TestObjectsBucket.PEPE_SANCHEZ_NAME,
                 TestObjectsBucket.PEPE_SANCHEZ_PASSWORD,
-                TestObjectsBucket.PEPE_SANCHEZ_ABOUT);
+                TestObjectsBucket.PEPE_SANCHEZ_ABOUT,
+                TestObjectsBucket.PEPE_SANCHEZ_URL);
     }
 
     private User registerJuanPerez() {
