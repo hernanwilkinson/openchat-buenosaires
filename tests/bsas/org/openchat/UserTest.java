@@ -1,7 +1,7 @@
 package bsas.org.openchat;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import static bsas.org.openchat.TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage;
 
@@ -19,13 +19,13 @@ public class UserTest {
     public void canCreateUserWithNoBlankName() {
         User createdUser = testObjects.createPepeSanchez();
 
-        Assertions.assertTrue(createdUser.isNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
+        assertTrue(createdUser.isNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
     }
 
     @Test
     public void isNamedReturnsFalseWhenAskedWithOtherName() {
         User createdUser = testObjects.createPepeSanchez();
 
-        Assertions.assertFalse(createdUser.isNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME+"x"));
+        assertFalse(createdUser.isNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME+"x"));
     }
 }

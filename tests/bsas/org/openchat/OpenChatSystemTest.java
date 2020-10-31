@@ -1,12 +1,11 @@
 package bsas.org.openchat;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 public class OpenChatSystemTest {
 
@@ -19,18 +18,18 @@ public class OpenChatSystemTest {
         //contexto mientras debuggeo
         system = createSystem();
 
-        Assertions.assertFalse(system.hasUsers());
-        Assertions.assertFalse(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
-        Assertions.assertEquals(0, system.numberOfUsers());
+        assertFalse(system.hasUsers());
+        assertFalse(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
+        assertEquals(0, system.numberOfUsers());
     }
     @Test
     public void canRegisterUser() {
         system = createSystem();
         registerPepeSanchez();
 
-        Assertions.assertTrue(system.hasUsers());
-        Assertions.assertTrue(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
-        Assertions.assertEquals(1,system.numberOfUsers());
+        assertTrue(system.hasUsers());
+        assertTrue(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
+        assertEquals(1,system.numberOfUsers());
     }
     @Test
     public void canRegisterManyUsers() {
@@ -38,10 +37,10 @@ public class OpenChatSystemTest {
         registerPepeSanchez();
         registerJuanPerez();
 
-        Assertions.assertTrue(system.hasUsers());
-        Assertions.assertTrue(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
-        Assertions.assertTrue(system.hasUserNamed(TestObjectsBucket.JUAN_PEREZ_NAME));
-        Assertions.assertEquals(2,system.numberOfUsers());
+        assertTrue(system.hasUsers());
+        assertTrue(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
+        assertTrue(system.hasUserNamed(TestObjectsBucket.JUAN_PEREZ_NAME));
+        assertEquals(2,system.numberOfUsers());
     }
     @Test
     public void canNotRegisterSameUserTwice() {
@@ -52,9 +51,9 @@ public class OpenChatSystemTest {
                 ()->registerPepeSanchez(),
                 OpenChatSystem.CANNOT_REGISTER_SAME_USER_TWICE);
 
-        Assertions.assertTrue(system.hasUsers());
-        Assertions.assertTrue(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
-        Assertions.assertEquals(1,system.numberOfUsers());
+        assertTrue(system.hasUsers());
+        assertTrue(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
+        assertEquals(1,system.numberOfUsers());
     }
     @Test
     public void canWorkWithAuthenticatedUser() {
