@@ -162,6 +162,7 @@ public class OpenChatSystemTest {
         return system.register(
                 TestObjectsBucket.JUAN_PEREZ_NAME,
                 TestObjectsBucket.JUAN_PEREZ_PASSWORD,
-                TestObjectsBucket.JUAN_PEREZ_ABOUT);
+                TestObjectsBucket.JUAN_PEREZ_ABOUT,
+                TestObjectsBucket.JUAN_PEREZ_URL);
     }
 }
