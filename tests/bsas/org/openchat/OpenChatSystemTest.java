@@ -33,8 +33,8 @@ public class OpenChatSystemTest {
 
         assertTrue(registeredUser.isNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
         assertEquals(TestObjectsBucket.PEPE_SANCHEZ_ABOUT,registeredUser.about());
-        assertEquals(TestObjectsBucket.PEPE_SANCHEZ_URL,registeredUser.url());
-        assertNotEquals(TestObjectsBucket.PEPE_SANCHEZ_URL+"x",registeredUser.url());
+        assertEquals(TestObjectsBucket.PEPE_SANCHEZ_HOME_PAGE,registeredUser.homePage());
+        assertNotEquals(TestObjectsBucket.PEPE_SANCHEZ_HOME_PAGE +"x",registeredUser.homePage());
     }
     @Test
     public void canRegisterManyUsers() {
@@ -155,7 +155,7 @@ public class OpenChatSystemTest {
                 TestObjectsBucket.PEPE_SANCHEZ_NAME,
                 TestObjectsBucket.PEPE_SANCHEZ_PASSWORD,
                 TestObjectsBucket.PEPE_SANCHEZ_ABOUT,
-                TestObjectsBucket.PEPE_SANCHEZ_URL);
+                TestObjectsBucket.PEPE_SANCHEZ_HOME_PAGE);
     }
 
     private User registerJuanPerez() {
@@ -163,6 +163,6 @@ public class OpenChatSystemTest {
                 TestObjectsBucket.JUAN_PEREZ_NAME,
                 TestObjectsBucket.JUAN_PEREZ_PASSWORD,
                 TestObjectsBucket.JUAN_PEREZ_ABOUT,
-                TestObjectsBucket.JUAN_PEREZ_URL);
+                TestObjectsBucket.JUAN_PEREZ_HOME_PAGE);
     }
 }

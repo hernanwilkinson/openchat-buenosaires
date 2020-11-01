@@ -11,7 +11,7 @@ POST - openchat/registration
 	"username" : "Alice",
 	"password" : "alki324d",
 	"about" : "I love playing the piano and travelling."
-	"url" : "www.twitter.com/alice"
+	"homePage" : "www.twitter.com/alice"
 }
 
 **Success**
@@ -21,7 +21,7 @@ Response:
     "id" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 	"username" : "Alice",
 	"about" : "I love playing the piano and travelling."
-	"url" : "www.twitter.com/alice"
+	"homePage" : "www.twitter.com/alice"
 }
 
 **Failure**
@@ -43,7 +43,7 @@ Response:
     "id" : "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 	"username" : "Alice",
 	"about" : "I love playing the piano and travelling."
-	"url" : "www.twitter.com/alice"
+	"homePage" : "www.twitter.com/alice"
 }
 
 **Failure**
@@ -151,17 +151,17 @@ GET - openchat/users
 	"id" : "123e4567-e89b-12d3-a456-426655440000",
 	"username" : "Alice",
 	"about" : "I love playing the pianno and travel.",
-	"url" : "www.twitter.com/alice"
+	"homePage" : "www.twitter.com/alice"
 },{
 	"id" : "093f2342-e89b-12d3-a456-426655440000",
 	"username" : "Bob",
 	"about" : "Writer and photographer. Passionate about food and languages."
-	"url" : "www.twitter.com/bob"
+	"homePage" : "www.twitter.com/bob"
 },{
 	"id" : "316h3543-e89b-12d3-a456-426655440000",
 	"username" : "Charlie",
 	"about" : "I'm a basketball player, love cycling and meeting new people. "
-	"url" : "www.linkedin.com/charlie"
+	"homePage" : "www.linkedin.com/charlie"
 }]
 
 **Success**
@@ -174,17 +174,17 @@ GET - openchat/user/:id/followees
 	"id" : "123e4567-e89b-12d3-a456-426655440000",
 	"username" : "Alice",
 	"about" : "I love playing the pianno and travel.",
-	"url" : "www.twitter.com/alice"
+	"homePage" : "www.twitter.com/alice"
 },{
 	"id" : "093f2342-e89b-12d3-a456-426655440000",
 	"username" : "Bob",
 	"about" : "Writer and photographer. Passionate about food and languages."
-	"url" : "www.twitter.com/bob"
+	"homePage" : "www.twitter.com/bob"
 },{
 	"id" : "316h3543-e89b-12d3-a456-426655440000",
 	"username" : "Charlie",
 	"about" : "I'm a basketball player, love cycling and meeting new people. "
-	"url" : "www.linkedin.com/charlie"
+	"homePage" : "www.linkedin.com/charlie"
 }]
 
 **Success**

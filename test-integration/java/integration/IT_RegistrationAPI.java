@@ -24,7 +24,7 @@ public class IT_RegistrationAPI {
                 .body("id", matchesPattern(UUID_PATTERN))
                 .body("username", is("Lucy"))
                 .body("about", is("About Lucy"))
-                .body("url", is("www.10pines.com"))
+                .body("homePage", is("www.10pines.com"))
         ;
     }
 
@@ -42,12 +42,12 @@ public class IT_RegistrationAPI {
                 .assertThat().body(is("Username already in use."));
     }
 
-    private String withJsonContaining(String username, String password, String about, String url) {
+    private String withJsonContaining(String username, String password, String about, String homePage) {
         return new JsonObject()
                         .add("username", username)
                         .add("password", password)
                         .add("about", about)
-                        .add("url",url)
+                        .add("homePage",homePage)
                         .toString();
     }
 }

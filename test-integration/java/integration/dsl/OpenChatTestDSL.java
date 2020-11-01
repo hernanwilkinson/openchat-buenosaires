@@ -89,7 +89,7 @@ public class OpenChatTestDSL {
                         .add("id", user.id())
                         .add("username", user.username())
                         .add("about", user.about())
-                        .add("url",user.url());
+                        .add("homePage",user.homePage());
     }
 
     private static String withFollowingJsonContaining(ITUser follower, ITUser followee) {
@@ -113,7 +113,7 @@ public class OpenChatTestDSL {
                         .add("username", user.username())
                         .add("password", user.password())
                         .add("about", user.about())
-                        .add("url",user.url())
+                        .add("homePage",user.homePage())
                         .toString();
     }
 }

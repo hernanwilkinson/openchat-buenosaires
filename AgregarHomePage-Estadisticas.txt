@@ -1,0 +1,22 @@
+Empezando por OpenChatSystem
+- Hacer fallar el test en OpenChatSystem:
+  - Clases modificadas: 4
+  - Diferencias: 6
+- Hacer pasar el test:
+  - Clases modificadas: 2
+  - Diferencias: 7
+- Hacer fallar el test en RestReceptionist:
+  - Clases modificadas: 3
+  - Diferencias: 4
+- Hacer pasar el test en RestReceptionist y aceptacion:
+  - Clases modificadas: 1
+  - Diferencias: 3
+- Remover metodo User.named(username,password,about)
+  - Clases modificadas: 3
+  - Diferencias: 4
+- Remover metodo OpenChatSystem.register(username,password,about)
+  - Clases modificadas: 2
+  - Diferencias: 2
+- Renombrar url por homePage
+  - Clases: 10
+  - Diferencias: 35

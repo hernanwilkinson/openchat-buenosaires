@@ -33,7 +33,7 @@ public class IT_LoginAPI {
                 .body("id", is(ANTONY.id()))
                 .body("username", is(ANTONY.username()))
                 .body("about", is(ANTONY.about()))
-                .body("url",is(ANTONY.url()));
+                .body("homePage",is(ANTONY.homePage()));
     }
 
     private String withJsonContaining(String username, String password) {
