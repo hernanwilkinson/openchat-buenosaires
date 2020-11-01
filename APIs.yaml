@@ -135,6 +135,60 @@ paths:
             items:
               $ref: "#/definitions/Post"
 
+  /users/{userId}/wall:
+    get:
+      tags:
+        - post
+      summary: Return user's wall.
+      operationId: wall
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: userId
+          description: ID of the user creating the post.
+          required: true
+          type: string
+          format: UUID
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Post"
+
+  /publications/{publicationId}/like:
+    post:
+      tags:
+        - post
+      summary: Likes a post.
+      operationId: likePost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: publicationId
+          description: ID of the publication to like.
+          required: true
+          type: string
+          format: UUID
+        - in: body
+          name: userId
+          description: userId that provides the like
+          required: true
+          schema:
+            $ref: "#/definitions/Like"
+      responses:
+        "201":
+          description: Like accepted.
+          schema:
+            $ref: "#/definitions/Post"
+        "400":
+          description: Invalid post or user id.
+
   /followings:
     post:
       tags:
@@ -178,29 +232,6 @@ paths:
             type: array
             items:
               $ref: "#/definitions/User"
-
-  /users/{userId}/wall:
-    get:
-      tags:
-        - post
-      summary: Return user's wall.
-      operationId: wall
-      produces:
-        - application/json
-      parameters:
-        - in: path
-          name: userId
-          description: ID of the user creating the post.
-          required: true
-          type: string
-          format: UUID
-      responses:
-        "200":
-          description: Successful operation
-          schema:
-            type: array
-            items:
-              $ref: "#/definitions/Post"
 
 definitions:
   Registration:
@@ -265,6 +296,8 @@ definitions:
         format: date-time
         description: "yyyy-MM-ddTHH:mm:ssZ"
         example: "2018-01-10T11:30:00Z"
+      likes:
+        type: integer
 
   Follow:
     type: object

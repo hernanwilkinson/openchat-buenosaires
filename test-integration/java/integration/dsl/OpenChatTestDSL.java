@@ -76,12 +76,13 @@ public class OpenChatTestDSL {
         users.forEach(user -> assertThat(usersArray.values().contains(jsonFor(user))).isTrue());
     }
 
-    public static void assertThatJsonPostMatchesPost(JsonValue jsonValue, ITPost post) {
+    public static void assertThatJsonPostMatchesPost(JsonValue jsonValue, ITPost post, int likes) {
         JsonObject postJson = jsonValue.asObject();
         assertThat(postJson.getString("postId", "")).matches(UUID_PATTERN);
         assertThat(postJson.getString("userId", "")).matches(UUID_PATTERN);
         assertThat(postJson.getString("text", "")).isEqualTo(post.text());
         assertThat(postJson.getString("dateTime", "")).matches(DATE_PATTERN);
+        assertThat(postJson.getInt("likes", -1)).isEqualTo(likes);
     }
 
     private static JsonObject jsonFor(ITUser user) {

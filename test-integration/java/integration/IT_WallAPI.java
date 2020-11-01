@@ -85,7 +85,7 @@ public class IT_WallAPI {
 
     private void thenSheSeesThePosts(ITPost... posts) {
         for (int index = 0; index < posts.length; index++) {
-            assertThatJsonPostMatchesPost(wall.get(index), posts[index]);
+            assertThatJsonPostMatchesPost(wall.get(index), posts[index],0);
         }
     }
 

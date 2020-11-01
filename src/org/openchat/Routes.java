@@ -33,6 +33,11 @@ public class Routes {
         post("followings", (req, res) -> followings(req,res));
         get("followings/:followerId/followees", (req, res) -> followees(req,res));
         get("users/:userId/wall", (req, res) -> wall(req,res));
+        post("publications/:publicationId/like", (req, res) -> likePublication(req,res));
+    }
+
+    private String likePublication(Request request, Response response) {
+        throw new RuntimeException("Should implement");
     }
 
     private String wall(Request request, Response response) {
