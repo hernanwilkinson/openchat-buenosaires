@@ -20,10 +20,10 @@ public class OpenChatSystem {
         return !userCards.isEmpty();
     }
 
-    public User register(String userName, String password, String about, String url) {
+    public User register(String userName, String password, String about, String homePage) {
         assertIsNotDuplicated(userName);
 
-        final User newUser = User.named(userName, about, url);
+        final User newUser = User.named(userName, about, homePage);
         userCards.put(
                 userName,
                 UserCard.of(newUser,password, Publisher.relatedTo(newUser)));

@@ -29,10 +29,10 @@ public class UserTest {
         assertFalse(createdUser.isNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME+"x"));
     }
     @Test
-    public void userKnowsItsUrl() {
+    public void userKnowsItsHomePage() {
         User createdUser = testObjects.createPepeSanchez();
 
-        assertEquals(TestObjectsBucket.PEPE_SANCHEZ_URL,createdUser.url());
-        assertNotEquals(TestObjectsBucket.PEPE_SANCHEZ_URL+"x",createdUser.url());
+        assertEquals(TestObjectsBucket.PEPE_SANCHEZ_HOME_PAGE,createdUser.homePage());
+        assertNotEquals(TestObjectsBucket.PEPE_SANCHEZ_HOME_PAGE +"x",createdUser.homePage());
     }
 }

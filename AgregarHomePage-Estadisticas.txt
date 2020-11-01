@@ -1,0 +1,28 @@
+Empezando desde User
+- Test fallando en UserTest
+  - Clases: 3
+  - Diferencias: 5
+- Test pasando en UserTest
+  - Clases: 1
+  - Diferencias: 6
+- Test en OpenChatSystemTest para url fallando
+  - Classes: 1
+  - Diferencias: 2
+- Test en OpenChatSystemTest para url pasando
+  - Clases: 2
+  - Diferencias: 3
+- Test en RestReceptionist para url fallando
+  - Clases: 3
+  - Diferencias: 4
+- Test en RestReceptionist para url pasando - Test de Aceptacion pasando
+  - Clases: 1
+  - Diferencias: 3
+- Remove method User.named(name,password,about)
+  - Clases: 3
+  - Diferencias: 4
+- Remove method OpenChatSystem.register(name,password,about)
+  - Clases: 2
+  - Diferencias: 2
+- Renombrar url por homePage
+  - Clases: 11
+  - Diferencias: 37
