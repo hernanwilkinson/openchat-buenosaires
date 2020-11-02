@@ -25,6 +25,7 @@ public class RestReceptionist {
     public static final String USER_ID_KEY = "userId";
     public static final String TEXT_KEY = "text";
     public static final String DATE_TIME_KEY = "dateTime";
+    public static final String LIKES_KEY = "likes";
     public static final String INVALID_CREDENTIALS = "Invalid credentials.";
     public static final String FOLLOWING_CREATED = "Following created.";
     public static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -178,7 +179,8 @@ public class RestReceptionist {
                 .add(POST_ID_KEY, publicationId)
                 .add(USER_ID_KEY, userId)
                 .add(TEXT_KEY, publication.message())
-                .add(DATE_TIME_KEY, formatDateTime(publication.publicationTime()));
+                .add(DATE_TIME_KEY, formatDateTime(publication.publicationTime()))
+                .add(LIKES_KEY,0);
     }
 
     private String formatDateTime(LocalDateTime dateTimeToFormat) {

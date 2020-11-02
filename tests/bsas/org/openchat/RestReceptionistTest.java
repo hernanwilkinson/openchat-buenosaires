@@ -110,6 +110,7 @@ public class RestReceptionistTest {
         assertEquals(registeredUserId, responseBody.getString(RestReceptionist.USER_ID_KEY,""));
         assertEquals(publicationMessage, responseBody.getString(RestReceptionist.TEXT_KEY,""));
         assertEquals(formattedNow(),responseBody.getString(RestReceptionist.DATE_TIME_KEY,""));
+        assertEquals(0,responseBody.getInt(RestReceptionist.LIKES_KEY,-1));
     }
 
     @Test

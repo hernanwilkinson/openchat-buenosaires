@@ -14,3 +14,6 @@ Empezando por OpenChatSystem
 - Test notRegisteredUserCanNotLikePublication
     - Clases: 2
     - Diferencias: 6
+- Test registeredUserCanPublishAppropriateMessage modificado
+    - Clases: 2
+    - Diferncias: 3
