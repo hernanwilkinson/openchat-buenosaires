@@ -37,7 +37,14 @@ public class Routes {
     }
 
     private String likePublication(Request request, Response response) {
-        throw new RuntimeException("Should implement");
+        return receptionistDo(
+                ()->receptionist.likePublicationIdentifiedAs(
+                        publicationIdFromParamsOf(request),requestBodyAsJson(request)),
+                response);
+    }
+
+    private String publicationIdFromParamsOf(Request request) {
+        return request.params(RestReceptionist.PUBLICATION_ID_KEY);
     }
 
     private String wall(Request request, Response response) {

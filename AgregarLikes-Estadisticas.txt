@@ -29,3 +29,6 @@ Empezando por OpenChatSystem
 - Test timelineIncludesLikes
     - Classes: 2
     - Diferencias: 2
+- Test de aceptacion pasando
+    - Clases: 2
+    - Diferencias: 2
