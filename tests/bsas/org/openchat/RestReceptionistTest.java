@@ -99,15 +99,13 @@ public class RestReceptionistTest {
         ReceptionistResponse registeredUserResponse = registerJuanPerez();
 
         final String publicationMessage = "hello";
-        final String registeredUserId = idOfRegisteredUser(registeredUserResponse);
-        ReceptionistResponse publicationResponse = receptionist.addPublication(
-                registeredUserId,
-                messageBodyAsJsonFor(publicationMessage));
+        ReceptionistResponse publicationResponse = publishMessageOf(
+                registeredUserResponse,publicationMessage);
 
         assertTrue(publicationResponse.isStatus(CREATED_201));
         JsonObject responseBody = publicationResponse.responseBodyAsJson();
         assertFalse(responseBody.getString(RestReceptionist.POST_ID_KEY,"").isBlank());
-        assertEquals(registeredUserId, responseBody.getString(RestReceptionist.USER_ID_KEY,""));
+        assertEquals(idOfRegisteredUser(registeredUserResponse), responseBody.getString(RestReceptionist.USER_ID_KEY,""));
         assertEquals(publicationMessage, responseBody.getString(RestReceptionist.TEXT_KEY,""));
         assertEquals(formattedNow(),responseBody.getString(RestReceptionist.DATE_TIME_KEY,""));
         assertEquals(0,responseBody.getInt(RestReceptionist.LIKES_KEY,-1));
@@ -118,9 +116,7 @@ public class RestReceptionistTest {
         receptionist = createReceptionist();
         ReceptionistResponse registeredUserResponse = registerJuanPerez();
 
-        ReceptionistResponse publicationResponse = receptionist.addPublication(
-                idOfRegisteredUser(registeredUserResponse),
-                messageBodyAsJsonFor("elephant"));
+        ReceptionistResponse publicationResponse = publishMessageOf(registeredUserResponse,"elephant");
 
         assertTrue(publicationResponse.isStatus(BAD_REQUEST_400));
         assertEquals(Publication.INAPPROPRIATE_WORD,publicationResponse.responseBody());
@@ -142,12 +138,10 @@ public class RestReceptionistTest {
         receptionist = createReceptionist();
         ReceptionistResponse registeredUserResponse = registerJuanPerez();
 
-        final String registereduserId = idOfRegisteredUser(registeredUserResponse);
-        ReceptionistResponse publicationResponse = receptionist.addPublication(
-                registereduserId,
-                messageBodyAsJsonFor("Hello"));
+        ReceptionistResponse publicationResponse = publishMessageOf(
+                registeredUserResponse,"hello");
 
-        ReceptionistResponse timelineResponse = receptionist.timelineOf(registereduserId);
+        ReceptionistResponse timelineResponse = receptionist.timelineOf(idOfRegisteredUser(registeredUserResponse));
         assertTrue(timelineResponse.isStatus(OK_200));
         JsonArray timelineBody = timelineResponse.responseBodyAsJsonArray();
         assertEquals(1,timelineBody.size());
@@ -160,16 +154,12 @@ public class RestReceptionistTest {
     public void wallReturnsFollowerAndFolloweePublications() {
         makePepeSanchezFollowJuanPerezAndAssert(
             (receptionist,firstResponse,followingsBody,followerResponse,followeeResponse)-> {
-                final String followerId = idOfRegisteredUser(followerResponse);
-                ReceptionistResponse followerPublicationResponse = receptionist.addPublication(
-                        followerId,
-                        messageBodyAsJsonFor("Hello"));
-                final String followeeId = idOfRegisteredUser(followeeResponse);
-                ReceptionistResponse followeePublicationResponse = receptionist.addPublication(
-                        followeeId,
-                        messageBodyAsJsonFor("Bye"));
+                ReceptionistResponse followerPublicationResponse = publishMessageOf(
+                        followerResponse,"Hello");
+                ReceptionistResponse followeePublicationResponse = publishMessageOf(
+                        followeeResponse,"Bye");
 
-                ReceptionistResponse wallInfo = receptionist.wallOf(followerId);
+                ReceptionistResponse wallInfo = receptionist.wallOf(idOfRegisteredUser(followerResponse));
                 assertTrue(wallInfo.isStatus(OK_200));
                 JsonArray timelineBody = wallInfo.responseBodyAsJsonArray();
                 assertEquals(2,timelineBody.size());
@@ -186,40 +176,32 @@ public class RestReceptionistTest {
     public void userCanLikePublication() {
         receptionist = createReceptionist();
         ReceptionistResponse publisherUserResponse = registerJuanPerez();
-        ReceptionistResponse likerUserResponse = receptionist.registerUser(pepeSanchezRegistrationBodyAsJson());
+        ReceptionistResponse likerUserResponse = registerPepeSanchez();
 
-        final String publisherId = idOfRegisteredUser(publisherUserResponse);
-        ReceptionistResponse publicationResponse = receptionist.addPublication(
-                publisherId,
-                messageBodyAsJsonFor("Hello"));
+        ReceptionistResponse publicationResponse = publishMessageOf(
+                publisherUserResponse, "Hello");
 
-        final JsonObject likerAsJson = new JsonObject()
-                .add(RestReceptionist.USER_ID_KEY,idOfRegisteredUser(likerUserResponse));
-
-        final String publicationId = publicationResponse.responseBodyAsJson().getString(RestReceptionist.POST_ID_KEY, "");
         ReceptionistResponse likeResponse = receptionist.likePublicationIdentifiedAs(
-                publicationId,likerAsJson);
+                publicationIdFrom(publicationResponse),
+                likerAsJsonFrom(likerUserResponse));
 
         assertTrue(likeResponse.isStatus(OK_200));
         JsonObject likesAsJson = likeResponse.responseBodyAsJson();
         assertEquals(1,likesAsJson.getInt(RestReceptionist.LIKES_KEY,-1));
     }
+
     @Test
     public void notRegisteredUserCanNotLikePublication() {
         receptionist = createReceptionist();
         ReceptionistResponse publisherUserResponse = registerJuanPerez();
 
-        final String publisherId = idOfRegisteredUser(publisherUserResponse);
-        ReceptionistResponse publicationResponse = receptionist.addPublication(
-                publisherId,
-                messageBodyAsJsonFor("Hello"));
+        ReceptionistResponse publicationResponse = publishMessageOf(publisherUserResponse, "Hello");
 
         final JsonObject likerAsJson = new JsonObject()
                 .add(RestReceptionist.USER_ID_KEY,"");
 
-        final String publicationId = publicationResponse.responseBodyAsJson().getString(RestReceptionist.POST_ID_KEY, "");
         ReceptionistResponse likeResponse = receptionist.likePublicationIdentifiedAs(
-                publicationId,likerAsJson);
+                publicationIdFrom(publicationResponse),likerAsJson);
 
         assertTrue(likeResponse.isStatus(BAD_REQUEST_400));
         assertEquals(RestReceptionist.INVALID_CREDENTIALS,likeResponse.responseBody());
@@ -229,11 +211,8 @@ public class RestReceptionistTest {
         receptionist = createReceptionist();
         ReceptionistResponse publisherUserResponse = registerJuanPerez();
 
-        final JsonObject likerAsJson = new JsonObject()
-                .add(RestReceptionist.USER_ID_KEY,idOfRegisteredUser(publisherUserResponse));
-
         ReceptionistResponse likeResponse = receptionist.likePublicationIdentifiedAs(
-                "",likerAsJson);
+                "", likerAsJsonFrom(publisherUserResponse));
 
         assertTrue(likeResponse.isStatus(BAD_REQUEST_400));
         assertEquals(RestReceptionist.INVALID_PUBLICATION,likeResponse.responseBody());
@@ -242,18 +221,13 @@ public class RestReceptionistTest {
     public void timelineIncludesLikes() {
         receptionist = createReceptionist();
         ReceptionistResponse publisherUserResponse = registerJuanPerez();
-        ReceptionistResponse likerUserResponse = receptionist.registerUser(pepeSanchezRegistrationBodyAsJson());
+        ReceptionistResponse likerUserResponse = registerPepeSanchez();
 
-        final String publisherId = idOfRegisteredUser(publisherUserResponse);
-        ReceptionistResponse publicationResponse = receptionist.addPublication(
-                publisherId,
-                messageBodyAsJsonFor("Hello"));
+        ReceptionistResponse publicationResponse = publishMessageOf(publisherUserResponse, "Hello");
 
-        final JsonObject likerAsJson = new JsonObject()
-                .add(RestReceptionist.USER_ID_KEY,idOfRegisteredUser(likerUserResponse));
-
-        final String publicationId = publicationResponse.responseBodyAsJson().getString(RestReceptionist.POST_ID_KEY, "");
-        receptionist.likePublicationIdentifiedAs(publicationId,likerAsJson);
+        receptionist.likePublicationIdentifiedAs(
+                publicationIdFrom(publicationResponse),
+                likerAsJsonFrom(likerUserResponse));
 
         ReceptionistResponse timelineResponse = receptionist.timelineOf(idOfRegisteredUser(publisherUserResponse));
         assertTrue(timelineResponse.isStatus(OK_200));
@@ -265,6 +239,9 @@ public class RestReceptionistTest {
         assertEquals(1,timelinePublicationAsJson.getInt(RestReceptionist.LIKES_KEY,-1));
     }
 
+    private String publicationIdFrom(ReceptionistResponse publicationResponse) {
+        return publicationResponse.responseBodyAsJson().getString(RestReceptionist.POST_ID_KEY, "");
+    }
 
     private RestReceptionist createReceptionist() {
         return new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
@@ -334,7 +311,7 @@ public class RestReceptionistTest {
     private void makePepeSanchezFollowJuanPerezAndAssert(
             FollowingsAssertion assertions) {
         receptionist = createReceptionist();
-        ReceptionistResponse followerResponse = receptionist.registerUser(pepeSanchezRegistrationBodyAsJson());
+        ReceptionistResponse followerResponse = registerPepeSanchez();
         ReceptionistResponse followeeResponse = registerJuanPerez();
 
         JsonObject followingsBodyAsJson = new JsonObject()
@@ -352,5 +329,21 @@ public class RestReceptionistTest {
 
     private String idOfRegisteredUser(ReceptionistResponse registeredUserResponse) {
         return registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
+    }
+
+    private JsonObject likerAsJsonFrom(ReceptionistResponse likerUserResponse) {
+        return new JsonObject()
+                .add(RestReceptionist.USER_ID_KEY,idOfRegisteredUser(likerUserResponse));
+    }
+
+    private ReceptionistResponse publishMessageOf(ReceptionistResponse publisherUserResponse, String message) {
+        final String publisherId = idOfRegisteredUser(publisherUserResponse);
+        return receptionist.addPublication(
+                publisherId,
+                messageBodyAsJsonFor(message));
+    }
+
+    private ReceptionistResponse registerPepeSanchez() {
+        return receptionist.registerUser(pepeSanchezRegistrationBodyAsJson());
     }
 }
