@@ -1,6 +1,8 @@
 package bsas.org.openchat;
 
 import org.junit.jupiter.api.Test;
+import org.openchat.OpenChat;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
@@ -178,6 +180,16 @@ public class OpenChatSystemTest {
 
         assertEquals(1,likes);
         assertEquals(1,system.likesOf(publication));
+    }
+    @Test
+    public void notRegisteredUserCanNotLikePublication() {
+        system = createSystem();
+        registerPepeSanchez();
+
+        Publication publication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
+        TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
+                ()->system.likePublication(publication,TestObjectsBucket.JUAN_PEREZ_NAME),
+                OpenChatSystem.USER_NOT_REGISTERED);
     }
 
     private void assertCanNotAuthenticateWith(OpenChatSystem system, String password) {

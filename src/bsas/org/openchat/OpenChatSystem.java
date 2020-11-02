@@ -11,7 +11,7 @@ public class OpenChatSystem {
     public static final String INVALID_PUBLICATION = "Invalid post";
 
     private final Map<String,UserCard> userCards = new HashMap<>();
-    private final Map<Publication,Set<String>> likersByPublication = new HashMap<>();
+    private final Map<Publication,Set<Publisher>> likersByPublication = new HashMap<>();
     private final Clock clock;
 
     public OpenChatSystem(Clock clock){
@@ -111,15 +111,15 @@ public class OpenChatSystem {
     }
 
     public int likePublication(Publication publication, String userName) {
-        final Set<String> likers = likersOf(publication);
+        final Set<Publisher> likers = likersOf(publication);
 
-        likers.add(userName);
+        likers.add(publisherForUserNamed(userName));
 
         return likers.size();
     }
 
-    private Set<String> likersOf(Publication publication) {
-        final Set<String> likers = likersByPublication.get(publication);
+    private Set<Publisher> likersOf(Publication publication) {
+        final Set<Publisher> likers = likersByPublication.get(publication);
         if (likers == null) throw new ModelException(INVALID_PUBLICATION);
 
         return likers;

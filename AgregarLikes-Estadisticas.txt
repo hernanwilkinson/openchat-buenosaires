@@ -11,3 +11,6 @@ Empezando por OpenChatSystem
 - Test likesByUserCountOnlyOnce
     - Clases: 2
     - Diferencias: 7
+- Test notRegisteredUserCanNotLikePublication
+    - Clases: 2
+    - Diferencias: 6
