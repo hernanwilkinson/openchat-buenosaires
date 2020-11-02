@@ -238,6 +238,33 @@ public class RestReceptionistTest {
         assertTrue(likeResponse.isStatus(BAD_REQUEST_400));
         assertEquals(RestReceptionist.INVALID_PUBLICATION,likeResponse.responseBody());
     }
+    @Test
+    public void timelineIncludesLikes() {
+        receptionist = createReceptionist();
+        ReceptionistResponse publisherUserResponse = registerJuanPerez();
+        ReceptionistResponse likerUserResponse = receptionist.registerUser(pepeSanchezRegistrationBodyAsJson());
+
+        final String publisherId = idOfRegisteredUser(publisherUserResponse);
+        ReceptionistResponse publicationResponse = receptionist.addPublication(
+                publisherId,
+                messageBodyAsJsonFor("Hello"));
+
+        final JsonObject likerAsJson = new JsonObject()
+                .add(RestReceptionist.USER_ID_KEY,idOfRegisteredUser(likerUserResponse));
+
+        final String publicationId = publicationResponse.responseBodyAsJson().getString(RestReceptionist.POST_ID_KEY, "");
+        receptionist.likePublicationIdentifiedAs(publicationId,likerAsJson);
+
+        ReceptionistResponse timelineResponse = receptionist.timelineOf(idOfRegisteredUser(publisherUserResponse));
+        assertTrue(timelineResponse.isStatus(OK_200));
+        JsonArray timelineBody = timelineResponse.responseBodyAsJsonArray();
+        assertEquals(1,timelineBody.size());
+
+        JsonObject publicationAsJson = publicationResponse.responseBodyAsJson();
+        JsonObject timelinePublicationAsJson = timelineBody.get(0).asObject();
+        assertEquals(1,timelinePublicationAsJson.getInt(RestReceptionist.LIKES_KEY,-1));
+    }
+
 
     private RestReceptionist createReceptionist() {
         return new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));

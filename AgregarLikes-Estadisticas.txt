@@ -26,3 +26,6 @@ Empezando por OpenChatSystem
 - Test canNotLikeNotPublishedPublication
     - Clases: 2
     - Diferencias: 4
+- Test timelineIncludesLikes
+    - Classes: 2
+    - Diferencias: 2

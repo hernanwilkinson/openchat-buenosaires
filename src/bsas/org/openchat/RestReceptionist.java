@@ -200,7 +200,7 @@ public class RestReceptionist {
                 .add(USER_ID_KEY, userId)
                 .add(TEXT_KEY, publication.message())
                 .add(DATE_TIME_KEY, formatDateTime(publication.publicationTime()))
-                .add(LIKES_KEY,0);
+                .add(LIKES_KEY,system.likesOf(publication));
     }
 
     private String formatDateTime(LocalDateTime dateTimeToFormat) {
