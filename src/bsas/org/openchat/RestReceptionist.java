@@ -121,13 +121,17 @@ public class RestReceptionist {
     }
 
     public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
-        final String userName = userNameIdentifiedAs(likerAsJson.getString(USER_ID_KEY, ""));
-        final Publication publication = idsByPublication.keySet().stream().findAny().get();
-        int likes = system.likePublication(publication, userName);
+        try {
+            final String userName = userNameIdentifiedAs(likerAsJson.getString(USER_ID_KEY, ""));
+            final Publication publication = idsByPublication.keySet().stream().findAny().get();
+            int likes = system.likePublication(publication, userName);
 
-        JsonObject likesAsJsonObject = new JsonObject()
-                .add(LIKES_KEY, likes);
-        return new ReceptionistResponse(CREATED_201, likesAsJsonObject);
+            JsonObject likesAsJsonObject = new JsonObject()
+                    .add(LIKES_KEY, likes);
+            return new ReceptionistResponse(CREATED_201, likesAsJsonObject);
+        } catch (ModelException error) {
+            return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
+        }
     }
 
     private String passwordFrom(JsonObject registrationAsJson) {

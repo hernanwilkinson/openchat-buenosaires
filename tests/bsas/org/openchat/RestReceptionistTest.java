@@ -204,6 +204,26 @@ public class RestReceptionistTest {
         JsonObject likesAsJson = likeResponse.responseBodyAsJson();
         assertEquals(1,likesAsJson.getInt(RestReceptionist.LIKES_KEY,-1));
     }
+    @Test
+    public void notRegisteredUserCanNotLikePublication() {
+        receptionist = createReceptionist();
+        ReceptionistResponse publisherUserResponse = registerJuanPerez();
+
+        final String publisherId = idOfRegisteredUser(publisherUserResponse);
+        ReceptionistResponse publicationResponse = receptionist.addPublication(
+                publisherId,
+                messageBodyAsJsonFor("Hello"));
+
+        final JsonObject likerAsJson = new JsonObject()
+                .add(RestReceptionist.USER_ID_KEY,"");
+
+        final String publicationId = publicationResponse.responseBodyAsJson().getString(RestReceptionist.POST_ID_KEY, "");
+        ReceptionistResponse likeResponse = receptionist.likePublicationIdentifiedAs(
+                publicationId,likerAsJson);
+
+        assertTrue(likeResponse.isStatus(BAD_REQUEST_400));
+        assertEquals(RestReceptionist.INVALID_CREDENTIALS,likeResponse.responseBody());
+    }
 
     private RestReceptionist createReceptionist() {
         return new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
