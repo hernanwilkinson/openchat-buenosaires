@@ -224,6 +224,20 @@ public class RestReceptionistTest {
         assertTrue(likeResponse.isStatus(BAD_REQUEST_400));
         assertEquals(RestReceptionist.INVALID_CREDENTIALS,likeResponse.responseBody());
     }
+    @Test
+    public void canNotLikeNotPublishedPublication() {
+        receptionist = createReceptionist();
+        ReceptionistResponse publisherUserResponse = registerJuanPerez();
+
+        final JsonObject likerAsJson = new JsonObject()
+                .add(RestReceptionist.USER_ID_KEY,idOfRegisteredUser(publisherUserResponse));
+
+        ReceptionistResponse likeResponse = receptionist.likePublicationIdentifiedAs(
+                "",likerAsJson);
+
+        assertTrue(likeResponse.isStatus(BAD_REQUEST_400));
+        assertEquals(RestReceptionist.INVALID_PUBLICATION,likeResponse.responseBody());
+    }
 
     private RestReceptionist createReceptionist() {
         return new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));

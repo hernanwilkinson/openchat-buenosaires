@@ -28,6 +28,7 @@ public class RestReceptionist {
     public static final String LIKES_KEY = "likes";
     public static final String INVALID_CREDENTIALS = "Invalid credentials.";
     public static final String FOLLOWING_CREATED = "Following created.";
+    public static final String INVALID_PUBLICATION = "Invalid post";
     public static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     private final OpenChatSystem system;
@@ -123,7 +124,12 @@ public class RestReceptionist {
     public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
         try {
             final String userName = userNameIdentifiedAs(likerAsJson.getString(USER_ID_KEY, ""));
-            final Publication publication = idsByPublication.keySet().stream().findAny().get();
+            final Publication publication = idsByPublication.entrySet().stream()
+                    .filter(idByPublication->idByPublication.getValue().equals(publicationId))
+                    .findFirst()
+                    .map(idByPublication->idByPublication.getKey())
+                    .orElseThrow(()->new ModelException(INVALID_PUBLICATION));
+
             int likes = system.likePublication(publication, userName);
 
             JsonObject likesAsJsonObject = new JsonObject()

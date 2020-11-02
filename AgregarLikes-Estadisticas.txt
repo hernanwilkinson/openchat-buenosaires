@@ -23,3 +23,6 @@ Empezando por OpenChatSystem
 - Test notRegisteredUserCanNotLikePublication
     - Clases: 2
     - Diferencias: 3
+- Test canNotLikeNotPublishedPublication
+    - Clases: 2
+    - Diferencias: 4
