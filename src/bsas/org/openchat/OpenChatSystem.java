@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 public class OpenChatSystem {
     public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Username already in use.";
     public static final String USER_NOT_REGISTERED = "User not registered";
+    public static final String INVALID_PUBLICATION = "Invalid post";
 
     private final Map<String,UserCard> userCards = new HashMap<>();
     private final Map<Publication,Integer> likesByPublication = new HashMap<>();
@@ -106,7 +107,10 @@ public class OpenChatSystem {
     }
 
     public int likesOf(Publication publication) {
-        return likesByPublication.get(publication);
+        final Integer likes = likesByPublication.get(publication);
+        if(likes==null) throw new ModelException(INVALID_PUBLICATION);
+
+        return likes;
     }
 
     public int likePublication(Publication publication, String userName) {

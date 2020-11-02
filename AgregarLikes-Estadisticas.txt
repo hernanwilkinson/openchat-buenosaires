@@ -5,3 +5,6 @@ Empezando por OpenChatSystem
 - Test registeredUserCanLikePublication
     - Clases: 2
     - Diferencias: 5
+- Test canNotLikeNotPublishPublication
+    - Clases: 2
+    - Diferencias: 3
