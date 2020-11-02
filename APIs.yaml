@@ -182,7 +182,7 @@ paths:
           schema:
             $ref: "#/definitions/Like"
       responses:
-        "201":
+        "200":
           description: Like accepted.
           schema:
             $ref: "#/definitions/Post"

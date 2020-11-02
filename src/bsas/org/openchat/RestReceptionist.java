@@ -136,7 +136,7 @@ public class RestReceptionist {
 
             JsonObject likesAsJsonObject = new JsonObject()
                     .add(LIKES_KEY, likes);
-            return new ReceptionistResponse(CREATED_201, likesAsJsonObject);
+            return new ReceptionistResponse(OK_200, likesAsJsonObject);
         } catch (ModelException error) {
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }

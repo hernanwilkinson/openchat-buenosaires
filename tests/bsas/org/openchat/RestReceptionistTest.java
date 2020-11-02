@@ -200,7 +200,7 @@ public class RestReceptionistTest {
         ReceptionistResponse likeResponse = receptionist.likePublicationIdentifiedAs(
                 publicationId,likerAsJson);
 
-        assertTrue(likeResponse.isStatus(CREATED_201));
+        assertTrue(likeResponse.isStatus(OK_200));
         JsonObject likesAsJson = likeResponse.responseBodyAsJson();
         assertEquals(1,likesAsJson.getInt(RestReceptionist.LIKES_KEY,-1));
     }
