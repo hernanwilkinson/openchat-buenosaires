@@ -81,7 +81,7 @@ public class IT_TimelineAPI {
                 .when()
                 .post(BASE_URL + "/publications/" + postId + "/like")
                 .then()
-                .statusCode(201)
+                .statusCode(200)
                 .contentType(JSON)
                 .body("likes", is(1));
     }
