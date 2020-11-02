@@ -17,3 +17,6 @@ Empezando por OpenChatSystem
 - Test registeredUserCanPublishAppropriateMessage modificado
     - Clases: 2
     - Diferncias: 3
+- Test userCanLikePublication
+    - Clases: 2
+    - Diferencias: 2

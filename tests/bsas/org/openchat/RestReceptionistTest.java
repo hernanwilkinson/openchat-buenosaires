@@ -182,6 +182,28 @@ public class RestReceptionistTest {
                 JsonObject wallSecondPublicationAsJson = timelineBody.get(1).asObject();
                 assertEquals(followeePublicationAsJson,wallSecondPublicationAsJson);});
     }
+    @Test
+    public void userCanLikePublication() {
+        receptionist = createReceptionist();
+        ReceptionistResponse publisherUserResponse = registerJuanPerez();
+        ReceptionistResponse likerUserResponse = receptionist.registerUser(pepeSanchezRegistrationBodyAsJson());
+
+        final String publisherId = idOfRegisteredUser(publisherUserResponse);
+        ReceptionistResponse publicationResponse = receptionist.addPublication(
+                publisherId,
+                messageBodyAsJsonFor("Hello"));
+
+        final JsonObject likerAsJson = new JsonObject()
+                .add(RestReceptionist.USER_ID_KEY,idOfRegisteredUser(likerUserResponse));
+
+        final String publicationId = publicationResponse.responseBodyAsJson().getString(RestReceptionist.POST_ID_KEY, "");
+        ReceptionistResponse likeResponse = receptionist.likePublicationIdentifiedAs(
+                publicationId,likerAsJson);
+
+        assertTrue(likeResponse.isStatus(CREATED_201));
+        JsonObject likesAsJson = likeResponse.responseBodyAsJson();
+        assertEquals(1,likesAsJson.getInt(RestReceptionist.LIKES_KEY,-1));
+    }
 
     private RestReceptionist createReceptionist() {
         return new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
