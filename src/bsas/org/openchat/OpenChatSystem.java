@@ -10,6 +10,7 @@ public class OpenChatSystem {
     public static final String USER_NOT_REGISTERED = "User not registered";
 
     private final Map<String,UserCard> userCards = new HashMap<>();
+    private final Map<Publication,Integer> likesByPublication = new HashMap<>();
     private final Clock clock;
 
     public OpenChatSystem(Clock clock){
@@ -50,7 +51,10 @@ public class OpenChatSystem {
     }
 
     public Publication publishForUserNamed(String userName, String message) {
-        return publisherForUserNamed(userName).publish(message, clock.now());
+        final Publication newPublication = publisherForUserNamed(userName).publish(message, clock.now());
+        likesByPublication.put(newPublication,0);
+
+        return newPublication;
     }
 
     public List<Publication> timeLineForUserNamed(String userName) {
@@ -102,7 +106,15 @@ public class OpenChatSystem {
     }
 
     public int likesOf(Publication publication) {
-        return 0;
+        return likesByPublication.get(publication);
+    }
+
+    public int likePublication(Publication publication, String userName) {
+        int likes = likesOf(publication) + 1;
+
+        likesByPublication.put(publication,likes);
+
+        return likes;
     }
 
     private static class UserCard {

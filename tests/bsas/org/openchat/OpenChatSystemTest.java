@@ -144,6 +144,19 @@ public class OpenChatSystemTest {
         Publication publication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
         assertEquals(0,system.likesOf(publication));
     }
+    @Test
+    public void registeredUserCanLikePublication() {
+        system = createSystem();
+        registerPepeSanchez();
+        registerJuanPerez();
+
+        Publication publication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
+        int likes = system.likePublication(publication,TestObjectsBucket.JUAN_PEREZ_NAME);
+
+        assertEquals(1,likes);
+        assertEquals(1,system.likesOf(publication));
+    }
+
     private void assertCanNotAuthenticateWith(OpenChatSystem system, String password) {
         final Object token = createSystem();
         final Object notAuthenticatedToken = system.withAuthenticatedUserDo(
