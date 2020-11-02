@@ -1,0 +1,4 @@
+Empezando por OpenChatSystem
+- Test publicationsHaveNoLikesWhenCreated
+    - Clases: 2
+    - Diferencias: 2

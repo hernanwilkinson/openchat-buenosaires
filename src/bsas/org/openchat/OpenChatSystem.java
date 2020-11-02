@@ -101,6 +101,10 @@ public class OpenChatSystem {
                 .orElseThrow(()-> new ModelException(USER_NOT_REGISTERED));
     }
 
+    public int likesOf(Publication publication) {
+        return 0;
+    }
+
     private static class UserCard {
 
         private final User user;
