@@ -8,3 +8,6 @@ Empezando por OpenChatSystem
 - Test canNotLikeNotPublishPublication
     - Clases: 2
     - Diferencias: 3
+- Test likesByUserCountOnlyOnce
+    - Clases: 2
+    - Diferencias: 7
