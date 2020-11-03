@@ -4,6 +4,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ public class RestReceptionist {
     public static final String USERNAME_KEY = "username";
     public static final String PASSWORD_KEY = "password";
     public static final String ABOUT_KEY = "about";
+    public static final String URL_KEY = "url";
     public static final String ID_KEY = "id";
     public static final String FOLLOWER_ID_KEY = "followerId";
     public static final String FOLLOWEE_ID_KEY = "followeeId";
@@ -42,7 +44,8 @@ public class RestReceptionist {
             User registeredUser = system.register(
                     userNameFrom(registrationBodyAsJson),
                     passwordFrom(registrationBodyAsJson),
-                    aboutFrom(registrationBodyAsJson));
+                    aboutFrom(registrationBodyAsJson),
+                    urlFrom(registrationBodyAsJson));
 
             final String registeredUserId = UUID.randomUUID().toString();
             idsByUser.put(registeredUser,registeredUserId);
@@ -130,11 +133,16 @@ public class RestReceptionist {
         return registrationAsJson.getString(ABOUT_KEY, "");
     }
 
+    private String urlFrom(JsonObject registrationAsJson) {
+        return registrationAsJson.getString(URL_KEY, "");
+    }
+
     private JsonObject userResponseAsJson(User registeredUser, String registeredUserId) {
         return new JsonObject()
                 .add(ID_KEY, registeredUserId)
                 .add(USERNAME_KEY, registeredUser.name())
-                .add(ABOUT_KEY, registeredUser.about());
+                .add(ABOUT_KEY, registeredUser.about())
+                .add(URL_KEY, registeredUser.url());
     }
 
     private ReceptionistResponse authenticatedUserResponse(User authenticatedUser) {

@@ -11,7 +11,7 @@ public class UserTest {
     @Test
     public void canNotCreateUserWithBlankName() {
         assertThrowsModelExceptionWithErrorMessage(
-                () -> User.named(" ", "password", "about"),
+                () -> User.named(" ", "password", "about", "www.10pines.com"),
                 User.NAME_CANNOT_BE_BLANK);
     }
 
@@ -28,4 +28,17 @@ public class UserTest {
 
         assertFalse(createdUser.isNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME+"x"));
     }
+
+    @Test
+    public void userRemembersItsUrl() {
+        User createdUser = User.named(
+                TestObjectsBucket.PEPE_SANCHEZ_NAME,
+                TestObjectsBucket.PEPE_SANCHEZ_PASSWORD,
+                TestObjectsBucket.PEPE_SANCHEZ_ABOUT,
+                TestObjectsBucket.PEPE_SANCHEZ_URL);
+
+        assertEquals(TestObjectsBucket.PEPE_SANCHEZ_URL,createdUser.url());
+        assertNotEquals(TestObjectsBucket.PEPE_SANCHEZ_URL+"X",createdUser.url());
+    }
+
 }
