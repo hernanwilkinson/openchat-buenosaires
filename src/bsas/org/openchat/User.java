@@ -7,11 +7,6 @@ public class User {
     private final String about;
     private final String url;
 
-    //TODO: Borrar
-    public static User named(String name, String password, String about) {
-        return named(name,password,about,"not defined");
-    }
-
     public static User named(String name, String password, String about, String url) {
         assertNameIsNotBlank(name);
 
