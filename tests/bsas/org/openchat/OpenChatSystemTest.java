@@ -67,7 +67,7 @@ public class OpenChatSystemTest {
         system = createSystem();
         registerPepeSanchez();
 
-        final Object token = createSystem();
+        final Object token = new Object();
         final Object authenticatedToken = system.withAuthenticatedUserDo(
                 TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.PEPE_SANCHEZ_PASSWORD,
                 user->token,
