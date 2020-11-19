@@ -41,7 +41,7 @@ public class ActionPersistentReceptionistTest {
     }
 
     @Test
-    public void invalidActionsAreNotPersisted() throws IOException {
+    public void invalidUserRegistrationIsNotPersisted() throws IOException {
         final StringWriter writer = new StringWriter();
         ActionPersistentReceptionist receptionist = new ActionPersistentReceptionist(
                 new RestReceptionist(new OpenChatSystem(() -> LocalDateTime.now())),
@@ -56,7 +56,7 @@ public class ActionPersistentReceptionistTest {
     }
 
     @Test
-    public void persistsfollowees() throws IOException {
+    public void persistsFollowees() throws IOException {
         final StringWriter writer = new StringWriter();
         ActionPersistentReceptionist receptionist = new ActionPersistentReceptionist(
                 new RestReceptionist(new OpenChatSystem(()-> LocalDateTime.now())),

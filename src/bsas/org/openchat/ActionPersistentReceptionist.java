@@ -26,7 +26,7 @@ public class ActionPersistentReceptionist implements Receptionist{
             JsonObject actionAsJson = new JsonObject()
                     .add(ACTION_NAME_KEY, REGISTER_USER_ACTION_NAME)
                     .add(PARAMETERS_KEY, registrationBodyAsJson)
-                    .add(RETURN_KEY, response.responseBodyAsJson().getString(RestReceptionist.ID_KEY, ""));
+                    .add(RETURN_KEY, response.idFromBody());
 
             writer.write(actionAsJson.toString());
             writer.write("\n");
