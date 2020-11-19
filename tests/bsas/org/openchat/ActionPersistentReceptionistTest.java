@@ -36,8 +36,8 @@ public class ActionPersistentReceptionistTest {
                 registrationBodyAsJson,
                 savedJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject());
         assertEquals(
-                registrationResponse.idFromBody(),
-                savedJson.getString(ActionPersistentReceptionist.RETURN_KEY,null));
+                registrationResponse.responseBodyAsJson(),
+                savedJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject());
     }
 
     @Test
@@ -82,6 +82,9 @@ public class ActionPersistentReceptionistTest {
         assertEquals(
                 followingsBodyAsJson,
                 savedJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject());
+        assertEquals(
+                new JsonObject(),
+                savedJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject());
     }
 
     @Test
@@ -134,8 +137,8 @@ public class ActionPersistentReceptionistTest {
                 publicationAsJson,
                 savedJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject());
         assertEquals(
-                publicationResponse.responseBodyAsJson().toString(),
-                savedJson.getString(ActionPersistentReceptionist.RETURN_KEY,null));
+                publicationResponse.responseBodyAsJson(),
+                savedJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject());
     }
 
 }

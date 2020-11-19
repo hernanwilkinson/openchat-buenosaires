@@ -26,11 +26,11 @@ public class ActionPersistentReceptionist implements Receptionist{
                 receptionist.registerUser(registrationBodyAsJson),
                 REGISTER_USER_ACTION_NAME,
                 registrationBodyAsJson,
-                response->response.idFromBody());
+                response->response.responseBodyAsJson());
     }
 
     private ReceptionistResponse persistAction(ReceptionistResponse response,
-        String actionName, JsonObject parameters, Function<ReceptionistResponse,String> returnedObject) {
+        String actionName, JsonObject parameters, Function<ReceptionistResponse,JsonObject> returnedObject) {
 
         if(response.isSucessStatus()) {
             JsonObject actionAsJson = new JsonObject()
@@ -60,7 +60,7 @@ public class ActionPersistentReceptionist implements Receptionist{
                 receptionist.followings(followingsBodyAsJson),
                 FOLLOWINGS_ACTION_NAME,
                 followingsBodyAsJson,
-                response-> "");
+                response-> new JsonObject());
     }
 
     @Override
@@ -74,7 +74,7 @@ public class ActionPersistentReceptionist implements Receptionist{
                 receptionist.addPublication(userId,messageBodyAsJson),
                 ADD_PUBLICATION_ACTION_NAME,
                 new JsonObject(messageBodyAsJson).add(RestReceptionist.USER_ID_KEY,userId),
-                response-> response.responseBodyAsJson().toString());
+                response-> response.responseBodyAsJson());
     }
 
     @Override
