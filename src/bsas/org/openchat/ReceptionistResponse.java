@@ -41,4 +41,8 @@ public class ReceptionistResponse {
     public JsonArray responseBodyAsJsonArray() {
         return Json.parse(responseBody).asArray();
     }
+
+    String idFromBody() {
+        return responseBodyAsJson().getString(RestReceptionist.ID_KEY, null);
+    }
 }

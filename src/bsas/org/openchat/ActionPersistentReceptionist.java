@@ -5,6 +5,10 @@ import com.eclipsesource.json.JsonObject;
 import java.io.StringWriter;
 
 public class ActionPersistentReceptionist implements Receptionist{
+    public static final String ACTION_NAME_KEY = "actionName";
+    public static final String REGISTER_USER_ACTION_NAME = "registerUser";
+    public static final String PARAMETERS_KEY = "parameters";
+    public static final String RETURN_KEY = "return";
     private final RestReceptionist receptionist;
     private final StringWriter writer;
 
@@ -17,9 +21,9 @@ public class ActionPersistentReceptionist implements Receptionist{
     public ReceptionistResponse registerUser(JsonObject registrationBodyAsJson) {
         final ReceptionistResponse response = receptionist.registerUser(registrationBodyAsJson);
         JsonObject actionAsJson = new JsonObject()
-                .add("actionName", "registerUser")
-                .add("parameters",registrationBodyAsJson)
-                .add("return",response.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
+                .add(ACTION_NAME_KEY, REGISTER_USER_ACTION_NAME)
+                .add(PARAMETERS_KEY,registrationBodyAsJson)
+                .add(RETURN_KEY,response.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
 
         writer.write(actionAsJson.toString());
         writer.write("\n");

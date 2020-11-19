@@ -28,10 +28,14 @@ public class ActionPersistentReceptionistTest {
         LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()));
         JsonObject savedJson = Json.parse(reader.readLine()).asObject();
 
-        assertEquals("registerUser",savedJson.getString("actionName",null));
-        assertEquals(registrationBodyAsJson,savedJson.get("parameters").asObject());
         assertEquals(
-                registrationResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY,null),
-                savedJson.getString("return",null));
+                ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME,
+                savedJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY,null));
+        assertEquals(
+                registrationBodyAsJson,
+                savedJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject());
+        assertEquals(
+                registrationResponse.idFromBody(),
+                savedJson.getString(ActionPersistentReceptionist.RETURN_KEY,null));
     }
 }
