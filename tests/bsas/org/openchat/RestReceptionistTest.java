@@ -255,17 +255,6 @@ public class RestReceptionistTest {
         return ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").format(testObjects.fixedNowClock().now());
     }
 
-    private JsonObject pepeSanchezLoginBodyAsJson() {
-        return new JsonObject()
-                .add(RestReceptionist.USERNAME_KEY, TestObjectsBucket.PEPE_SANCHEZ_NAME)
-                .add(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.PEPE_SANCHEZ_PASSWORD);
-    }
-
-    private JsonObject pepeSanchezRegistrationBodyAsJson() {
-        return pepeSanchezLoginBodyAsJson()
-                .add(RestReceptionist.ABOUT_KEY, TestObjectsBucket.PEPE_SANCHEZ_ABOUT);
-    }
-
     private void assertJuanPerezOk(ReceptionistResponse response, int status) {
         assertTrue(response.isStatus(status));
         JsonObject responseBodyAsJson = response.responseBodyAsJson();
@@ -328,6 +317,6 @@ public class RestReceptionistTest {
     }
 
     private ReceptionistResponse registerPepeSanchez() {
-        return receptionist.registerUser(pepeSanchezRegistrationBodyAsJson());
+        return receptionist.registerUser(testObjects.pepeSanchezRegistrationBodyAsJson());
     }
 }

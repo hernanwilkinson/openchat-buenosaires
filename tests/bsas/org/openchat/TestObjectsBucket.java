@@ -59,4 +59,15 @@ public class TestObjectsBucket {
                 .add(RestReceptionist.ABOUT_KEY, JUAN_PEREZ_ABOUT)
                 .add(RestReceptionist.HOME_PAGE_KEY, JUAN_PEREZ_HOME_PAGE);
     }
+
+    public JsonObject pepeSanchezLoginBodyAsJson() {
+        return new JsonObject()
+                .add(RestReceptionist.USERNAME_KEY, PEPE_SANCHEZ_NAME)
+                .add(RestReceptionist.PASSWORD_KEY, PEPE_SANCHEZ_PASSWORD);
+    }
+
+    public JsonObject pepeSanchezRegistrationBodyAsJson() {
+        return pepeSanchezLoginBodyAsJson()
+                .add(RestReceptionist.ABOUT_KEY, PEPE_SANCHEZ_ABOUT);
+    }
 }

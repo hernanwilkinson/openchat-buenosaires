@@ -9,6 +9,7 @@ public class ActionPersistentReceptionist implements Receptionist{
     public static final String REGISTER_USER_ACTION_NAME = "registerUser";
     public static final String PARAMETERS_KEY = "parameters";
     public static final String RETURN_KEY = "return";
+    public static final String FOLLOWINGS_ACTION_NAME = "followings";
     private final RestReceptionist receptionist;
     private final StringWriter writer;
 
@@ -46,7 +47,15 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse followings(JsonObject followingsBodyAsJson) {
-        throw new UnsupportedOperationException();
+        final ReceptionistResponse response = receptionist.followings(followingsBodyAsJson);
+        JsonObject actionAsJson = new JsonObject()
+                .add(ACTION_NAME_KEY, FOLLOWINGS_ACTION_NAME)
+                .add(PARAMETERS_KEY, followingsBodyAsJson);
+
+        writer.write(actionAsJson.toString());
+        writer.write("\n");
+
+        return response;
     }
 
     @Override
