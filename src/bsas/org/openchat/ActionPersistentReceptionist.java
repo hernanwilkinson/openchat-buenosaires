@@ -3,6 +3,7 @@ package bsas.org.openchat;
 import com.eclipsesource.json.JsonObject;
 
 import java.io.StringWriter;
+import java.util.function.Function;
 
 public class ActionPersistentReceptionist implements Receptionist{
     public static final String ACTION_NAME_KEY = "actionName";
@@ -20,18 +21,25 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse registerUser(JsonObject registrationBodyAsJson) {
-        final ReceptionistResponse response = receptionist.registerUser(registrationBodyAsJson);
+        return persistAction(
+                receptionist.registerUser(registrationBodyAsJson),
+                REGISTER_USER_ACTION_NAME,
+                registrationBodyAsJson,
+                response->response.idFromBody());
+    }
+
+    private ReceptionistResponse persistAction(ReceptionistResponse response,
+        String actionName, JsonObject parameters, Function<ReceptionistResponse,String> returnedObject) {
 
         if(response.isSucessStatus()) {
             JsonObject actionAsJson = new JsonObject()
-                    .add(ACTION_NAME_KEY, REGISTER_USER_ACTION_NAME)
-                    .add(PARAMETERS_KEY, registrationBodyAsJson)
-                    .add(RETURN_KEY, response.idFromBody());
+                    .add(ACTION_NAME_KEY, actionName)
+                    .add(PARAMETERS_KEY, parameters)
+                    .add(RETURN_KEY, returnedObject.apply(response));
 
             writer.write(actionAsJson.toString());
             writer.write("\n");
         }
-
         return response;
     }
 
@@ -47,18 +55,11 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse followings(JsonObject followingsBodyAsJson) {
-        final ReceptionistResponse response = receptionist.followings(followingsBodyAsJson);
-
-        if(response.isSucessStatus()) {
-            JsonObject actionAsJson = new JsonObject()
-                    .add(ACTION_NAME_KEY, FOLLOWINGS_ACTION_NAME)
-                    .add(PARAMETERS_KEY, followingsBodyAsJson);
-
-            writer.write(actionAsJson.toString());
-            writer.write("\n");
-        }
-
-        return response;
+        return persistAction(
+                receptionist.followings(followingsBodyAsJson),
+                FOLLOWINGS_ACTION_NAME,
+                followingsBodyAsJson,
+                response-> "");
     }
 
     @Override
