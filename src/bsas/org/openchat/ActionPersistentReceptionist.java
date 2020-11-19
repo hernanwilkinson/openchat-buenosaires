@@ -48,12 +48,15 @@ public class ActionPersistentReceptionist implements Receptionist{
     @Override
     public ReceptionistResponse followings(JsonObject followingsBodyAsJson) {
         final ReceptionistResponse response = receptionist.followings(followingsBodyAsJson);
-        JsonObject actionAsJson = new JsonObject()
-                .add(ACTION_NAME_KEY, FOLLOWINGS_ACTION_NAME)
-                .add(PARAMETERS_KEY, followingsBodyAsJson);
 
-        writer.write(actionAsJson.toString());
-        writer.write("\n");
+        if(response.isSucessStatus()) {
+            JsonObject actionAsJson = new JsonObject()
+                    .add(ACTION_NAME_KEY, FOLLOWINGS_ACTION_NAME)
+                    .add(PARAMETERS_KEY, followingsBodyAsJson);
+
+            writer.write(actionAsJson.toString());
+            writer.write("\n");
+        }
 
         return response;
     }

@@ -84,4 +84,28 @@ public class ActionPersistentReceptionistTest {
                 savedJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject());
     }
 
+    @Test
+    public void invalidFollowingsIsNotPersisted() throws IOException {
+        final StringWriter writer = new StringWriter();
+        ActionPersistentReceptionist receptionist = new ActionPersistentReceptionist(
+                new RestReceptionist(new OpenChatSystem(()-> LocalDateTime.now())),
+                writer);
+
+        ReceptionistResponse followerResponse = receptionist.registerUser(testObjectsBucket.pepeSanchezRegistrationBodyAsJson());
+        ReceptionistResponse followeeResponse = receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
+
+        JsonObject followingsBodyAsJson = new JsonObject()
+                .add(RestReceptionist.FOLLOWER_ID_KEY, followerResponse.idFromBody())
+                .add(RestReceptionist.FOLLOWEE_ID_KEY, followeeResponse.idFromBody());
+        receptionist.followings(followingsBodyAsJson);
+        receptionist.followings(followingsBodyAsJson);
+
+        LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()));
+        reader.readLine();
+        reader.readLine();
+        reader.readLine();
+
+        assertNull(reader.readLine());
+    }
+
 }
