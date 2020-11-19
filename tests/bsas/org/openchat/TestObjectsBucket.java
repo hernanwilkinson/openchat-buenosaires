@@ -1,5 +1,6 @@
 package bsas.org.openchat;
 
+import com.eclipsesource.json.JsonObject;
 import org.junit.jupiter.api.function.Executable;
 
 import java.time.LocalDateTime;
@@ -45,5 +46,17 @@ public class TestObjectsBucket {
 
     public Clock fixedNowClock(){
         return ()-> now;
+    }
+
+    public JsonObject juanPerezLoginBodyAsJson() {
+        return new JsonObject()
+                .add(RestReceptionist.USERNAME_KEY, JUAN_PEREZ_NAME)
+                .add(RestReceptionist.PASSWORD_KEY, JUAN_PEREZ_PASSWORD);
+    }
+
+    public JsonObject juanPerezRegistrationBodyAsJson() {
+        return juanPerezLoginBodyAsJson()
+                .add(RestReceptionist.ABOUT_KEY, JUAN_PEREZ_ABOUT)
+                .add(RestReceptionist.HOME_PAGE_KEY, JUAN_PEREZ_HOME_PAGE);
     }
 }

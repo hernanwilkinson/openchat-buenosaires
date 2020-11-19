@@ -38,7 +38,7 @@ public class RestReceptionistTest {
         receptionist = createReceptionist();
         registerJuanPerez();
 
-        ReceptionistResponse response = receptionist.login(juanPerezLoginBodyAsJson());
+        ReceptionistResponse response = receptionist.login(testObjects.juanPerezLoginBodyAsJson());
 
         assertJuanPerezOk(response, OK_200);
     }
@@ -47,7 +47,7 @@ public class RestReceptionistTest {
         receptionist = createReceptionist();
         registerJuanPerez();
 
-        final JsonObject invalidJuanPerezLoginBodyAsJson = juanPerezLoginBodyAsJson();
+        final JsonObject invalidJuanPerezLoginBodyAsJson = testObjects.juanPerezLoginBodyAsJson();
         invalidJuanPerezLoginBodyAsJson
                 .remove(RestReceptionist.PASSWORD_KEY)
                 .add(RestReceptionist.PASSWORD_KEY,TestObjectsBucket.JUAN_PEREZ_PASSWORD+"x");
@@ -248,29 +248,17 @@ public class RestReceptionistTest {
     }
 
     private ReceptionistResponse registerJuanPerez() {
-        return receptionist.registerUser(juanPerezRegistrationBodyAsJson());
+        return receptionist.registerUser(testObjects.juanPerezRegistrationBodyAsJson());
     }
 
     private String formattedNow() {
         return ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").format(testObjects.fixedNowClock().now());
     }
 
-    private JsonObject juanPerezLoginBodyAsJson() {
-        return new JsonObject()
-                .add(RestReceptionist.USERNAME_KEY, TestObjectsBucket.JUAN_PEREZ_NAME)
-                .add(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.JUAN_PEREZ_PASSWORD);
-    }
-
     private JsonObject pepeSanchezLoginBodyAsJson() {
         return new JsonObject()
                 .add(RestReceptionist.USERNAME_KEY, TestObjectsBucket.PEPE_SANCHEZ_NAME)
                 .add(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.PEPE_SANCHEZ_PASSWORD);
-    }
-
-    private JsonObject juanPerezRegistrationBodyAsJson() {
-        return juanPerezLoginBodyAsJson()
-                .add(RestReceptionist.ABOUT_KEY, TestObjectsBucket.JUAN_PEREZ_ABOUT)
-                .add(RestReceptionist.HOME_PAGE_KEY,TestObjectsBucket.JUAN_PEREZ_HOME_PAGE);
     }
 
     private JsonObject pepeSanchezRegistrationBodyAsJson() {

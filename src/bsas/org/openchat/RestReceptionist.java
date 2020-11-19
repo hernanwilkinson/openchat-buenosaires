@@ -13,7 +13,7 @@ import java.util.UUID;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.eclipse.jetty.http.HttpStatus.*;
 
-public class RestReceptionist {
+public class RestReceptionist implements Receptionist {
     public static final String USERNAME_KEY = "username";
     public static final String PASSWORD_KEY = "password";
     public static final String ABOUT_KEY = "about";
@@ -41,6 +41,7 @@ public class RestReceptionist {
         this.system = system;
     }
 
+    @Override
     public ReceptionistResponse registerUser(JsonObject registrationBodyAsJson) {
         try {
             User registeredUser = system.register(
@@ -60,6 +61,7 @@ public class RestReceptionist {
         }
     }
 
+    @Override
     public ReceptionistResponse login(JsonObject loginBodyAsJson) {
         return system.withAuthenticatedUserDo(
                 userNameFrom(loginBodyAsJson),
@@ -69,10 +71,12 @@ public class RestReceptionist {
 
     }
 
+    @Override
     public ReceptionistResponse users() {
         return okResponseWithUserArrayFrom(system.users());
     }
 
+    @Override
     public ReceptionistResponse followings(JsonObject followingsBodyAsJson) {
 
         String followerId = followingsBodyAsJson.getString(FOLLOWER_ID_KEY,"");
@@ -89,6 +93,7 @@ public class RestReceptionist {
         }
     }
 
+    @Override
     public ReceptionistResponse followeesOf(String userId) {
         final List<User> followees =
                 system.followeesOfUserNamed(userNameIdentifiedAs(userId));
@@ -96,6 +101,7 @@ public class RestReceptionist {
         return okResponseWithUserArrayFrom(followees);
     }
 
+    @Override
     public ReceptionistResponse addPublication(String userId, JsonObject messageBodyAsJson) {
         try {
             Publication publication = system.publishForUserNamed(userNameIdentifiedAs(userId), messageBodyAsJson.getString("text", ""));
@@ -110,6 +116,7 @@ public class RestReceptionist {
         }
     }
 
+    @Override
     public ReceptionistResponse timelineOf(String userId) {
         List<Publication> timeLine =
                 system.timeLineForUserNamed(userNameIdentifiedAs(userId));
@@ -117,12 +124,14 @@ public class RestReceptionist {
         return publicationsAsJson(timeLine);
     }
 
+    @Override
     public ReceptionistResponse wallOf(String userId) {
         List<Publication> wall = system.wallForUserNamed(userNameIdentifiedAs(userId));
 
         return publicationsAsJson(wall);
     }
 
+    @Override
     public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
         try {
             final String userName = userNameIdentifiedAs(likerAsJson.getString(USER_ID_KEY, ""));
