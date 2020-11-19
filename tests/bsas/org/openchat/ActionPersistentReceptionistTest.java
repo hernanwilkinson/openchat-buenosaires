@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ActionPersistentReceptionistTest {
 
@@ -37,5 +38,20 @@ public class ActionPersistentReceptionistTest {
         assertEquals(
                 registrationResponse.idFromBody(),
                 savedJson.getString(ActionPersistentReceptionist.RETURN_KEY,null));
+    }
+
+    @Test
+    public void invalidActionsAreNotPersisted() throws IOException {
+        final StringWriter writer = new StringWriter();
+        ActionPersistentReceptionist receptionist = new ActionPersistentReceptionist(
+                new RestReceptionist(new OpenChatSystem(() -> LocalDateTime.now())),
+                writer);
+
+        final JsonObject registrationBodyAsJson = testObjectsBucket.juanPerezRegistrationBodyAsJson();
+        receptionist.registerUser(registrationBodyAsJson);
+        receptionist.registerUser(registrationBodyAsJson);
+        LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()));
+        reader.readLine();
+        assertNull(reader.readLine());
     }
 }

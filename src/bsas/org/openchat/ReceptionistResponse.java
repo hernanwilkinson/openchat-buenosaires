@@ -4,6 +4,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import org.eclipse.jetty.http.HttpStatus;
 
 public class ReceptionistResponse {
     private final int status;
@@ -44,5 +45,9 @@ public class ReceptionistResponse {
 
     String idFromBody() {
         return responseBodyAsJson().getString(RestReceptionist.ID_KEY, null);
+    }
+
+    public boolean isSucessStatus() {
+        return status>= HttpStatus.OK_200 && status <HttpStatus.MULTIPLE_CHOICES_300;
     }
 }

@@ -20,13 +20,16 @@ public class ActionPersistentReceptionist implements Receptionist{
     @Override
     public ReceptionistResponse registerUser(JsonObject registrationBodyAsJson) {
         final ReceptionistResponse response = receptionist.registerUser(registrationBodyAsJson);
-        JsonObject actionAsJson = new JsonObject()
-                .add(ACTION_NAME_KEY, REGISTER_USER_ACTION_NAME)
-                .add(PARAMETERS_KEY,registrationBodyAsJson)
-                .add(RETURN_KEY,response.responseBodyAsJson().getString(RestReceptionist.ID_KEY,""));
 
-        writer.write(actionAsJson.toString());
-        writer.write("\n");
+        if(response.isSucessStatus()) {
+            JsonObject actionAsJson = new JsonObject()
+                    .add(ACTION_NAME_KEY, REGISTER_USER_ACTION_NAME)
+                    .add(PARAMETERS_KEY, registrationBodyAsJson)
+                    .add(RETURN_KEY, response.responseBodyAsJson().getString(RestReceptionist.ID_KEY, ""));
+
+            writer.write(actionAsJson.toString());
+            writer.write("\n");
+        }
 
         return response;
     }
