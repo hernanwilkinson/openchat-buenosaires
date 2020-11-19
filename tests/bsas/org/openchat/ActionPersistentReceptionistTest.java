@@ -26,18 +26,9 @@ public class ActionPersistentReceptionistTest {
 
         final JsonObject registrationBodyAsJson = testObjectsBucket.juanPerezRegistrationBodyAsJson();
         ReceptionistResponse registrationResponse = receptionist.registerUser(registrationBodyAsJson);
-        LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()));
-        JsonObject savedJson = Json.parse(reader.readLine()).asObject();
-
-        assertEquals(
-                ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME,
-                savedJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY,null));
-        assertEquals(
-                registrationBodyAsJson,
-                savedJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject());
-        assertEquals(
-                registrationResponse.responseBodyAsJson(),
-                savedJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject());
+        assertActionInLineNumberIs(
+                0, ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME, registrationBodyAsJson, registrationResponse.responseBodyAsJson(), writer
+        );
     }
 
     @Test
@@ -50,9 +41,7 @@ public class ActionPersistentReceptionistTest {
         final JsonObject registrationBodyAsJson = testObjectsBucket.juanPerezRegistrationBodyAsJson();
         receptionist.registerUser(registrationBodyAsJson);
         receptionist.registerUser(registrationBodyAsJson);
-        LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()));
-        reader.readLine();
-        assertNull(reader.readLine());
+        assertNumberOfSavedActionsAre(1,writer);
     }
 
     @Test
@@ -70,21 +59,11 @@ public class ActionPersistentReceptionistTest {
                 .add(RestReceptionist.FOLLOWEE_ID_KEY, followeeResponse.idFromBody());
         receptionist.followings(followingsBodyAsJson);
 
-        LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()));
-        reader.readLine();
-        reader.readLine();
-
-        JsonObject savedJson = Json.parse(reader.readLine()).asObject();
-
-        assertEquals(
+        assertActionInLineNumberIs(2,
                 ActionPersistentReceptionist.FOLLOWINGS_ACTION_NAME,
-                savedJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY,null));
-        assertEquals(
                 followingsBodyAsJson,
-                savedJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject());
-        assertEquals(
                 new JsonObject(),
-                savedJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject());
+                writer);
     }
 
     @Test
@@ -103,12 +82,7 @@ public class ActionPersistentReceptionistTest {
         receptionist.followings(followingsBodyAsJson);
         receptionist.followings(followingsBodyAsJson);
 
-        LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()));
-        reader.readLine();
-        reader.readLine();
-        reader.readLine();
-
-        assertNull(reader.readLine());
+        assertNumberOfSavedActionsAre(3, writer);
     }
 
     @Test
@@ -125,20 +99,38 @@ public class ActionPersistentReceptionistTest {
                 registrationResponse.idFromBody(),
                 publicationAsJson);
 
-        LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()));
-        reader.readLine();
-        JsonObject savedJson = Json.parse(reader.readLine()).asObject();
+        assertActionInLineNumberIs(
+                1,
+                ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME,
+                publicationAsJson.add(RestReceptionist.USER_ID_KEY,registrationResponse.idFromBody()),
+                publicationResponse.responseBodyAsJson(),
+                writer);
+    }
+
+    private void assertActionInLineNumberIs(int lineNumber, String actionName, JsonObject parameters, JsonObject returned, StringWriter writer) throws IOException {
+        JsonObject savedJson = Json.parse(lineAt(lineNumber, writer)).asObject();
 
         assertEquals(
-                ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME,
+                actionName,
                 savedJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY,null));
-        publicationAsJson.add(RestReceptionist.USER_ID_KEY,registrationResponse.idFromBody());
         assertEquals(
-                publicationAsJson,
+                parameters,
                 savedJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject());
         assertEquals(
-                publicationResponse.responseBodyAsJson(),
+                returned,
                 savedJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject());
     }
 
+    private void assertNumberOfSavedActionsAre(int numberOfSavedActions, StringWriter writer) throws IOException {
+        assertNull(lineAt(numberOfSavedActions, writer));
+    }
+
+    private String lineAt(int numberOfSavedActions, StringWriter writer) throws IOException {
+        LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()));
+
+        for (int currentLineNumber = 0; currentLineNumber < numberOfSavedActions; currentLineNumber++)
+            reader.readLine();
+
+        return reader.readLine();
+    }
 }
