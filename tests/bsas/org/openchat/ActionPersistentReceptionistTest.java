@@ -108,4 +108,34 @@ public class ActionPersistentReceptionistTest {
         assertNull(reader.readLine());
     }
 
+    @Test
+    public void persistsPublications() throws IOException {
+        final StringWriter writer = new StringWriter();
+        ActionPersistentReceptionist receptionist = new ActionPersistentReceptionist(
+                new RestReceptionist(new OpenChatSystem(()-> LocalDateTime.now())),
+                writer);
+
+        final JsonObject registrationBodyAsJson = testObjectsBucket.juanPerezRegistrationBodyAsJson();
+        final ReceptionistResponse registrationResponse = receptionist.registerUser(registrationBodyAsJson);
+        final JsonObject publicationAsJson = testObjectsBucket.publicationBodyAsJsonFor("hello");
+        final ReceptionistResponse publicationResponse = receptionist.addPublication(
+                registrationResponse.idFromBody(),
+                publicationAsJson);
+
+        LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()));
+        reader.readLine();
+        JsonObject savedJson = Json.parse(reader.readLine()).asObject();
+
+        assertEquals(
+                ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME,
+                savedJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY,null));
+        publicationAsJson.add(RestReceptionist.USER_ID_KEY,registrationResponse.idFromBody());
+        assertEquals(
+                publicationAsJson,
+                savedJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject());
+        assertEquals(
+                publicationResponse.responseBodyAsJson().toString(),
+                savedJson.getString(ActionPersistentReceptionist.RETURN_KEY,null));
+    }
+
 }

@@ -11,6 +11,7 @@ public class ActionPersistentReceptionist implements Receptionist{
     public static final String PARAMETERS_KEY = "parameters";
     public static final String RETURN_KEY = "return";
     public static final String FOLLOWINGS_ACTION_NAME = "followings";
+    public static final String ADD_PUBLICATION_ACTION_NAME = "addPublication";
     private final RestReceptionist receptionist;
     private final StringWriter writer;
 
@@ -69,7 +70,11 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse addPublication(String userId, JsonObject messageBodyAsJson) {
-        throw new UnsupportedOperationException();
+        return persistAction(
+                receptionist.addPublication(userId,messageBodyAsJson),
+                ADD_PUBLICATION_ACTION_NAME,
+                new JsonObject(messageBodyAsJson).add(RestReceptionist.USER_ID_KEY,userId),
+                response-> response.responseBodyAsJson().toString());
     }
 
     @Override

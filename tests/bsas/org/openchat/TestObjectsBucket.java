@@ -70,4 +70,9 @@ public class TestObjectsBucket {
         return pepeSanchezLoginBodyAsJson()
                 .add(RestReceptionist.ABOUT_KEY, PEPE_SANCHEZ_ABOUT);
     }
+
+    public JsonObject publicationBodyAsJsonFor(String message) {
+        return new JsonObject()
+                .add(RestReceptionist.TEXT_KEY, message);
+    }
 }

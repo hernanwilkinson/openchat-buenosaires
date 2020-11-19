@@ -128,7 +128,7 @@ public class RestReceptionistTest {
         final String invalidUserId = "";
         ReceptionistResponse publicationResponse = receptionist.addPublication(
                 invalidUserId,
-                messageBodyAsJsonFor("something"));
+                testObjects.publicationBodyAsJsonFor("something"));
 
         assertTrue(publicationResponse.isStatus(BAD_REQUEST_400));
         assertEquals(RestReceptionist.INVALID_CREDENTIALS,publicationResponse.responseBody());
@@ -299,11 +299,6 @@ public class RestReceptionistTest {
         assertions.accept(receptionist,response,followingsBodyAsJson,followerResponse,followeeResponse);
     }
 
-    private JsonObject messageBodyAsJsonFor(String message) {
-        return new JsonObject()
-                .add(RestReceptionist.TEXT_KEY, message);
-    }
-
     private JsonObject likerAsJsonFrom(ReceptionistResponse likerUserResponse) {
         return new JsonObject()
                 .add(RestReceptionist.USER_ID_KEY, likerUserResponse.idFromBody());
@@ -313,7 +308,7 @@ public class RestReceptionistTest {
         final String publisherId = publisherUserResponse.idFromBody();
         return receptionist.addPublication(
                 publisherId,
-                messageBodyAsJsonFor(message));
+                testObjects.publicationBodyAsJsonFor(message));
     }
 
     private ReceptionistResponse registerPepeSanchez() {
