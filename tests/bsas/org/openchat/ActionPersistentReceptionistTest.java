@@ -2,6 +2,7 @@ package bsas.org.openchat;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -15,42 +16,43 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ActionPersistentReceptionistTest {
 
-    private TestObjectsBucket testObjectsBucket = new TestObjectsBucket();
+    private TestObjectsBucket testObjectsBucket;
+    private StringWriter writer;
+    private ActionPersistentReceptionist receptionist;
+
+    @BeforeEach
+    public void setUp() {
+        testObjectsBucket = new TestObjectsBucket();
+        writer = new StringWriter();
+        receptionist = new ActionPersistentReceptionist(
+                new RestReceptionist(new OpenChatSystem(()-> LocalDateTime.now())),
+                writer);
+    }
 
     @Test
     public void persistsUserRegistration() throws IOException {
-        final StringWriter writer = new StringWriter();
-        ActionPersistentReceptionist receptionist = new ActionPersistentReceptionist(
-                new RestReceptionist(new OpenChatSystem(()-> LocalDateTime.now())),
-                writer);
-
         final JsonObject registrationBodyAsJson = testObjectsBucket.juanPerezRegistrationBodyAsJson();
         ReceptionistResponse registrationResponse = receptionist.registerUser(registrationBodyAsJson);
+
         assertActionInLineNumberIs(
-                0, ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME, registrationBodyAsJson, registrationResponse.responseBodyAsJson(), writer
+                0,
+                ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME,
+                registrationBodyAsJson,
+                registrationResponse.responseBodyAsJson()
         );
     }
 
     @Test
     public void invalidUserRegistrationIsNotPersisted() throws IOException {
-        final StringWriter writer = new StringWriter();
-        ActionPersistentReceptionist receptionist = new ActionPersistentReceptionist(
-                new RestReceptionist(new OpenChatSystem(() -> LocalDateTime.now())),
-                writer);
-
         final JsonObject registrationBodyAsJson = testObjectsBucket.juanPerezRegistrationBodyAsJson();
         receptionist.registerUser(registrationBodyAsJson);
         receptionist.registerUser(registrationBodyAsJson);
-        assertNumberOfSavedActionsAre(1,writer);
+
+        assertNumberOfSavedActionsAre(1);
     }
 
     @Test
     public void persistsFollowees() throws IOException {
-        final StringWriter writer = new StringWriter();
-        ActionPersistentReceptionist receptionist = new ActionPersistentReceptionist(
-                new RestReceptionist(new OpenChatSystem(()-> LocalDateTime.now())),
-                writer);
-
         ReceptionistResponse followerResponse = receptionist.registerUser(testObjectsBucket.pepeSanchezRegistrationBodyAsJson());
         ReceptionistResponse followeeResponse = receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
 
@@ -62,17 +64,12 @@ public class ActionPersistentReceptionistTest {
         assertActionInLineNumberIs(2,
                 ActionPersistentReceptionist.FOLLOWINGS_ACTION_NAME,
                 followingsBodyAsJson,
-                new JsonObject(),
-                writer);
+                new JsonObject()
+        );
     }
 
     @Test
     public void invalidFollowingsIsNotPersisted() throws IOException {
-        final StringWriter writer = new StringWriter();
-        ActionPersistentReceptionist receptionist = new ActionPersistentReceptionist(
-                new RestReceptionist(new OpenChatSystem(()-> LocalDateTime.now())),
-                writer);
-
         ReceptionistResponse followerResponse = receptionist.registerUser(testObjectsBucket.pepeSanchezRegistrationBodyAsJson());
         ReceptionistResponse followeeResponse = receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
 
@@ -82,16 +79,11 @@ public class ActionPersistentReceptionistTest {
         receptionist.followings(followingsBodyAsJson);
         receptionist.followings(followingsBodyAsJson);
 
-        assertNumberOfSavedActionsAre(3, writer);
+        assertNumberOfSavedActionsAre(3);
     }
 
     @Test
     public void persistsPublications() throws IOException {
-        final StringWriter writer = new StringWriter();
-        ActionPersistentReceptionist receptionist = new ActionPersistentReceptionist(
-                new RestReceptionist(new OpenChatSystem(()-> LocalDateTime.now())),
-                writer);
-
         final JsonObject registrationBodyAsJson = testObjectsBucket.juanPerezRegistrationBodyAsJson();
         final ReceptionistResponse registrationResponse = receptionist.registerUser(registrationBodyAsJson);
         final JsonObject publicationAsJson = testObjectsBucket.publicationBodyAsJsonFor("hello");
@@ -103,17 +95,12 @@ public class ActionPersistentReceptionistTest {
                 1,
                 ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME,
                 receptionist.addPublicationParameters(registrationResponse.idFromBody(),publicationAsJson),
-                publicationResponse.responseBodyAsJson(),
-                writer);
+                publicationResponse.responseBodyAsJson()
+        );
     }
 
     @Test
     public void persistsLikes() throws IOException {
-        final StringWriter writer = new StringWriter();
-        ActionPersistentReceptionist receptionist = new ActionPersistentReceptionist(
-                new RestReceptionist(new OpenChatSystem(()-> LocalDateTime.now())),
-                writer);
-
         final JsonObject registrationBodyAsJson = testObjectsBucket.juanPerezRegistrationBodyAsJson();
         final ReceptionistResponse registrationResponse = receptionist.registerUser(registrationBodyAsJson);
         final JsonObject publicationAsJson = testObjectsBucket.publicationBodyAsJsonFor("hello");
@@ -131,12 +118,12 @@ public class ActionPersistentReceptionistTest {
                 2,
                 ActionPersistentReceptionist.LIKE_PUBLICATION_ACTION_NAME,
                 receptionist.likeParameters(publicationResponse.postIdFromBody(),likerJson),
-                likeResponse.responseBodyAsJson(),
-                writer);
+                likeResponse.responseBodyAsJson()
+        );
     }
 
-    private void assertActionInLineNumberIs(int lineNumber, String actionName, JsonObject parameters, JsonObject returned, StringWriter writer) throws IOException {
-        JsonObject savedJson = Json.parse(lineAt(lineNumber, writer)).asObject();
+    private void assertActionInLineNumberIs(int lineNumber, String actionName, JsonObject parameters, JsonObject returned) throws IOException {
+        JsonObject savedJson = Json.parse(lineAt(lineNumber)).asObject();
 
         assertEquals(
                 actionName,
@@ -149,11 +136,11 @@ public class ActionPersistentReceptionistTest {
                 savedJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject());
     }
 
-    private void assertNumberOfSavedActionsAre(int numberOfSavedActions, StringWriter writer) throws IOException {
-        assertNull(lineAt(numberOfSavedActions, writer));
+    private void assertNumberOfSavedActionsAre(int numberOfSavedActions) throws IOException {
+        assertNull(lineAt(numberOfSavedActions));
     }
 
-    private String lineAt(int numberOfSavedActions, StringWriter writer) throws IOException {
+    private String lineAt(int numberOfSavedActions) throws IOException {
         LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()));
 
         for (int currentLineNumber = 0; currentLineNumber < numberOfSavedActions; currentLineNumber++)

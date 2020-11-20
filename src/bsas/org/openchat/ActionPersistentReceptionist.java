@@ -6,13 +6,15 @@ import java.io.StringWriter;
 import java.util.function.Function;
 
 public class ActionPersistentReceptionist implements Receptionist{
-    public static final String ACTION_NAME_KEY = "actionName";
     public static final String REGISTER_USER_ACTION_NAME = "registerUser";
-    public static final String PARAMETERS_KEY = "parameters";
-    public static final String RETURN_KEY = "return";
     public static final String FOLLOWINGS_ACTION_NAME = "followings";
     public static final String ADD_PUBLICATION_ACTION_NAME = "addPublication";
     public static final String LIKE_PUBLICATION_ACTION_NAME = "likePublication";
+
+    public static final String ACTION_NAME_KEY = "actionName";
+    public static final String PARAMETERS_KEY = "parameters";
+    public static final String RETURN_KEY = "return";
+
     private final RestReceptionist receptionist;
     private final StringWriter writer;
 
@@ -26,23 +28,7 @@ public class ActionPersistentReceptionist implements Receptionist{
         return persistAction(
                 receptionist.registerUser(registrationBodyAsJson),
                 REGISTER_USER_ACTION_NAME,
-                registrationBodyAsJson,
-                response->response.responseBodyAsJson());
-    }
-
-    private ReceptionistResponse persistAction(ReceptionistResponse response,
-        String actionName, JsonObject parameters, Function<ReceptionistResponse,JsonObject> returnedObject) {
-
-        if(response.isSucessStatus()) {
-            JsonObject actionAsJson = new JsonObject()
-                    .add(ACTION_NAME_KEY, actionName)
-                    .add(PARAMETERS_KEY, parameters)
-                    .add(RETURN_KEY, returnedObject.apply(response));
-
-            writer.write(actionAsJson.toString());
-            writer.write("\n");
-        }
-        return response;
+                registrationBodyAsJson);
     }
 
     @Override
@@ -74,8 +60,7 @@ public class ActionPersistentReceptionist implements Receptionist{
         return persistAction(
                 receptionist.addPublication(userId,messageBodyAsJson),
                 ADD_PUBLICATION_ACTION_NAME,
-                addPublicationParameters(userId, messageBodyAsJson),
-                response-> response.responseBodyAsJson());
+                addPublicationParameters(userId, messageBodyAsJson));
     }
 
     public JsonObject addPublicationParameters(String userId, JsonObject messageBodyAsJson) {
@@ -97,11 +82,33 @@ public class ActionPersistentReceptionist implements Receptionist{
         return persistAction(
                 receptionist.likePublicationIdentifiedAs(publicationId,likerAsJson),
                 LIKE_PUBLICATION_ACTION_NAME,
-                likeParameters(publicationId, likerAsJson),
-                response -> response.responseBodyAsJson());
+                likeParameters(publicationId, likerAsJson));
     }
 
     public JsonObject likeParameters(String publicationId, JsonObject likerAsJson) {
         return new JsonObject(likerAsJson).add(RestReceptionist.POST_ID_KEY,publicationId);
+    }
+
+    private ReceptionistResponse persistAction(ReceptionistResponse originalResponse, String actionName, JsonObject parameters) {
+        return persistAction(
+                originalResponse,
+                actionName,
+                parameters,
+                response->response.responseBodyAsJson());
+    }
+
+    private ReceptionistResponse persistAction(ReceptionistResponse response,
+                                               String actionName, JsonObject parameters, Function<ReceptionistResponse, JsonObject> returnClosure) {
+
+        if(response.isSucessStatus()) {
+            JsonObject actionAsJson = new JsonObject()
+                    .add(ACTION_NAME_KEY, actionName)
+                    .add(PARAMETERS_KEY, parameters)
+                    .add(RETURN_KEY, returnClosure.apply(response));
+
+            writer.write(actionAsJson.toString());
+            writer.write("\n");
+        }
+        return response;
     }
 }
