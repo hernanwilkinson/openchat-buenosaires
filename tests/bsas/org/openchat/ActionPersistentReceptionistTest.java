@@ -107,6 +107,34 @@ public class ActionPersistentReceptionistTest {
                 writer);
     }
 
+    @Test
+    public void persistsLikes() throws IOException {
+        final StringWriter writer = new StringWriter();
+        ActionPersistentReceptionist receptionist = new ActionPersistentReceptionist(
+                new RestReceptionist(new OpenChatSystem(()-> LocalDateTime.now())),
+                writer);
+
+        final JsonObject registrationBodyAsJson = testObjectsBucket.juanPerezRegistrationBodyAsJson();
+        final ReceptionistResponse registrationResponse = receptionist.registerUser(registrationBodyAsJson);
+        final JsonObject publicationAsJson = testObjectsBucket.publicationBodyAsJsonFor("hello");
+        final ReceptionistResponse publicationResponse = receptionist.addPublication(
+                registrationResponse.idFromBody(),
+                publicationAsJson);
+
+        final JsonObject likerJson = new JsonObject()
+                .add(RestReceptionist.USER_ID_KEY, registrationResponse.idFromBody());
+        final ReceptionistResponse likeResponse = receptionist.likePublicationIdentifiedAs(
+                publicationResponse.responseBodyAsJson().getString(RestReceptionist.POST_ID_KEY, null),
+                likerJson);
+
+        assertActionInLineNumberIs(
+                2,
+                ActionPersistentReceptionist.LIKE_PUBLICATION_ACTION_NAME,
+                likerJson.add(RestReceptionist.POST_ID_KEY,publicationResponse.responseBodyAsJson().getString(RestReceptionist.POST_ID_KEY, null)),
+                likeResponse.responseBodyAsJson(),
+                writer);
+    }
+
     private void assertActionInLineNumberIs(int lineNumber, String actionName, JsonObject parameters, JsonObject returned, StringWriter writer) throws IOException {
         JsonObject savedJson = Json.parse(lineAt(lineNumber, writer)).asObject();
 

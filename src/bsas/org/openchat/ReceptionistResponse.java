@@ -43,7 +43,7 @@ public class ReceptionistResponse {
         return Json.parse(responseBody).asArray();
     }
 
-    String idFromBody() {
+    public String idFromBody() {
         return responseBodyAsJson().getString(RestReceptionist.ID_KEY, null);
     }
 

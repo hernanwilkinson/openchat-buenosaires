@@ -12,6 +12,7 @@ public class ActionPersistentReceptionist implements Receptionist{
     public static final String RETURN_KEY = "return";
     public static final String FOLLOWINGS_ACTION_NAME = "followings";
     public static final String ADD_PUBLICATION_ACTION_NAME = "addPublication";
+    public static final String LIKE_PUBLICATION_ACTION_NAME = "likePublication";
     private final RestReceptionist receptionist;
     private final StringWriter writer;
 
@@ -89,6 +90,10 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
-        throw new UnsupportedOperationException();
+        return persistAction(
+                receptionist.likePublicationIdentifiedAs(publicationId,likerAsJson),
+                LIKE_PUBLICATION_ACTION_NAME,
+                new JsonObject(likerAsJson).add(RestReceptionist.POST_ID_KEY,publicationId),
+                response -> response.responseBodyAsJson());
     }
 }
