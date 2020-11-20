@@ -74,8 +74,12 @@ public class ActionPersistentReceptionist implements Receptionist{
         return persistAction(
                 receptionist.addPublication(userId,messageBodyAsJson),
                 ADD_PUBLICATION_ACTION_NAME,
-                new JsonObject(messageBodyAsJson).add(RestReceptionist.USER_ID_KEY,userId),
+                addPublicationParameters(userId, messageBodyAsJson),
                 response-> response.responseBodyAsJson());
+    }
+
+    public JsonObject addPublicationParameters(String userId, JsonObject messageBodyAsJson) {
+        return new JsonObject(messageBodyAsJson).add(RestReceptionist.USER_ID_KEY,userId);
     }
 
     @Override
@@ -93,7 +97,11 @@ public class ActionPersistentReceptionist implements Receptionist{
         return persistAction(
                 receptionist.likePublicationIdentifiedAs(publicationId,likerAsJson),
                 LIKE_PUBLICATION_ACTION_NAME,
-                new JsonObject(likerAsJson).add(RestReceptionist.POST_ID_KEY,publicationId),
+                likeParameters(publicationId, likerAsJson),
                 response -> response.responseBodyAsJson());
+    }
+
+    public JsonObject likeParameters(String publicationId, JsonObject likerAsJson) {
+        return new JsonObject(likerAsJson).add(RestReceptionist.POST_ID_KEY,publicationId);
     }
 }

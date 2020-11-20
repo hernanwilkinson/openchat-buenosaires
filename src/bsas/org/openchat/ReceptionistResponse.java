@@ -50,4 +50,8 @@ public class ReceptionistResponse {
     public boolean isSucessStatus() {
         return status>= HttpStatus.OK_200 && status <HttpStatus.MULTIPLE_CHOICES_300;
     }
+
+    public String postIdFromBody() {
+        return responseBodyAsJson().getString(RestReceptionist.POST_ID_KEY, null);
+    }
 }

@@ -102,7 +102,7 @@ public class ActionPersistentReceptionistTest {
         assertActionInLineNumberIs(
                 1,
                 ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME,
-                publicationAsJson.add(RestReceptionist.USER_ID_KEY,registrationResponse.idFromBody()),
+                receptionist.addPublicationParameters(registrationResponse.idFromBody(),publicationAsJson),
                 publicationResponse.responseBodyAsJson(),
                 writer);
     }
@@ -124,13 +124,13 @@ public class ActionPersistentReceptionistTest {
         final JsonObject likerJson = new JsonObject()
                 .add(RestReceptionist.USER_ID_KEY, registrationResponse.idFromBody());
         final ReceptionistResponse likeResponse = receptionist.likePublicationIdentifiedAs(
-                publicationResponse.responseBodyAsJson().getString(RestReceptionist.POST_ID_KEY, null),
+                publicationResponse.postIdFromBody(),
                 likerJson);
 
         assertActionInLineNumberIs(
                 2,
                 ActionPersistentReceptionist.LIKE_PUBLICATION_ACTION_NAME,
-                likerJson.add(RestReceptionist.POST_ID_KEY,publicationResponse.responseBodyAsJson().getString(RestReceptionist.POST_ID_KEY, null)),
+                receptionist.likeParameters(publicationResponse.postIdFromBody(),likerJson),
                 likeResponse.responseBodyAsJson(),
                 writer);
     }
