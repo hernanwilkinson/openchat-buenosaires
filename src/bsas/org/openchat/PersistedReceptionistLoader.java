@@ -34,9 +34,7 @@ class PersistedReceptionistLoader {
 
     public RestReceptionist execute() throws IOException {
 
-        receptionist = new RestReceptionist(
-                new OpenChatSystem(() -> lastNow),
-                () -> lastId);
+        createReceptionist();
 
         while (hasLineToParse()) {
             createAction();
@@ -44,6 +42,12 @@ class PersistedReceptionistLoader {
         }
 
         return receptionist;
+    }
+
+    public void createReceptionist() {
+        receptionist = new RestReceptionist(
+                new OpenChatSystem(() -> lastNow),
+                () -> lastId);
     }
 
     public boolean hasLineToParse() throws IOException {
