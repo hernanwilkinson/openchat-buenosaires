@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 
 class PersistedReceptionistLoader {
     public static final String INVALID_RECORD = "Invalid record";
-    private Reader reader;
+    private final LineNumberReader lineReader;
 
     public PersistedReceptionistLoader(Reader reader) {
-        this.reader = reader;
+        lineReader = new LineNumberReader(reader);
     }
 
     public static RestReceptionist recoverFrom(Reader reader) throws IOException {
@@ -25,7 +25,6 @@ class PersistedReceptionistLoader {
     }
 
     public RestReceptionist invoke() throws IOException {
-        LineNumberReader lineReader = new LineNumberReader(reader);
         final String[] lastId = new String[1];
         LocalDateTime[] lastNow = new LocalDateTime[1];
         RestReceptionist receptionist = new RestReceptionist(
