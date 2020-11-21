@@ -23,7 +23,7 @@ public class ActionPersistentReceptionistTest {
     private ActionPersistentReceptionist receptionist;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws NoSuchMethodException {
         testObjectsBucket = new TestObjectsBucket();
         writer = new StringWriter();
         receptionist = new ActionPersistentReceptionist(

@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 public class RecoverExample {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, NoSuchMethodException {
         System.out.println("Creating data ...");
         final String fileName = "openchat.data";
         final FileWriter writer = new FileWriter(fileName);

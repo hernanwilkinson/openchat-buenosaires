@@ -5,8 +5,7 @@ import com.eclipsesource.json.JsonObject;
 import java.io.Writer;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class ActionPersistentReceptionist implements Receptionist, InvocationHandler {
     public static final String REGISTER_USER_ACTION_NAME = "registerUser";
@@ -20,13 +19,14 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
 
     private final RestReceptionist receptionist;
     final Writer writer;
-    private final List<PersistentAction> persistentActions;
+    private final HashMap<Method,PersistentAction> persistentActions;
 
-    public ActionPersistentReceptionist(RestReceptionist receptionist, Writer writer) {
+    public ActionPersistentReceptionist(RestReceptionist receptionist, Writer writer) throws NoSuchMethodException {
         this.receptionist = receptionist;
         this.writer = writer;
-        this.persistentActions = new ArrayList<>();
-        persistentActions.add(createRegisterUserAction());
+        this.persistentActions = new HashMap<>();
+        persistentActions.put(Receptionist.class.getMethod("registerUser", JsonObject.class),createRegisterUserAction());
+        persistentActions.put(Receptionist.class.getMethod("followings", JsonObject.class),createFollowingsAction());
     }
 
     @Override
@@ -40,8 +40,11 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
         }
     }
 
-    public PersistentAction createRegisterUserAction() {
-        return new PersistentAction(REGISTER_USER_ACTION_NAME, response -> response.responseBodyAsJson());
+    public PersistentAction createRegisterUserAction() throws NoSuchMethodException {
+        return new PersistentAction(
+                REGISTER_USER_ACTION_NAME,
+                response -> response.responseBodyAsJson(),
+                Receptionist.class.getMethod("registerUser", JsonObject.class));
     }
 
     @Override
@@ -56,10 +59,20 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
 
     @Override
     public ReceptionistResponse followings(JsonObject followingsBodyAsJson) {
-        return new PersistentAction(FOLLOWINGS_ACTION_NAME, response -> new JsonObject()).persistAction(
-                receptionist.followings(followingsBodyAsJson),
-                followingsBodyAsJson,
-                this);
+        try {
+            return (ReceptionistResponse) invoke(this,
+                    Receptionist.class.getMethod("followings", JsonObject.class),
+                    new JsonObject[]{followingsBodyAsJson});
+        } catch (Throwable throwable) {
+            return null;
+        }
+    }
+
+    public PersistentAction createFollowingsAction() throws NoSuchMethodException {
+        return new PersistentAction(
+                FOLLOWINGS_ACTION_NAME,
+                response -> new JsonObject(),
+                Receptionist.class.getMethod("followings", JsonObject.class));
     }
 
     @Override
@@ -69,7 +82,7 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
 
     @Override
     public ReceptionistResponse addPublication(String userId, JsonObject messageBodyAsJson) {
-        return new PersistentAction(ADD_PUBLICATION_ACTION_NAME, response -> response.responseBodyAsJson()).persistAction(
+        return new PersistentAction(ADD_PUBLICATION_ACTION_NAME, response -> response.responseBodyAsJson(), null).persistAction(
                 receptionist.addPublication(userId,messageBodyAsJson),
                 addPublicationParameters(userId, messageBodyAsJson),
                 this);
@@ -91,7 +104,7 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
 
     @Override
     public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
-        return new PersistentAction(LIKE_PUBLICATION_ACTION_NAME, response -> response.responseBodyAsJson()).persistAction(
+        return new PersistentAction(LIKE_PUBLICATION_ACTION_NAME, response -> response.responseBodyAsJson(), null).persistAction(
                 receptionist.likePublicationIdentifiedAs(publicationId,likerAsJson),
                 likeParameters(publicationId, likerAsJson),
                 this);
@@ -103,7 +116,9 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        return persistentActions.get(0).persistAction(
+        final PersistentAction persistentAction = persistentActions.get(method);
+
+        return persistentAction.persistAction(
                 (ReceptionistResponse) method.invoke(receptionist,args),
                 (JsonObject) args[0],
                 this);
