@@ -2,7 +2,6 @@ package bsas.org.openchat;
 
 import com.eclipsesource.json.JsonObject;
 
-import java.io.IOException;
 import java.io.Writer;
 
 public class ActionPersistentReceptionist implements Receptionist{
@@ -16,7 +15,7 @@ public class ActionPersistentReceptionist implements Receptionist{
     public static final String RETURN_KEY = "return";
 
     private final RestReceptionist receptionist;
-    private final Writer writer;
+    final Writer writer;
 
     public ActionPersistentReceptionist(RestReceptionist receptionist, Writer writer) {
         this.receptionist = receptionist;
@@ -43,10 +42,10 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse followings(JsonObject followingsBodyAsJson) {
-        return persistAction(
+        return new PersistentAction(FOLLOWINGS_ACTION_NAME, response -> new JsonObject()).persistAction(
                 receptionist.followings(followingsBodyAsJson),
-                new PersistentAction(FOLLOWINGS_ACTION_NAME, response -> new JsonObject()), followingsBodyAsJson
-        );
+                followingsBodyAsJson,
+                this);
     }
 
     @Override
@@ -89,30 +88,10 @@ public class ActionPersistentReceptionist implements Receptionist{
     }
 
     private ReceptionistResponse persistAction(ReceptionistResponse originalResponse, String actionName, JsonObject parameters) {
-        return persistAction(
+        return new PersistentAction(actionName, response -> response.responseBodyAsJson()).persistAction(
                 originalResponse,
-                new PersistentAction(actionName, response -> response.responseBodyAsJson()), parameters
-        );
-    }
-
-    private ReceptionistResponse persistAction(ReceptionistResponse response,
-                                               PersistentAction persistentAction, JsonObject parameters) {
-
-        if(response.isSucessStatus()) {
-            JsonObject actionAsJson = new JsonObject()
-                    .add(ACTION_NAME_KEY, persistentAction.getActionName())
-                    .add(PARAMETERS_KEY, parameters)
-                    .add(RETURN_KEY, persistentAction.getReturnClosure().apply(response));
-
-            try {
-                writer.write(actionAsJson.toString());
-                writer.write("\n");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        return response;
+                parameters,
+                this);
     }
 
 }
