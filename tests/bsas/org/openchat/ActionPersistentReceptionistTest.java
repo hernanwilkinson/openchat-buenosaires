@@ -260,6 +260,20 @@ public class ActionPersistentReceptionistTest {
         assertEquals(ActionPersistentReceptionist.invalidRecordErrorMessage(1), error.getMessage());
     }
 
+    @Test
+    public void failsGracefullyWhenNoReturnObject() throws IOException {
+
+        writer.write(new JsonObject()
+            .add(ActionPersistentReceptionist.PARAMETERS_KEY,new JsonObject())
+            .toString());
+        RuntimeException error = assertThrows(
+                RuntimeException.class,
+                ()->ActionPersistentReceptionist.recoverFrom(
+                        new StringReader(writer.toString())));
+
+        assertEquals(ActionPersistentReceptionist.invalidRecordErrorMessage(1), error.getMessage());
+    }
+
     private void assertActionInLineNumberIs(int lineNumber, String actionName, JsonObject parameters, JsonObject returned) throws IOException {
         JsonObject savedJson = Json.parse(lineAt(lineNumber)).asObject();
 
