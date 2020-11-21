@@ -17,14 +17,14 @@ class PersistedReceptionistLoader {
     }
 
     public static RestReceptionist recoverFrom(Reader reader) throws IOException {
-        return new PersistedReceptionistLoader(reader).invoke();
+        return new PersistedReceptionistLoader(reader).execute();
     }
 
     public static String invalidRecordErrorMessage(int lineNumber) {
         return INVALID_RECORD + " at line " + lineNumber;
     }
 
-    public RestReceptionist invoke() throws IOException {
+    public RestReceptionist execute() throws IOException {
         final String[] lastId = new String[1];
         LocalDateTime[] lastNow = new LocalDateTime[1];
         RestReceptionist receptionist = new RestReceptionist(
