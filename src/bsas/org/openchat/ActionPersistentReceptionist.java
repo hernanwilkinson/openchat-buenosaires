@@ -3,6 +3,8 @@ package bsas.org.openchat;
 import com.eclipsesource.json.JsonObject;
 
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ActionPersistentReceptionist implements Receptionist{
     public static final String REGISTER_USER_ACTION_NAME = "registerUser";
@@ -16,15 +18,18 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     private final RestReceptionist receptionist;
     final Writer writer;
+    private final List<PersistentAction> persistentActions;
 
     public ActionPersistentReceptionist(RestReceptionist receptionist, Writer writer) {
         this.receptionist = receptionist;
         this.writer = writer;
+        this.persistentActions = new ArrayList<>();
+        persistentActions.add(createRegisterUserAction());
     }
 
     @Override
     public ReceptionistResponse registerUser(JsonObject registrationBodyAsJson) {
-        return createRegisterUserAction().persistAction(
+        return persistentActions.get(0).persistAction(
                 receptionist.registerUser(registrationBodyAsJson),
                 registrationBodyAsJson,
                 this);
