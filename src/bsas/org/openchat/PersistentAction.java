@@ -3,16 +3,21 @@ package bsas.org.openchat;
 import com.eclipsesource.json.JsonObject;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.function.Function;
 
 public class PersistentAction {
     private final String actionName;
     private final Function<ReceptionistResponse, JsonObject> returnClosure;
+    private Function<Object[], JsonObject> parametersToJsonObjectConverter;
 
     public PersistentAction(String actionName, Function<ReceptionistResponse, JsonObject> returnClosure) {
+        this(actionName,returnClosure,args->(JsonObject) args[0]);
+    }
+
+    public PersistentAction(String actionName, Function<ReceptionistResponse, JsonObject> returnClosure, Function<Object[], JsonObject> parametersToJsonObjectConverter) {
         this.actionName = actionName;
         this.returnClosure = returnClosure;
+        this.parametersToJsonObjectConverter = parametersToJsonObjectConverter;
     }
 
     public String getActionName() {
@@ -24,12 +29,14 @@ public class PersistentAction {
     }
 
     ReceptionistResponse persistAction(ReceptionistResponse response,
-                                       JsonObject parameters, ActionPersistentReceptionist actionPersistentReceptionist) {
+                                       Object[] parameters, ActionPersistentReceptionist actionPersistentReceptionist) {
+
+        JsonObject parametersAsJson = parametersAsJson(parameters);
 
         if(response.isSucessStatus()) {
             JsonObject actionAsJson = new JsonObject()
                     .add(ActionPersistentReceptionist.ACTION_NAME_KEY, getActionName())
-                    .add(ActionPersistentReceptionist.PARAMETERS_KEY, parameters)
+                    .add(ActionPersistentReceptionist.PARAMETERS_KEY, parametersAsJson)
                     .add(ActionPersistentReceptionist.RETURN_KEY, getReturnClosure().apply(response));
 
             try {
@@ -41,5 +48,9 @@ public class PersistentAction {
         }
 
         return response;
+    }
+
+    private JsonObject parametersAsJson(Object[] parameters) {
+        return parametersToJsonObjectConverter.apply(parameters);
     }
 }
