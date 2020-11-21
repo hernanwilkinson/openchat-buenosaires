@@ -52,7 +52,7 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse followeesOf(String userId) {
-        throw new UnsupportedOperationException();
+        return receptionist.followeesOf(userId);
     }
 
     @Override
