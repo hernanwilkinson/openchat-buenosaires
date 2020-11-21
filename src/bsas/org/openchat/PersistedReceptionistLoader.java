@@ -13,6 +13,10 @@ class PersistedReceptionistLoader {
     private final LineNumberReader lineReader;
     private String lastId;
     private LocalDateTime lastNow;
+    private RestReceptionist receptionist;
+    private JsonObject actionAsJson;
+    private JsonObject parameters;
+    private JsonObject returned;
 
     public PersistedReceptionistLoader(Reader reader) {
         lineReader = new LineNumberReader(reader);
@@ -28,15 +32,12 @@ class PersistedReceptionistLoader {
 
     public RestReceptionist execute() throws IOException {
 
-        RestReceptionist receptionist = new RestReceptionist(
+        receptionist = new RestReceptionist(
                 new OpenChatSystem(() -> lastNow),
                 () -> lastId);
 
         String line = lineReader.readLine();
         while (line != null) {
-            final JsonObject actionAsJson;
-            final JsonObject parameters;
-            final JsonObject returned;
             try {
                 actionAsJson = Json.parse(line).asObject();
                 parameters = actionAsJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject();
