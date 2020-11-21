@@ -9,10 +9,19 @@ import java.io.Reader;
 import java.time.LocalDateTime;
 
 class PersistedReceptionistLoader {
+    public static final String INVALID_RECORD = "Invalid record";
     private Reader reader;
 
     public PersistedReceptionistLoader(Reader reader) {
         this.reader = reader;
+    }
+
+    public static RestReceptionist recoverFrom(Reader reader) throws IOException {
+        return new PersistedReceptionistLoader(reader).invoke();
+    }
+
+    public static String invalidRecordErrorMessage(int lineNumber) {
+        return INVALID_RECORD + " at line " + lineNumber;
     }
 
     public RestReceptionist invoke() throws IOException {
@@ -33,7 +42,7 @@ class PersistedReceptionistLoader {
                 parameters = actionAsJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject();
                 returned = actionAsJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject();
             } catch (RuntimeException e) {
-                throw new RuntimeException(ActionPersistentReceptionist.invalidRecordErrorMessage(lineReader.getLineNumber()), e);
+                throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()), e);
             }
             final String actionName = actionAsJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY, "");
             if (actionName.equals(ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME)) {
@@ -53,7 +62,7 @@ class PersistedReceptionistLoader {
                         parameters.getString(RestReceptionist.POST_ID_KEY, null),
                         parameters);
             } else
-                throw new RuntimeException(ActionPersistentReceptionist.invalidRecordErrorMessage(lineReader.getLineNumber()));
+                throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()));
 
             line = lineReader.readLine();
         }

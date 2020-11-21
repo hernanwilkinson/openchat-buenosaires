@@ -16,7 +16,6 @@ public class ActionPersistentReceptionist implements Receptionist{
     public static final String ACTION_NAME_KEY = "actionName";
     public static final String PARAMETERS_KEY = "parameters";
     public static final String RETURN_KEY = "return";
-    public static final String INVALID_RECORD = "Invalid record";
 
     private final RestReceptionist receptionist;
     private final StringWriter writer;
@@ -24,14 +23,6 @@ public class ActionPersistentReceptionist implements Receptionist{
     public ActionPersistentReceptionist(RestReceptionist receptionist, StringWriter writer) {
         this.receptionist = receptionist;
         this.writer = writer;
-    }
-
-    public static RestReceptionist recoverFrom(Reader reader) throws IOException {
-        return new PersistedReceptionistLoader(reader).invoke();
-    }
-
-    public static String invalidRecordErrorMessage(int lineNumber) {
-        return INVALID_RECORD + " at line " + lineNumber;
     }
 
     @Override
