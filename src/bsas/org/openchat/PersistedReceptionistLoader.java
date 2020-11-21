@@ -58,7 +58,7 @@ class PersistedReceptionistLoader {
     public void executeAction() {
         if (isRegisterUserAction()) {
             executeRegisterUserAction();
-        } else if (actionName.equals(ActionPersistentReceptionist.FOLLOWINGS_ACTION_NAME)) {
+        } else if (isFollowingsAction()) {
             receptionist.followings(parameters);
         } else if (actionName.equals(ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME)) {
             lastId = returned.getString(RestReceptionist.POST_ID_KEY, null);
@@ -73,6 +73,10 @@ class PersistedReceptionistLoader {
                     parameters);
         } else
             throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()));
+    }
+
+    public boolean isFollowingsAction() {
+        return actionName.equals(ActionPersistentReceptionist.FOLLOWINGS_ACTION_NAME);
     }
 
     public void executeRegisterUserAction() {
