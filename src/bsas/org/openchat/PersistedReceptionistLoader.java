@@ -41,29 +41,33 @@ class PersistedReceptionistLoader {
         line = lineReader.readLine();
         while (line != null) {
             createAction();
-            if (actionName.equals(ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME)) {
-                lastId = returned.getString(RestReceptionist.ID_KEY, null);
-                receptionist.registerUser(parameters);
-            } else if (actionName.equals(ActionPersistentReceptionist.FOLLOWINGS_ACTION_NAME)) {
-                receptionist.followings(parameters);
-            } else if (actionName.equals(ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME)) {
-                lastId = returned.getString(RestReceptionist.POST_ID_KEY, null);
-                lastNow = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
-                        returned.getString(RestReceptionist.DATE_TIME_KEY, null)));
-                receptionist.addPublication(
-                        parameters.getString(RestReceptionist.USER_ID_KEY, null),
-                        parameters);
-            } else if (actionName.equals(ActionPersistentReceptionist.LIKE_PUBLICATION_ACTION_NAME)) {
-                receptionist.likePublicationIdentifiedAs(
-                        parameters.getString(RestReceptionist.POST_ID_KEY, null),
-                        parameters);
-            } else
-                throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()));
+            executeAction();
 
             line = lineReader.readLine();
         }
 
         return receptionist;
+    }
+
+    public void executeAction() {
+        if (actionName.equals(ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME)) {
+            lastId = returned.getString(RestReceptionist.ID_KEY, null);
+            receptionist.registerUser(parameters);
+        } else if (actionName.equals(ActionPersistentReceptionist.FOLLOWINGS_ACTION_NAME)) {
+            receptionist.followings(parameters);
+        } else if (actionName.equals(ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME)) {
+            lastId = returned.getString(RestReceptionist.POST_ID_KEY, null);
+            lastNow = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
+                    returned.getString(RestReceptionist.DATE_TIME_KEY, null)));
+            receptionist.addPublication(
+                    parameters.getString(RestReceptionist.USER_ID_KEY, null),
+                    parameters);
+        } else if (actionName.equals(ActionPersistentReceptionist.LIKE_PUBLICATION_ACTION_NAME)) {
+            receptionist.likePublicationIdentifiedAs(
+                    parameters.getString(RestReceptionist.POST_ID_KEY, null),
+                    parameters);
+        } else
+            throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()));
     }
 
     public void createAction() {
