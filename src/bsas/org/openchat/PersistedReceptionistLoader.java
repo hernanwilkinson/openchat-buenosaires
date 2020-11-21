@@ -12,6 +12,7 @@ class PersistedReceptionistLoader {
     public static final String INVALID_RECORD = "Invalid record";
     private final LineNumberReader lineReader;
     private String lastId;
+    private LocalDateTime lastNow;
 
     public PersistedReceptionistLoader(Reader reader) {
         lineReader = new LineNumberReader(reader);
@@ -27,9 +28,8 @@ class PersistedReceptionistLoader {
 
     public RestReceptionist execute() throws IOException {
 
-        LocalDateTime[] lastNow = new LocalDateTime[1];
         RestReceptionist receptionist = new RestReceptionist(
-                new OpenChatSystem(() -> lastNow[0]),
+                new OpenChatSystem(() -> lastNow),
                 () -> lastId);
 
         String line = lineReader.readLine();
@@ -52,7 +52,7 @@ class PersistedReceptionistLoader {
                 receptionist.followings(parameters);
             } else if (actionName.equals(ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME)) {
                 lastId = returned.getString(RestReceptionist.POST_ID_KEY, null);
-                lastNow[0] = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
+                lastNow = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
                         returned.getString(RestReceptionist.DATE_TIME_KEY, null)));
                 receptionist.addPublication(
                         parameters.getString(RestReceptionist.USER_ID_KEY, null),
