@@ -1,9 +1,7 @@
 package bsas.org.openchat;
 
 import com.eclipsesource.json.JsonObject;
-import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,17 +14,18 @@ public class LoadExample {
 
     private String userNamePrefix;
     private List<String> followees;
-    private RestReceptionist receptionist;
+    private Receptionist receptionist;
 
     public static void main(String[] args) {
-        new LoadExample().load();
+        new LoadExample().load(new RestReceptionist(
+                new OpenChatSystem(() -> LocalDateTime.now())));
     }
 
-    public void load() {
+    public void load(Receptionist receptionist) {
+        final long startTime = System.currentTimeMillis();
         printMemoryUsage();
 
-        receptionist = new RestReceptionist(
-                new OpenChatSystem(()-> LocalDateTime.now()));
+        this.receptionist = receptionist;
 
         userNamePrefix = "";
         followees = new ArrayList<>();
@@ -39,8 +38,10 @@ public class LoadExample {
 
             calculatePrefix(currentUserNumber);
         }
-        System.out.println("-------");
+
+        final long endTime = System.currentTimeMillis();
         printMemoryUsage();
+        System.out.println("Elapsed millis: " + (endTime-startTime));
     }
 
     private void calculatePrefix(int currentUserNumber) {

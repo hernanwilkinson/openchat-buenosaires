@@ -3,8 +3,7 @@ package bsas.org.openchat;
 import com.eclipsesource.json.JsonObject;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringWriter;
+import java.io.Writer;
 import java.util.function.Function;
 
 public class ActionPersistentReceptionist implements Receptionist{
@@ -18,9 +17,9 @@ public class ActionPersistentReceptionist implements Receptionist{
     public static final String RETURN_KEY = "return";
 
     private final RestReceptionist receptionist;
-    private final StringWriter writer;
+    private final Writer writer;
 
-    public ActionPersistentReceptionist(RestReceptionist receptionist, StringWriter writer) {
+    public ActionPersistentReceptionist(RestReceptionist receptionist, Writer writer) {
         this.receptionist = receptionist;
         this.writer = writer;
     }
@@ -108,9 +107,14 @@ public class ActionPersistentReceptionist implements Receptionist{
                     .add(PARAMETERS_KEY, parameters)
                     .add(RETURN_KEY, returnClosure.apply(response));
 
-            writer.write(actionAsJson.toString());
-            writer.write("\n");
+            try {
+                writer.write(actionAsJson.toString());
+                writer.write("\n");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+
         return response;
     }
 
