@@ -157,9 +157,18 @@ public class ActionPersistentReceptionistTest {
     @Test
     public void followeesIsNotPersisted() throws IOException {
         final ReceptionistResponse registrationResponse = receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
-        final ReceptionistResponse usersResponse = receptionist.followeesOf(registrationResponse.idFromBody());
+        final ReceptionistResponse followeesResponse = receptionist.followeesOf(registrationResponse.idFromBody());
 
-        assertTrue(usersResponse.isStatus(HttpStatus.OK_200));
+        assertTrue(followeesResponse.isStatus(HttpStatus.OK_200));
+        assertNumberOfSavedActionsAre(1);
+    }
+
+    @Test
+    public void timelineIsNotPersisted() throws IOException {
+        final ReceptionistResponse registrationResponse = receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
+        final ReceptionistResponse timelineResponse = receptionist.timelineOf(registrationResponse.idFromBody());
+
+        assertTrue(timelineResponse.isStatus(HttpStatus.OK_200));
         assertNumberOfSavedActionsAre(1);
     }
 

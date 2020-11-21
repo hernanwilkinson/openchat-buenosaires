@@ -69,7 +69,7 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse timelineOf(String userId) {
-        throw new UnsupportedOperationException();
+        return receptionist.timelineOf(userId);
     }
 
     @Override
