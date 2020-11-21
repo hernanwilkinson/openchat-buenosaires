@@ -24,10 +24,10 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse registerUser(JsonObject registrationBodyAsJson) {
-        return persistAction(
+        return new PersistentAction(REGISTER_USER_ACTION_NAME, response -> response.responseBodyAsJson()).persistAction(
                 receptionist.registerUser(registrationBodyAsJson),
-                REGISTER_USER_ACTION_NAME,
-                registrationBodyAsJson);
+                registrationBodyAsJson,
+                this);
     }
 
     @Override
@@ -55,10 +55,10 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse addPublication(String userId, JsonObject messageBodyAsJson) {
-        return persistAction(
+        return new PersistentAction(ADD_PUBLICATION_ACTION_NAME, response -> response.responseBodyAsJson()).persistAction(
                 receptionist.addPublication(userId,messageBodyAsJson),
-                ADD_PUBLICATION_ACTION_NAME,
-                addPublicationParameters(userId, messageBodyAsJson));
+                addPublicationParameters(userId, messageBodyAsJson),
+                this);
     }
 
     public JsonObject addPublicationParameters(String userId, JsonObject messageBodyAsJson) {
@@ -77,21 +77,14 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
-        return persistAction(
+        return new PersistentAction(LIKE_PUBLICATION_ACTION_NAME, response -> response.responseBodyAsJson()).persistAction(
                 receptionist.likePublicationIdentifiedAs(publicationId,likerAsJson),
-                LIKE_PUBLICATION_ACTION_NAME,
-                likeParameters(publicationId, likerAsJson));
+                likeParameters(publicationId, likerAsJson),
+                this);
     }
 
     public JsonObject likeParameters(String publicationId, JsonObject likerAsJson) {
         return new JsonObject(likerAsJson).add(RestReceptionist.POST_ID_KEY,publicationId);
-    }
-
-    private ReceptionistResponse persistAction(ReceptionistResponse originalResponse, String actionName, JsonObject parameters) {
-        return new PersistentAction(actionName, response -> response.responseBodyAsJson()).persistAction(
-                originalResponse,
-                parameters,
-                this);
     }
 
 }
