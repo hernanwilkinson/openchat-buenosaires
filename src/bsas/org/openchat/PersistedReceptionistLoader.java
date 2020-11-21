@@ -65,7 +65,11 @@ class PersistedReceptionistLoader {
         } else if (isLikePublicationAction()) {
             executeLikePublicationAction();
         } else
-            throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()));
+            invalidAction();
+    }
+
+    public void invalidAction() {
+        throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()));
     }
 
     public void executeLikePublicationAction() {
