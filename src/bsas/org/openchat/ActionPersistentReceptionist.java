@@ -100,6 +100,9 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        throw new UnsupportedOperationException();
+        return persistentActions.get(0).persistAction(
+                (ReceptionistResponse) method.invoke(args),
+                (JsonObject) args[0],
+                this);
     }
 }
