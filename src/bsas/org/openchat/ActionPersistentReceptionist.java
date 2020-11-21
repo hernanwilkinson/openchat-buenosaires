@@ -38,7 +38,7 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse users() {
-        throw new UnsupportedOperationException();
+        return receptionist.users();
     }
 
     @Override

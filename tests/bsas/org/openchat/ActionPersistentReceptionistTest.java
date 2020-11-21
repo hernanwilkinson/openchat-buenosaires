@@ -145,6 +145,15 @@ public class ActionPersistentReceptionistTest {
         assertNumberOfSavedActionsAre(1);
     }
 
+    @Test
+    public void usersIsNotPersisted() throws IOException {
+        receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
+        final ReceptionistResponse usersResponse = receptionist.users();
+
+        assertTrue(usersResponse.isStatus(HttpStatus.OK_200));
+        assertNumberOfSavedActionsAre(1);
+    }
+
     private void assertNumberOfSavedActionsAre(int numberOfSavedActions) throws IOException {
         assertNull(lineAt(numberOfSavedActions));
     }
