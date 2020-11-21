@@ -28,6 +28,7 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
         createRegisterUserAction();
         createFollowingsAction();
         createAddPublicationAction();
+        createLikePublicationAction();
     }
 
     @Override
@@ -121,15 +122,24 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
 
     @Override
     public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
-        return new PersistentAction(
-                LIKE_PUBLICATION_ACTION_NAME,
-                response -> response.responseBodyAsJson(),
-                args->likeParameters(
-                        (String) args[0],
-                        (JsonObject) args[1])).persistAction(
-                receptionist.likePublicationIdentifiedAs(publicationId,likerAsJson),
-                new Object[]{publicationId, likerAsJson},
-                this);
+        try {
+            return (ReceptionistResponse) invoke(this,
+                    Receptionist.class.getMethod("likePublicationIdentifiedAs", String.class, JsonObject.class),
+                    new Object[]{publicationId,likerAsJson});
+        } catch (Throwable throwable) {
+            throw new RuntimeException(throwable);
+        }
+    }
+
+    public void createLikePublicationAction() throws NoSuchMethodException {
+        persistentActions.put(
+                Receptionist.class.getMethod("likePublicationIdentifiedAs", String.class, JsonObject.class),
+                new PersistentAction(
+                    LIKE_PUBLICATION_ACTION_NAME,
+                    response -> response.responseBodyAsJson(),
+                    args -> likeParameters(
+                            (String) args[0],
+                            (JsonObject) args[1])));
     }
 
     public JsonObject likeParameters(String publicationId, JsonObject likerAsJson) {
