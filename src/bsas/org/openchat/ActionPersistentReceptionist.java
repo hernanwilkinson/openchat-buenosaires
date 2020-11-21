@@ -4,7 +4,6 @@ import com.eclipsesource.json.JsonObject;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.function.Function;
 
 public class ActionPersistentReceptionist implements Receptionist{
     public static final String REGISTER_USER_ACTION_NAME = "registerUser";
@@ -46,9 +45,8 @@ public class ActionPersistentReceptionist implements Receptionist{
     public ReceptionistResponse followings(JsonObject followingsBodyAsJson) {
         return persistAction(
                 receptionist.followings(followingsBodyAsJson),
-                FOLLOWINGS_ACTION_NAME,
-                followingsBodyAsJson,
-                response-> new JsonObject());
+                new PersistentAction(FOLLOWINGS_ACTION_NAME, response -> new JsonObject()), followingsBodyAsJson
+        );
     }
 
     @Override
@@ -93,19 +91,18 @@ public class ActionPersistentReceptionist implements Receptionist{
     private ReceptionistResponse persistAction(ReceptionistResponse originalResponse, String actionName, JsonObject parameters) {
         return persistAction(
                 originalResponse,
-                actionName,
-                parameters,
-                response->response.responseBodyAsJson());
+                new PersistentAction(actionName, response -> response.responseBodyAsJson()), parameters
+        );
     }
 
     private ReceptionistResponse persistAction(ReceptionistResponse response,
-                                               String actionName, JsonObject parameters, Function<ReceptionistResponse, JsonObject> returnClosure) {
+                                               PersistentAction persistentAction, JsonObject parameters) {
 
         if(response.isSucessStatus()) {
             JsonObject actionAsJson = new JsonObject()
-                    .add(ACTION_NAME_KEY, actionName)
+                    .add(ACTION_NAME_KEY, persistentAction.getActionName())
                     .add(PARAMETERS_KEY, parameters)
-                    .add(RETURN_KEY, returnClosure.apply(response));
+                    .add(RETURN_KEY, persistentAction.getReturnClosure().apply(response));
 
             try {
                 writer.write(actionAsJson.toString());
