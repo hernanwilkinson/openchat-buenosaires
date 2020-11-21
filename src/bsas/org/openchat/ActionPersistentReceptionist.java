@@ -49,23 +49,26 @@ public class ActionPersistentReceptionist implements Receptionist{
             } catch (RuntimeException e) {
                 throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()),e);
             }
-            if(actionAsJson.getString(ACTION_NAME_KEY,"").equals(REGISTER_USER_ACTION_NAME)) {
+            final String actionName = actionAsJson.getString(ACTION_NAME_KEY, "");
+            if(actionName.equals(REGISTER_USER_ACTION_NAME)) {
                 lastId[0] = returned.getString(RestReceptionist.ID_KEY, null);
                 receptionist.registerUser(parameters);
-            } else if(actionAsJson.getString(ACTION_NAME_KEY,"").equals(FOLLOWINGS_ACTION_NAME)) {
+            } else if(actionName.equals(FOLLOWINGS_ACTION_NAME)) {
                 receptionist.followings(parameters);
-            } else if(actionAsJson.getString(ACTION_NAME_KEY,"").equals(ADD_PUBLICATION_ACTION_NAME)) {
+            } else if(actionName.equals(ADD_PUBLICATION_ACTION_NAME)) {
                 lastId[0] = returned.getString(RestReceptionist.POST_ID_KEY,null);
                 lastNow[0] = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
                         returned.getString(RestReceptionist.DATE_TIME_KEY,null)));
                 receptionist.addPublication(
                         parameters.getString(RestReceptionist.USER_ID_KEY,null),
                         parameters);
-            } else {
+            } else if(actionName.equals(LIKE_PUBLICATION_ACTION_NAME)){
                 receptionist.likePublicationIdentifiedAs(
                         parameters.getString(RestReceptionist.POST_ID_KEY,null),
                         parameters);
-            }
+            } else
+                throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()));
+
             line = lineReader.readLine();
         }
 

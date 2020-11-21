@@ -264,8 +264,24 @@ public class ActionPersistentReceptionistTest {
     public void failsGracefullyWhenNoReturnObject() throws IOException {
 
         writer.write(new JsonObject()
-            .add(ActionPersistentReceptionist.PARAMETERS_KEY,new JsonObject())
-            .toString());
+                .add(ActionPersistentReceptionist.PARAMETERS_KEY,new JsonObject())
+                .toString());
+        RuntimeException error = assertThrows(
+                RuntimeException.class,
+                ()->ActionPersistentReceptionist.recoverFrom(
+                        new StringReader(writer.toString())));
+
+        assertEquals(ActionPersistentReceptionist.invalidRecordErrorMessage(1), error.getMessage());
+    }
+
+    @Test
+    public void failsGracefullyWhenInvalidActionName() throws IOException {
+
+        writer.write(new JsonObject()
+                .add(ActionPersistentReceptionist.PARAMETERS_KEY,new JsonObject())
+                .add(ActionPersistentReceptionist.RETURN_KEY,new JsonObject())
+                .add(ActionPersistentReceptionist.ACTION_NAME_KEY,"")
+                .toString());
         RuntimeException error = assertThrows(
                 RuntimeException.class,
                 ()->ActionPersistentReceptionist.recoverFrom(
