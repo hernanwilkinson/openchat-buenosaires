@@ -181,6 +181,19 @@ public class ActionPersistentReceptionistTest {
         assertNumberOfSavedActionsAre(1);
     }
 
+    @Test
+    public void recoversRegisterUser() throws IOException {
+        final ReceptionistResponse registrationResponse = receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
+
+        RestReceptionist recoveredReceptionist = ActionPersistentReceptionist.recoverFrom(
+                new StringReader(writer.toString()));
+
+        final ReceptionistResponse usersResponse = recoveredReceptionist.users();
+        testObjectsBucket.assertIsArrayWithJuanPerezOnly(usersResponse);
+        JsonObject userJson = usersResponse.responseBodyAsJsonArray().values().get(0).asObject();
+        assertEquals(registrationResponse.idFromBody(),userJson.getString(RestReceptionist.ID_KEY,null));
+    }
+
     private void assertNumberOfSavedActionsAre(int numberOfSavedActions) throws IOException {
         assertNull(lineAt(numberOfSavedActions));
     }

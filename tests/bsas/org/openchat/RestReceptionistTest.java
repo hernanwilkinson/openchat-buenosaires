@@ -64,7 +64,7 @@ public class RestReceptionistTest {
 
         ReceptionistResponse response = receptionist.users();
 
-        assertIsArrayWithJuanPerezOnly(response);
+        testObjects.assertIsArrayWithJuanPerezOnly(response);
     }
 
     @Test
@@ -90,7 +90,7 @@ public class RestReceptionistTest {
             (receptionist,firstResponse,followingsBody,followerResponse,followeeResponse)-> {
                 ReceptionistResponse response = receptionist.followeesOf(followerResponse.idFromBody());
 
-                assertIsArrayWithJuanPerezOnly(response);
+                testObjects.assertIsArrayWithJuanPerezOnly(response);
             });
     }
     @Test
@@ -258,25 +258,7 @@ public class RestReceptionistTest {
     private void assertJuanPerezOk(ReceptionistResponse response, int status) {
         assertTrue(response.isStatus(status));
         JsonObject responseBodyAsJson = response.responseBodyAsJson();
-        assertJuanPerezJson(responseBodyAsJson);
-    }
-
-    private void assertJuanPerezJson(JsonObject responseBodyAsJson) {
-        assertFalse(responseBodyAsJson.getString(RestReceptionist.ID_KEY, "").isBlank());
-        assertEquals(TestObjectsBucket.JUAN_PEREZ_NAME, responseBodyAsJson.getString(RestReceptionist.USERNAME_KEY, ""));
-        assertEquals(TestObjectsBucket.JUAN_PEREZ_ABOUT, responseBodyAsJson.getString(RestReceptionist.ABOUT_KEY, ""));
-        assertEquals(TestObjectsBucket.JUAN_PEREZ_HOME_PAGE, responseBodyAsJson.getString(RestReceptionist.HOME_PAGE_KEY, ""));
-        assertEquals(
-                TestObjectsBucket.JUAN_PEREZ_PASSWORD + "x",
-                responseBodyAsJson.getString(RestReceptionist.PASSWORD_KEY, TestObjectsBucket.JUAN_PEREZ_PASSWORD + "x"));
-    }
-
-    private void assertIsArrayWithJuanPerezOnly(ReceptionistResponse response) {
-        assertTrue(response.isStatus(OK_200));
-        JsonArray responseBody = response.responseBodyAsJsonArray();
-        assertEquals(1, responseBody.size());
-        JsonObject userJson = responseBody.values().get(0).asObject();
-        assertJuanPerezJson(userJson);
+        testObjects.assertJuanPerezJson(responseBodyAsJson);
     }
 
     interface FollowingsAssertion {

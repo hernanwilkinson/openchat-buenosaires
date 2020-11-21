@@ -1,8 +1,13 @@
 package bsas.org.openchat;
 
+import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.Reader;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
 import java.util.function.Function;
 
 public class ActionPersistentReceptionist implements Receptionist{
@@ -21,6 +26,21 @@ public class ActionPersistentReceptionist implements Receptionist{
     public ActionPersistentReceptionist(RestReceptionist receptionist, StringWriter writer) {
         this.receptionist = receptionist;
         this.writer = writer;
+    }
+
+    public static RestReceptionist recoverFrom(Reader reader) throws IOException {
+        LineNumberReader lineReader = new LineNumberReader(reader);
+        final String[] lastId = new String[1];
+        RestReceptionist receptionist = new RestReceptionist(
+                new OpenChatSystem(()-> LocalDateTime.now()),
+                ()->lastId[0]);
+
+        String line = lineReader.readLine();
+        final JsonObject actionAsJson = Json.parse(line).asObject();
+        lastId[0] = actionAsJson.get(RETURN_KEY).asObject().getString(RestReceptionist.ID_KEY,null);
+        receptionist.registerUser(actionAsJson.get(PARAMETERS_KEY).asObject());
+
+        return receptionist;
     }
 
     @Override

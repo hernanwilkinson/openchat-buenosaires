@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.eclipse.jetty.http.HttpStatus.*;
@@ -34,11 +35,17 @@ public class RestReceptionist implements Receptionist {
 
 
     private final OpenChatSystem system;
+    private final Supplier<String> idGenerator;
     private final Map<User,String> idsByUser = new HashMap<>();
     private final Map<Publication,String> idsByPublication = new HashMap<>();
 
     public RestReceptionist(OpenChatSystem system) {
+        this(system, () -> UUID.randomUUID().toString());
+    }
+
+    public RestReceptionist(OpenChatSystem system, Supplier<String> idGenerator) {
         this.system = system;
+        this.idGenerator = idGenerator;
     }
 
     @Override
@@ -50,7 +57,7 @@ public class RestReceptionist implements Receptionist {
                     aboutFrom(registrationBodyAsJson),
                     homePageFrom(registrationBodyAsJson));
 
-            final String registeredUserId = UUID.randomUUID().toString();
+            final String registeredUserId = generateId();
             idsByUser.put(registeredUser,registeredUserId);
 
             return new ReceptionistResponse(
@@ -59,6 +66,10 @@ public class RestReceptionist implements Receptionist {
         } catch (ModelException error){
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }
+    }
+
+    public String generateId() {
+        return idGenerator.get();
     }
 
     @Override
@@ -105,7 +116,7 @@ public class RestReceptionist implements Receptionist {
     public ReceptionistResponse addPublication(String userId, JsonObject messageBodyAsJson) {
         try {
             Publication publication = system.publishForUserNamed(userNameIdentifiedAs(userId), messageBodyAsJson.getString("text", ""));
-            String publicationId = UUID.randomUUID().toString();
+            String publicationId = generateId();
             idsByPublication.put(publication, publicationId);
 
             return new ReceptionistResponse(

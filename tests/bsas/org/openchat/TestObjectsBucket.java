@@ -1,12 +1,13 @@
 package bsas.org.openchat;
 
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.junit.jupiter.api.function.Executable;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.eclipse.jetty.http.HttpStatus.OK_200;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestObjectsBucket {
     public static final String PEPE_SANCHEZ_NAME = "Pepe Sanchez";
@@ -74,5 +75,23 @@ public class TestObjectsBucket {
     public JsonObject publicationBodyAsJsonFor(String message) {
         return new JsonObject()
                 .add(RestReceptionist.TEXT_KEY, message);
+    }
+
+    public void assertJuanPerezJson(JsonObject responseBodyAsJson) {
+        assertFalse(responseBodyAsJson.getString(RestReceptionist.ID_KEY, "").isBlank());
+        assertEquals(JUAN_PEREZ_NAME, responseBodyAsJson.getString(RestReceptionist.USERNAME_KEY, ""));
+        assertEquals(JUAN_PEREZ_ABOUT, responseBodyAsJson.getString(RestReceptionist.ABOUT_KEY, ""));
+        assertEquals(JUAN_PEREZ_HOME_PAGE, responseBodyAsJson.getString(RestReceptionist.HOME_PAGE_KEY, ""));
+        assertEquals(
+                JUAN_PEREZ_PASSWORD + "x",
+                responseBodyAsJson.getString(RestReceptionist.PASSWORD_KEY, JUAN_PEREZ_PASSWORD + "x"));
+    }
+
+    public void assertIsArrayWithJuanPerezOnly(ReceptionistResponse response) {
+        assertTrue(response.isStatus(OK_200));
+        JsonArray responseBody = response.responseBodyAsJsonArray();
+        assertEquals(1, responseBody.size());
+        JsonObject userJson = responseBody.values().get(0).asObject();
+        assertJuanPerezJson(userJson);
     }
 }
