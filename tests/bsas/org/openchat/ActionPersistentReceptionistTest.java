@@ -1,6 +1,7 @@
 package bsas.org.openchat;
 
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +12,9 @@ import java.io.LineNumberReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.time.LocalDateTime;
+import java.time.Month;
 
+import static org.eclipse.jetty.http.HttpStatus.OK_200;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ActionPersistentReceptionistTest {
@@ -25,7 +28,7 @@ public class ActionPersistentReceptionistTest {
         testObjectsBucket = new TestObjectsBucket();
         writer = new StringWriter();
         receptionist = new ActionPersistentReceptionist(
-                new RestReceptionist(new OpenChatSystem(()-> LocalDateTime.now())),
+                new RestReceptionist(new OpenChatSystem(testObjectsBucket.fixedNowClock())),
                 writer);
     }
 
@@ -194,6 +197,28 @@ public class ActionPersistentReceptionistTest {
         assertEquals(
                 followingsAsJson.getString(RestReceptionist.FOLLOWEE_ID_KEY,null),
                 userJson.getString(RestReceptionist.ID_KEY,null));
+    }
+
+    @Test
+    public void recoversAddPublication() throws IOException {
+        testObjectsBucket.changeNowTo(LocalDateTime.of(2020, Month.JANUARY,1,0,0));
+        final JsonObject registrationBodyAsJson = testObjectsBucket.juanPerezRegistrationBodyAsJson();
+        final ReceptionistResponse registrationResponse = receptionist.registerUser(registrationBodyAsJson);
+        final ReceptionistResponse publicationResponse = receptionist.addPublication(
+                registrationResponse.idFromBody(),
+                testObjectsBucket.publicationBodyAsJsonFor("hello"));
+
+        RestReceptionist recoveredReceptionist = ActionPersistentReceptionist.recoverFrom(
+                new StringReader(writer.toString()));
+
+        final ReceptionistResponse timelineResponse = recoveredReceptionist.timelineOf(registrationResponse.idFromBody());
+
+        JsonArray timelineBody = timelineResponse.responseBodyAsJsonArray();
+        assertEquals(1,timelineBody.size());
+
+        JsonObject publicationAsJson = publicationResponse.responseBodyAsJson();
+        JsonObject restoredPublicationAsJson = timelineBody.get(0).asObject();
+        assertEquals(publicationAsJson,restoredPublicationAsJson);
     }
 
     private void assertNumberOfSavedActionsAre(int numberOfSavedActions) throws IOException {

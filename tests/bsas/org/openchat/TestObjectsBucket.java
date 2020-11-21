@@ -20,7 +20,7 @@ public class TestObjectsBucket {
     public static final String JUAN_PEREZ_ABOUT = "about";
     public static final String JUAN_PEREZ_HOME_PAGE = "www.twitter.com/juanPerez";
 
-    private final LocalDateTime now = LocalDateTime.now();
+    private LocalDateTime now = LocalDateTime.now();
 
     public static <T extends Throwable> void assertThrowsModelExceptionWithErrorMessage(
             Executable closureToFail, String errorMessage) {
@@ -93,5 +93,9 @@ public class TestObjectsBucket {
         assertEquals(1, responseBody.size());
         JsonObject userJson = responseBody.values().get(0).asObject();
         assertJuanPerezJson(userJson);
+    }
+
+    public void changeNowTo(LocalDateTime newNow) {
+        now = newNow;
     }
 }

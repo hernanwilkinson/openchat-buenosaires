@@ -31,18 +31,28 @@ public class ActionPersistentReceptionist implements Receptionist{
     public static RestReceptionist recoverFrom(Reader reader) throws IOException {
         LineNumberReader lineReader = new LineNumberReader(reader);
         final String[] lastId = new String[1];
+        LocalDateTime[] lastNow = new LocalDateTime[1];
         RestReceptionist receptionist = new RestReceptionist(
-                new OpenChatSystem(()-> LocalDateTime.now()),
+                new OpenChatSystem(()-> lastNow[0]),
                 ()->lastId[0]);
 
         String line = lineReader.readLine();
         while(line!=null){
             final JsonObject actionAsJson = Json.parse(line).asObject();
+            final JsonObject parameters = actionAsJson.get(PARAMETERS_KEY).asObject();
+            final JsonObject returned = actionAsJson.get(RETURN_KEY).asObject();
             if(actionAsJson.getString(ACTION_NAME_KEY,"").equals(REGISTER_USER_ACTION_NAME)) {
-                lastId[0] = actionAsJson.get(RETURN_KEY).asObject().getString(RestReceptionist.ID_KEY, null);
-                receptionist.registerUser(actionAsJson.get(PARAMETERS_KEY).asObject());
+                lastId[0] = returned.getString(RestReceptionist.ID_KEY, null);
+                receptionist.registerUser(parameters);
+            } else if(actionAsJson.getString(ACTION_NAME_KEY,"").equals(FOLLOWINGS_ACTION_NAME)) {
+                receptionist.followings(parameters);
             } else {
-                receptionist.followings(actionAsJson.get(PARAMETERS_KEY).asObject());
+                lastId[0] = returned.getString(RestReceptionist.POST_ID_KEY,null);
+                lastNow[0] = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
+                        returned.getString(RestReceptionist.DATE_TIME_KEY,null)));
+                receptionist.addPublication(
+                        parameters.getString(RestReceptionist.USER_ID_KEY,null),
+                        parameters);
             }
             line = lineReader.readLine();
         }
