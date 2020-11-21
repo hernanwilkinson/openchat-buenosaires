@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 class PersistedReceptionistLoader {
     public static final String INVALID_RECORD = "Invalid record";
     private final LineNumberReader lineReader;
+    private String lastId;
 
     public PersistedReceptionistLoader(Reader reader) {
         lineReader = new LineNumberReader(reader);
@@ -25,11 +26,11 @@ class PersistedReceptionistLoader {
     }
 
     public RestReceptionist execute() throws IOException {
-        final String[] lastId = new String[1];
+
         LocalDateTime[] lastNow = new LocalDateTime[1];
         RestReceptionist receptionist = new RestReceptionist(
                 new OpenChatSystem(() -> lastNow[0]),
-                () -> lastId[0]);
+                () -> lastId);
 
         String line = lineReader.readLine();
         while (line != null) {
@@ -45,12 +46,12 @@ class PersistedReceptionistLoader {
             }
             final String actionName = actionAsJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY, "");
             if (actionName.equals(ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME)) {
-                lastId[0] = returned.getString(RestReceptionist.ID_KEY, null);
+                lastId = returned.getString(RestReceptionist.ID_KEY, null);
                 receptionist.registerUser(parameters);
             } else if (actionName.equals(ActionPersistentReceptionist.FOLLOWINGS_ACTION_NAME)) {
                 receptionist.followings(parameters);
             } else if (actionName.equals(ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME)) {
-                lastId[0] = returned.getString(RestReceptionist.POST_ID_KEY, null);
+                lastId = returned.getString(RestReceptionist.POST_ID_KEY, null);
                 lastNow[0] = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
                         returned.getString(RestReceptionist.DATE_TIME_KEY, null)));
                 receptionist.addPublication(
