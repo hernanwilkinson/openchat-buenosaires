@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoadTest {
+public class LoadExample {
     private static final int NUMBER_OF_PUBLICATIONS = 300;
     public static final int NUMBER_OF_USERS = 1000;
     public static final int NUMBER_OF_FOLLOWEES = 20;
@@ -18,7 +18,10 @@ public class LoadTest {
     private List<String> followees;
     private RestReceptionist receptionist;
 
-    @Test
+    public static void main(String[] args) {
+        new LoadExample().load();
+    }
+
     public void load() {
         printMemoryUsage();
 
@@ -105,7 +108,7 @@ public class LoadTest {
         Runtime rt = Runtime.getRuntime();
         long usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024 / 1024;
 
-        System.out.println("used bytes:" + usedMB);
+        System.out.println("used megabytes: " + usedMB);
     }
 
 }
