@@ -61,18 +61,22 @@ class PersistedReceptionistLoader {
         } else if (isFollowingsAction()) {
             executeFollowingsAction();
         } else if (isAddPublicationAction()) {
-            lastId = returned.getString(RestReceptionist.POST_ID_KEY, null);
-            lastNow = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
-                    returned.getString(RestReceptionist.DATE_TIME_KEY, null)));
-            receptionist.addPublication(
-                    parameters.getString(RestReceptionist.USER_ID_KEY, null),
-                    parameters);
+            executeAddPublicationAction();
         } else if (actionName.equals(ActionPersistentReceptionist.LIKE_PUBLICATION_ACTION_NAME)) {
             receptionist.likePublicationIdentifiedAs(
                     parameters.getString(RestReceptionist.POST_ID_KEY, null),
                     parameters);
         } else
             throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()));
+    }
+
+    public void executeAddPublicationAction() {
+        lastId = returned.getString(RestReceptionist.POST_ID_KEY, null);
+        lastNow = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
+                returned.getString(RestReceptionist.DATE_TIME_KEY, null)));
+        receptionist.addPublication(
+                parameters.getString(RestReceptionist.USER_ID_KEY, null),
+                parameters);
     }
 
     public boolean isAddPublicationAction() {
