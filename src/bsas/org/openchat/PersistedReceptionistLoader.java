@@ -17,6 +17,8 @@ class PersistedReceptionistLoader {
     private JsonObject actionAsJson;
     private JsonObject parameters;
     private JsonObject returned;
+    private String line;
+    private String actionName;
 
     public PersistedReceptionistLoader(Reader reader) {
         lineReader = new LineNumberReader(reader);
@@ -36,7 +38,7 @@ class PersistedReceptionistLoader {
                 new OpenChatSystem(() -> lastNow),
                 () -> lastId);
 
-        String line = lineReader.readLine();
+        line = lineReader.readLine();
         while (line != null) {
             try {
                 actionAsJson = Json.parse(line).asObject();
@@ -45,7 +47,7 @@ class PersistedReceptionistLoader {
             } catch (RuntimeException e) {
                 throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()), e);
             }
-            final String actionName = actionAsJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY, "");
+            actionName = actionAsJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY, "");
             if (actionName.equals(ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME)) {
                 lastId = returned.getString(RestReceptionist.ID_KEY, null);
                 receptionist.registerUser(parameters);
