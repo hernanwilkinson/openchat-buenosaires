@@ -52,7 +52,13 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
 
     @Override
     public ReceptionistResponse login(JsonObject loginBodyAsJson) {
-        return receptionist.login(loginBodyAsJson);
+        try {
+            return (ReceptionistResponse) invoke(this,
+                    Receptionist.class.getMethod("login", JsonObject.class),
+                    new JsonObject[]{loginBodyAsJson});
+        } catch (Throwable throwable) {
+            throw new RuntimeException(throwable);
+        }
     }
 
     @Override
@@ -150,9 +156,12 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         final PersistentAction persistentAction = persistentActions.get(method);
 
-        return persistentAction.persistAction(
-                (ReceptionistResponse) method.invoke(receptionist,args),
-                args,
-                this);
+        if(persistentAction==null)
+            return (ReceptionistResponse) method.invoke(receptionist,args);
+        else
+            return persistentAction.persistAction(
+                    (ReceptionistResponse) method.invoke(receptionist,args),
+                    args,
+                    this);
     }
 }
