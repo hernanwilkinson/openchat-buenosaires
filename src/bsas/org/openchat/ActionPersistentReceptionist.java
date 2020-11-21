@@ -36,9 +36,16 @@ public class ActionPersistentReceptionist implements Receptionist{
                 ()->lastId[0]);
 
         String line = lineReader.readLine();
-        final JsonObject actionAsJson = Json.parse(line).asObject();
-        lastId[0] = actionAsJson.get(RETURN_KEY).asObject().getString(RestReceptionist.ID_KEY,null);
-        receptionist.registerUser(actionAsJson.get(PARAMETERS_KEY).asObject());
+        while(line!=null){
+            final JsonObject actionAsJson = Json.parse(line).asObject();
+            if(actionAsJson.getString(ACTION_NAME_KEY,"").equals(REGISTER_USER_ACTION_NAME)) {
+                lastId[0] = actionAsJson.get(RETURN_KEY).asObject().getString(RestReceptionist.ID_KEY, null);
+                receptionist.registerUser(actionAsJson.get(PARAMETERS_KEY).asObject());
+            } else {
+                receptionist.followings(actionAsJson.get(PARAMETERS_KEY).asObject());
+            }
+            line = lineReader.readLine();
+        }
 
         return receptionist;
     }

@@ -53,13 +53,7 @@ public class ActionPersistentReceptionistTest {
 
     @Test
     public void persistsFollowees() throws IOException {
-        ReceptionistResponse followerResponse = receptionist.registerUser(testObjectsBucket.pepeSanchezRegistrationBodyAsJson());
-        ReceptionistResponse followeeResponse = receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
-
-        JsonObject followingsBodyAsJson = new JsonObject()
-                .add(RestReceptionist.FOLLOWER_ID_KEY, followerResponse.idFromBody())
-                .add(RestReceptionist.FOLLOWEE_ID_KEY, followeeResponse.idFromBody());
-        receptionist.followings(followingsBodyAsJson);
+        JsonObject followingsBodyAsJson = makeJuanPerezFollowPepeSanchez();
 
         assertActionInLineNumberIs(2,
                 ActionPersistentReceptionist.FOLLOWINGS_ACTION_NAME,
@@ -70,13 +64,7 @@ public class ActionPersistentReceptionistTest {
 
     @Test
     public void invalidFollowingsIsNotPersisted() throws IOException {
-        ReceptionistResponse followerResponse = receptionist.registerUser(testObjectsBucket.pepeSanchezRegistrationBodyAsJson());
-        ReceptionistResponse followeeResponse = receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
-
-        JsonObject followingsBodyAsJson = new JsonObject()
-                .add(RestReceptionist.FOLLOWER_ID_KEY, followerResponse.idFromBody())
-                .add(RestReceptionist.FOLLOWEE_ID_KEY, followeeResponse.idFromBody());
-        receptionist.followings(followingsBodyAsJson);
+        JsonObject followingsBodyAsJson = makeJuanPerezFollowPepeSanchez();
         receptionist.followings(followingsBodyAsJson);
 
         assertNumberOfSavedActionsAre(3);
@@ -194,6 +182,20 @@ public class ActionPersistentReceptionistTest {
         assertEquals(registrationResponse.idFromBody(),userJson.getString(RestReceptionist.ID_KEY,null));
     }
 
+    @Test
+    public void recoversFollowings() throws IOException {
+        final JsonObject followingsAsJson = makeJuanPerezFollowPepeSanchez();
+        RestReceptionist recoveredReceptionist = ActionPersistentReceptionist.recoverFrom(
+                new StringReader(writer.toString()));
+
+        final ReceptionistResponse followeesOfResponse = recoveredReceptionist.followeesOf(followingsAsJson.getString(RestReceptionist.FOLLOWER_ID_KEY,null));
+        testObjectsBucket.assertIsArrayWithJuanPerezOnly(followeesOfResponse);
+        JsonObject userJson = followeesOfResponse.responseBodyAsJsonArray().values().get(0).asObject();
+        assertEquals(
+                followingsAsJson.getString(RestReceptionist.FOLLOWEE_ID_KEY,null),
+                userJson.getString(RestReceptionist.ID_KEY,null));
+    }
+
     private void assertNumberOfSavedActionsAre(int numberOfSavedActions) throws IOException {
         assertNull(lineAt(numberOfSavedActions));
     }
@@ -206,4 +208,18 @@ public class ActionPersistentReceptionistTest {
 
         return reader.readLine();
     }
+
+    private JsonObject makeJuanPerezFollowPepeSanchez() {
+        ReceptionistResponse followerResponse = receptionist.registerUser(testObjectsBucket.pepeSanchezRegistrationBodyAsJson());
+        ReceptionistResponse followeeResponse = receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
+
+        JsonObject followingsBodyAsJson = new JsonObject()
+                .add(RestReceptionist.FOLLOWER_ID_KEY, followerResponse.idFromBody())
+                .add(RestReceptionist.FOLLOWEE_ID_KEY, followeeResponse.idFromBody());
+        receptionist.followings(followingsBodyAsJson);
+
+        return followingsBodyAsJson;
+    }
+
+
 }
