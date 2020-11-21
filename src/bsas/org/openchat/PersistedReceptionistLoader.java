@@ -80,7 +80,11 @@ class PersistedReceptionistLoader {
     }
 
     public boolean isLikePublicationAction() {
-        return actionName.equals(ActionPersistentReceptionist.LIKE_PUBLICATION_ACTION_NAME);
+        return isAction(ActionPersistentReceptionist.LIKE_PUBLICATION_ACTION_NAME);
+    }
+
+    public boolean isAction(String likePublicationActionName) {
+        return actionName.equals(likePublicationActionName);
     }
 
     public void executeAddPublicationAction() {
@@ -93,7 +97,7 @@ class PersistedReceptionistLoader {
     }
 
     public boolean isAddPublicationAction() {
-        return actionName.equals(ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME);
+        return isAction(ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME);
     }
 
     public void executeFollowingsAction() {
@@ -101,7 +105,7 @@ class PersistedReceptionistLoader {
     }
 
     public boolean isFollowingsAction() {
-        return actionName.equals(ActionPersistentReceptionist.FOLLOWINGS_ACTION_NAME);
+        return isAction(ActionPersistentReceptionist.FOLLOWINGS_ACTION_NAME);
     }
 
     public void executeRegisterUserAction() {
@@ -110,7 +114,7 @@ class PersistedReceptionistLoader {
     }
 
     public boolean isRegisterUserAction() {
-        return actionName.equals(ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME);
+        return isAction(ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME);
     }
 
     public void createAction() {
