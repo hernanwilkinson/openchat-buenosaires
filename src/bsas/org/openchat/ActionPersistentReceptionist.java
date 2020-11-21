@@ -24,10 +24,14 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse registerUser(JsonObject registrationBodyAsJson) {
-        return new PersistentAction(REGISTER_USER_ACTION_NAME, response -> response.responseBodyAsJson()).persistAction(
+        return createRegisterUserAction().persistAction(
                 receptionist.registerUser(registrationBodyAsJson),
                 registrationBodyAsJson,
                 this);
+    }
+
+    public PersistentAction createRegisterUserAction() {
+        return new PersistentAction(REGISTER_USER_ACTION_NAME, response -> response.responseBodyAsJson());
     }
 
     @Override
