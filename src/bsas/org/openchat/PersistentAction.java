@@ -10,7 +10,7 @@ public class PersistentAction {
     private final String actionName;
     private final Function<ReceptionistResponse, JsonObject> returnClosure;
 
-    public PersistentAction(String actionName, Function<ReceptionistResponse, JsonObject> returnClosure, Method method) {
+    public PersistentAction(String actionName, Function<ReceptionistResponse, JsonObject> returnClosure) {
         this.actionName = actionName;
         this.returnClosure = returnClosure;
     }

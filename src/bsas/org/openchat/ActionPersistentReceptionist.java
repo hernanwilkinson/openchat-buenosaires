@@ -25,8 +25,8 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
         this.receptionist = receptionist;
         this.writer = writer;
         this.persistentActions = new HashMap<>();
-        persistentActions.put(Receptionist.class.getMethod("registerUser", JsonObject.class),createRegisterUserAction());
-        persistentActions.put(Receptionist.class.getMethod("followings", JsonObject.class),createFollowingsAction());
+        createRegisterUserAction();
+        createFollowingsAction();
     }
 
     @Override
@@ -40,11 +40,12 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
         }
     }
 
-    public PersistentAction createRegisterUserAction() throws NoSuchMethodException {
-        return new PersistentAction(
+    public void createRegisterUserAction() throws NoSuchMethodException {
+        persistentActions.put(
+            Receptionist.class.getMethod("registerUser", JsonObject.class),
+            new PersistentAction(
                 REGISTER_USER_ACTION_NAME,
-                response -> response.responseBodyAsJson(),
-                Receptionist.class.getMethod("registerUser", JsonObject.class));
+                response -> response.responseBodyAsJson()));
     }
 
     @Override
@@ -68,11 +69,12 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
         }
     }
 
-    public PersistentAction createFollowingsAction() throws NoSuchMethodException {
-        return new PersistentAction(
-                FOLLOWINGS_ACTION_NAME,
-                response -> new JsonObject(),
-                Receptionist.class.getMethod("followings", JsonObject.class));
+    public void createFollowingsAction() throws NoSuchMethodException {
+        persistentActions.put(
+                Receptionist.class.getMethod("followings", JsonObject.class),
+                new PersistentAction(
+                    FOLLOWINGS_ACTION_NAME,
+                    response -> new JsonObject()));
     }
 
     @Override
@@ -82,7 +84,7 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
 
     @Override
     public ReceptionistResponse addPublication(String userId, JsonObject messageBodyAsJson) {
-        return new PersistentAction(ADD_PUBLICATION_ACTION_NAME, response -> response.responseBodyAsJson(), null).persistAction(
+        return new PersistentAction(ADD_PUBLICATION_ACTION_NAME, response -> response.responseBodyAsJson()).persistAction(
                 receptionist.addPublication(userId,messageBodyAsJson),
                 addPublicationParameters(userId, messageBodyAsJson),
                 this);
@@ -104,7 +106,7 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
 
     @Override
     public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
-        return new PersistentAction(LIKE_PUBLICATION_ACTION_NAME, response -> response.responseBodyAsJson(), null).persistAction(
+        return new PersistentAction(LIKE_PUBLICATION_ACTION_NAME, response -> response.responseBodyAsJson()).persistAction(
                 receptionist.likePublicationIdentifiedAs(publicationId,likerAsJson),
                 likeParameters(publicationId, likerAsJson),
                 this);
