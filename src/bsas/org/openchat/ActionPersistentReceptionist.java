@@ -33,7 +33,7 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse login(JsonObject loginBodyAsJson) {
-        throw new UnsupportedOperationException();
+        return receptionist.login(loginBodyAsJson);
     }
 
     @Override

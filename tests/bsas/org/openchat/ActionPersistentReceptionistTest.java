@@ -2,6 +2,7 @@ package bsas.org.openchat;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,8 +12,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ActionPersistentReceptionistTest {
 
@@ -134,6 +134,15 @@ public class ActionPersistentReceptionistTest {
         assertEquals(
                 returned,
                 savedJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject());
+    }
+
+    @Test
+    public void loginIsNotPersisted() throws IOException {
+        receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
+        final ReceptionistResponse loginResponse = receptionist.login(testObjectsBucket.juanPerezLoginBodyAsJson());
+
+        assertTrue(loginResponse.isStatus(HttpStatus.OK_200));
+        assertNumberOfSavedActionsAre(1);
     }
 
     private void assertNumberOfSavedActionsAre(int numberOfSavedActions) throws IOException {
