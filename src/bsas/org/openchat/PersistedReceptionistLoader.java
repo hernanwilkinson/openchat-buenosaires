@@ -41,8 +41,6 @@ class PersistedReceptionistLoader {
         while (hasLineToParse()) {
             createAction();
             executeAction();
-
-            boolean hasLineToParse = hasLineToParse();
         }
 
         return receptionist;
