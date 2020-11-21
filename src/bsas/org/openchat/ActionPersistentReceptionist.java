@@ -3,10 +3,12 @@ package bsas.org.openchat;
 import com.eclipsesource.json.JsonObject;
 
 import java.io.Writer;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ActionPersistentReceptionist implements Receptionist{
+public class ActionPersistentReceptionist implements Receptionist, InvocationHandler {
     public static final String REGISTER_USER_ACTION_NAME = "registerUser";
     public static final String FOLLOWINGS_ACTION_NAME = "followings";
     public static final String ADD_PUBLICATION_ACTION_NAME = "addPublication";
@@ -96,4 +98,8 @@ public class ActionPersistentReceptionist implements Receptionist{
         return new JsonObject(likerAsJson).add(RestReceptionist.POST_ID_KEY,publicationId);
     }
 
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        throw new UnsupportedOperationException();
+    }
 }
