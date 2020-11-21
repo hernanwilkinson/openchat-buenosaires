@@ -89,11 +89,15 @@ class PersistedReceptionistLoader {
 
     public void executeAddPublicationAction() {
         changeLastIdTo(RestReceptionist.POST_ID_KEY);
-        lastNow = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
-                returned.getString(RestReceptionist.DATE_TIME_KEY, null)));
+        changeLastNowTo();
         receptionist.addPublication(
                 parameters.getString(RestReceptionist.USER_ID_KEY, null),
                 parameters);
+    }
+
+    public void changeLastNowTo() {
+        lastNow = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
+                returned.getString(RestReceptionist.DATE_TIME_KEY, null)));
     }
 
     public boolean isAddPublicationAction() {
