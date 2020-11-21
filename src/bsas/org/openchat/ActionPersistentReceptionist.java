@@ -1,13 +1,10 @@
 package bsas.org.openchat;
 
-import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.time.LocalDateTime;
 import java.util.function.Function;
 
 public class ActionPersistentReceptionist implements Receptionist{
@@ -30,49 +27,7 @@ public class ActionPersistentReceptionist implements Receptionist{
     }
 
     public static RestReceptionist recoverFrom(Reader reader) throws IOException {
-        LineNumberReader lineReader = new LineNumberReader(reader);
-        final String[] lastId = new String[1];
-        LocalDateTime[] lastNow = new LocalDateTime[1];
-        RestReceptionist receptionist = new RestReceptionist(
-                new OpenChatSystem(()-> lastNow[0]),
-                ()->lastId[0]);
-
-        String line = lineReader.readLine();
-        while(line!=null){
-            final JsonObject actionAsJson;
-            final JsonObject parameters;
-            final JsonObject returned;
-            try {
-                actionAsJson = Json.parse(line).asObject();
-                parameters = actionAsJson.get(PARAMETERS_KEY).asObject();
-                returned = actionAsJson.get(RETURN_KEY).asObject();
-            } catch (RuntimeException e) {
-                throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()),e);
-            }
-            final String actionName = actionAsJson.getString(ACTION_NAME_KEY, "");
-            if(actionName.equals(REGISTER_USER_ACTION_NAME)) {
-                lastId[0] = returned.getString(RestReceptionist.ID_KEY, null);
-                receptionist.registerUser(parameters);
-            } else if(actionName.equals(FOLLOWINGS_ACTION_NAME)) {
-                receptionist.followings(parameters);
-            } else if(actionName.equals(ADD_PUBLICATION_ACTION_NAME)) {
-                lastId[0] = returned.getString(RestReceptionist.POST_ID_KEY,null);
-                lastNow[0] = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
-                        returned.getString(RestReceptionist.DATE_TIME_KEY,null)));
-                receptionist.addPublication(
-                        parameters.getString(RestReceptionist.USER_ID_KEY,null),
-                        parameters);
-            } else if(actionName.equals(LIKE_PUBLICATION_ACTION_NAME)){
-                receptionist.likePublicationIdentifiedAs(
-                        parameters.getString(RestReceptionist.POST_ID_KEY,null),
-                        parameters);
-            } else
-                throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()));
-
-            line = lineReader.readLine();
-        }
-
-        return receptionist;
+        return new PersistedReceptionistLoader(reader).invoke();
     }
 
     public static String invalidRecordErrorMessage(int lineNumber) {
@@ -167,4 +122,5 @@ public class ActionPersistentReceptionist implements Receptionist{
         }
         return response;
     }
+
 }
