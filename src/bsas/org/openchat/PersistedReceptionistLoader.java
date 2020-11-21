@@ -40,14 +40,7 @@ class PersistedReceptionistLoader {
 
         line = lineReader.readLine();
         while (line != null) {
-            try {
-                actionAsJson = Json.parse(line).asObject();
-                parameters = actionAsJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject();
-                returned = actionAsJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject();
-            } catch (RuntimeException e) {
-                throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()), e);
-            }
-            actionName = actionAsJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY, "");
+            createAction();
             if (actionName.equals(ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME)) {
                 lastId = returned.getString(RestReceptionist.ID_KEY, null);
                 receptionist.registerUser(parameters);
@@ -71,5 +64,16 @@ class PersistedReceptionistLoader {
         }
 
         return receptionist;
+    }
+
+    public void createAction() {
+        try {
+            actionAsJson = Json.parse(line).asObject();
+            parameters = actionAsJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject();
+            returned = actionAsJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject();
+        } catch (RuntimeException e) {
+            throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()), e);
+        }
+        actionName = actionAsJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY, "");
     }
 }
