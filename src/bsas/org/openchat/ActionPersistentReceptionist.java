@@ -31,10 +31,13 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
 
     @Override
     public ReceptionistResponse registerUser(JsonObject registrationBodyAsJson) {
-        return persistentActions.get(0).persistAction(
-                receptionist.registerUser(registrationBodyAsJson),
-                registrationBodyAsJson,
-                this);
+        try {
+            return (ReceptionistResponse) invoke(this,
+                    Receptionist.class.getMethod("registerUser", JsonObject.class),
+                    new JsonObject[]{registrationBodyAsJson});
+        } catch (Throwable throwable) {
+            return null;
+        }
     }
 
     public PersistentAction createRegisterUserAction() {
@@ -101,7 +104,7 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         return persistentActions.get(0).persistAction(
-                (ReceptionistResponse) method.invoke(args),
+                (ReceptionistResponse) method.invoke(receptionist,args),
                 (JsonObject) args[0],
                 this);
     }
