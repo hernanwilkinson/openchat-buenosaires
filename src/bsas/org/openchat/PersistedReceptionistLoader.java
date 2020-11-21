@@ -39,11 +39,13 @@ class PersistedReceptionistLoader {
                 () -> lastId);
 
         line = lineReader.readLine();
-        while (line != null) {
+        boolean hasLineToParse = line != null;
+        while (hasLineToParse) {
             createAction();
             executeAction();
 
             line = lineReader.readLine();
+            hasLineToParse = line != null;
         }
 
         return receptionist;
