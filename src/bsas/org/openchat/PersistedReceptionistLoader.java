@@ -51,10 +51,8 @@ class PersistedReceptionistLoader {
     }
 
     public boolean hasLineToParse() throws IOException {
-        boolean hasLineToParse;
         line = lineReader.readLine();
-        hasLineToParse = line != null;
-        return hasLineToParse;
+        return line != null;
     }
 
     public void executeAction() {
