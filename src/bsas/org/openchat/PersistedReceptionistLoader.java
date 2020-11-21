@@ -38,9 +38,7 @@ class PersistedReceptionistLoader {
                 new OpenChatSystem(() -> lastNow),
                 () -> lastId);
 
-        boolean hasLineToParse;
-        hasLineToParse = hasLineToParse();
-        while (hasLineToParse) {
+        while (hasLineToParse()) {
             createAction();
             executeAction();
 
