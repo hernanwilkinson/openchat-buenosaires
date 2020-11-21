@@ -88,7 +88,7 @@ class PersistedReceptionistLoader {
     }
 
     public void executeAddPublicationAction() {
-        lastId = returned.getString(RestReceptionist.POST_ID_KEY, null);
+        changeLastIdTo(RestReceptionist.POST_ID_KEY);
         lastNow = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
                 returned.getString(RestReceptionist.DATE_TIME_KEY, null)));
         receptionist.addPublication(
@@ -109,8 +109,12 @@ class PersistedReceptionistLoader {
     }
 
     public void executeRegisterUserAction() {
-        lastId = returned.getString(RestReceptionist.ID_KEY, null);
+        changeLastIdTo(RestReceptionist.ID_KEY);
         receptionist.registerUser(parameters);
+    }
+
+    public void changeLastIdTo(String idKey) {
+        lastId = returned.getString(idKey, null);
     }
 
     public boolean isRegisterUserAction() {
