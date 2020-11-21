@@ -161,7 +161,7 @@ public class ActionPersistentReceptionistTest {
     public void recoversRegisterUser() throws IOException {
         final ReceptionistResponse registrationResponse = receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
 
-        RestReceptionist recoveredReceptionist = PersistedReceptionistLoader.recoverFrom(
+        RestReceptionist recoveredReceptionist = PersistedReceptionistLoader.loadFrom(
                 new StringReader(writer.toString()));
 
         final ReceptionistResponse usersResponse = recoveredReceptionist.users();
@@ -173,7 +173,7 @@ public class ActionPersistentReceptionistTest {
     @Test
     public void recoversFollowings() throws IOException {
         final JsonObject followingsAsJson = makeJuanPerezFollowPepeSanchez();
-        RestReceptionist recoveredReceptionist = PersistedReceptionistLoader.recoverFrom(
+        RestReceptionist recoveredReceptionist = PersistedReceptionistLoader.loadFrom(
                 new StringReader(writer.toString()));
 
         final ReceptionistResponse followeesOfResponse = recoveredReceptionist.followeesOf(followingsAsJson.getString(RestReceptionist.FOLLOWER_ID_KEY,null));
@@ -193,7 +193,7 @@ public class ActionPersistentReceptionistTest {
                 registrationResponse.idFromBody(),
                 testObjectsBucket.publicationBodyAsJsonFor("hello"));
 
-        RestReceptionist recoveredReceptionist = PersistedReceptionistLoader.recoverFrom(
+        RestReceptionist recoveredReceptionist = PersistedReceptionistLoader.loadFrom(
                 new StringReader(writer.toString()));
 
         final ReceptionistResponse timelineResponse = recoveredReceptionist.timelineOf(registrationResponse.idFromBody());
@@ -220,7 +220,7 @@ public class ActionPersistentReceptionistTest {
                 publicationResponse.postIdFromBody(),
                 likerJson);
 
-        RestReceptionist recoveredReceptionist = PersistedReceptionistLoader.recoverFrom(
+        RestReceptionist recoveredReceptionist = PersistedReceptionistLoader.loadFrom(
                 new StringReader(writer.toString()));
 
         final ReceptionistResponse timelineResponse = recoveredReceptionist.timelineOf(registrationResponse.idFromBody());
@@ -242,7 +242,7 @@ public class ActionPersistentReceptionistTest {
         writer.write("something went wrong");
         RuntimeException error = assertThrows(
                 RuntimeException.class,
-                ()-> PersistedReceptionistLoader.recoverFrom(
+                ()-> PersistedReceptionistLoader.loadFrom(
                     new StringReader(writer.toString())));
 
         assertEquals(PersistedReceptionistLoader.invalidRecordErrorMessage(1), error.getMessage());
@@ -254,7 +254,7 @@ public class ActionPersistentReceptionistTest {
         writer.write(new JsonObject().toString());
         RuntimeException error = assertThrows(
                 RuntimeException.class,
-                ()-> PersistedReceptionistLoader.recoverFrom(
+                ()-> PersistedReceptionistLoader.loadFrom(
                         new StringReader(writer.toString())));
 
         assertEquals(PersistedReceptionistLoader.invalidRecordErrorMessage(1), error.getMessage());
@@ -268,7 +268,7 @@ public class ActionPersistentReceptionistTest {
                 .toString());
         RuntimeException error = assertThrows(
                 RuntimeException.class,
-                ()-> PersistedReceptionistLoader.recoverFrom(
+                ()-> PersistedReceptionistLoader.loadFrom(
                         new StringReader(writer.toString())));
 
         assertEquals(PersistedReceptionistLoader.invalidRecordErrorMessage(1), error.getMessage());
@@ -284,7 +284,7 @@ public class ActionPersistentReceptionistTest {
                 .toString());
         RuntimeException error = assertThrows(
                 RuntimeException.class,
-                ()-> PersistedReceptionistLoader.recoverFrom(
+                ()-> PersistedReceptionistLoader.loadFrom(
                         new StringReader(writer.toString())));
 
         assertEquals(PersistedReceptionistLoader.invalidRecordErrorMessage(1), error.getMessage());
