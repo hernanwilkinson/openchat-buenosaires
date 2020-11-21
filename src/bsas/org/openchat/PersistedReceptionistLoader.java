@@ -62,12 +62,16 @@ class PersistedReceptionistLoader {
             executeFollowingsAction();
         } else if (isAddPublicationAction()) {
             executeAddPublicationAction();
-        } else if (actionName.equals(ActionPersistentReceptionist.LIKE_PUBLICATION_ACTION_NAME)) {
+        } else if (isLikePublicationAction()) {
             receptionist.likePublicationIdentifiedAs(
                     parameters.getString(RestReceptionist.POST_ID_KEY, null),
                     parameters);
         } else
             throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()));
+    }
+
+    public boolean isLikePublicationAction() {
+        return actionName.equals(ActionPersistentReceptionist.LIKE_PUBLICATION_ACTION_NAME);
     }
 
     public void executeAddPublicationAction() {
