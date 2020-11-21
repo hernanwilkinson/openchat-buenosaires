@@ -60,7 +60,7 @@ class PersistedReceptionistLoader {
             executeRegisterUserAction();
         } else if (isFollowingsAction()) {
             executeFollowingsAction();
-        } else if (actionName.equals(ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME)) {
+        } else if (isAddPublicationAction()) {
             lastId = returned.getString(RestReceptionist.POST_ID_KEY, null);
             lastNow = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
                     returned.getString(RestReceptionist.DATE_TIME_KEY, null)));
@@ -73,6 +73,10 @@ class PersistedReceptionistLoader {
                     parameters);
         } else
             throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()));
+    }
+
+    public boolean isAddPublicationAction() {
+        return actionName.equals(ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME);
     }
 
     public void executeFollowingsAction() {
