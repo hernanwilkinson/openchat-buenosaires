@@ -290,6 +290,20 @@ public class ActionPersistentReceptionistTest {
         assertEquals(PersistedReceptionistLoader.invalidRecordErrorMessage(1), error.getMessage());
     }
 
+    @Test
+    public void recoveredReceptionistGeneratesNewIdsAfterRecover() throws IOException {
+        final ReceptionistResponse juanPerezRegistrationResponse = receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
+
+        RestReceptionist recoveredReceptionist = PersistedReceptionistLoader.loadFrom(
+                new StringReader(writer.toString()));
+
+        final ReceptionistResponse pepeSanchezRegistrationResponse = recoveredReceptionist.registerUser(testObjectsBucket.pepeSanchezRegistrationBodyAsJson());
+
+        assertNotEquals(
+                pepeSanchezRegistrationResponse.idFromBody(),
+                juanPerezRegistrationResponse.idFromBody());
+    }
+
     private void assertActionInLineNumberIs(int lineNumber, String actionName, JsonObject parameters, JsonObject returned) throws IOException {
         JsonObject savedJson = Json.parse(lineAt(lineNumber)).asObject();
 

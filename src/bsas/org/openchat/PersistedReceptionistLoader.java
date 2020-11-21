@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 class PersistedReceptionistLoader {
     public static final String INVALID_RECORD = "Invalid record";
@@ -42,13 +43,25 @@ class PersistedReceptionistLoader {
             executeAction();
         }
 
+        clearLastId();
         return receptionist;
+    }
+
+    private void clearLastId() {
+        lastId = null;
     }
 
     public void createReceptionist() {
         receptionist = new RestReceptionist(
                 new OpenChatSystem(() -> lastNow),
-                () -> lastId);
+                () -> generateId());
+    }
+
+    public String generateId() {
+        if (lastId==null)
+            return UUID.randomUUID().toString();
+        else
+            return lastId;
     }
 
     public boolean hasLineToParse() throws IOException {
