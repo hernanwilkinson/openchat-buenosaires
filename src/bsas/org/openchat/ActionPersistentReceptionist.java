@@ -46,12 +46,16 @@ public class ActionPersistentReceptionist implements Receptionist{
                 receptionist.registerUser(parameters);
             } else if(actionAsJson.getString(ACTION_NAME_KEY,"").equals(FOLLOWINGS_ACTION_NAME)) {
                 receptionist.followings(parameters);
-            } else {
+            } else if(actionAsJson.getString(ACTION_NAME_KEY,"").equals(ADD_PUBLICATION_ACTION_NAME)) {
                 lastId[0] = returned.getString(RestReceptionist.POST_ID_KEY,null);
                 lastNow[0] = LocalDateTime.from(RestReceptionist.DATE_TIME_FORMATTER.parse(
                         returned.getString(RestReceptionist.DATE_TIME_KEY,null)));
                 receptionist.addPublication(
                         parameters.getString(RestReceptionist.USER_ID_KEY,null),
+                        parameters);
+            } else {
+                receptionist.likePublicationIdentifiedAs(
+                        parameters.getString(RestReceptionist.POST_ID_KEY,null),
                         parameters);
             }
             line = lineReader.readLine();

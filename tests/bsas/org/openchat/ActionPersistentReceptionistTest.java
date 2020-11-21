@@ -113,20 +113,6 @@ public class ActionPersistentReceptionistTest {
         );
     }
 
-    private void assertActionInLineNumberIs(int lineNumber, String actionName, JsonObject parameters, JsonObject returned) throws IOException {
-        JsonObject savedJson = Json.parse(lineAt(lineNumber)).asObject();
-
-        assertEquals(
-                actionName,
-                savedJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY,null));
-        assertEquals(
-                parameters,
-                savedJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject());
-        assertEquals(
-                returned,
-                savedJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject());
-    }
-
     @Test
     public void loginIsNotPersisted() throws IOException {
         receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
@@ -219,6 +205,50 @@ public class ActionPersistentReceptionistTest {
         JsonObject publicationAsJson = publicationResponse.responseBodyAsJson();
         JsonObject restoredPublicationAsJson = timelineBody.get(0).asObject();
         assertEquals(publicationAsJson,restoredPublicationAsJson);
+    }
+
+    @Test
+    public void recoversLikes() throws IOException {
+        final JsonObject registrationBodyAsJson = testObjectsBucket.juanPerezRegistrationBodyAsJson();
+        final ReceptionistResponse registrationResponse = receptionist.registerUser(registrationBodyAsJson);
+        final ReceptionistResponse publicationResponse = receptionist.addPublication(
+                registrationResponse.idFromBody(),
+                testObjectsBucket.publicationBodyAsJsonFor("hello"));
+
+        final JsonObject likerJson = new JsonObject()
+                .add(RestReceptionist.USER_ID_KEY, registrationResponse.idFromBody());
+        final ReceptionistResponse likeResponse = receptionist.likePublicationIdentifiedAs(
+                publicationResponse.postIdFromBody(),
+                likerJson);
+
+        RestReceptionist recoveredReceptionist = ActionPersistentReceptionist.recoverFrom(
+                new StringReader(writer.toString()));
+
+        final ReceptionistResponse timelineResponse = recoveredReceptionist.timelineOf(registrationResponse.idFromBody());
+
+        JsonArray timelineBody = timelineResponse.responseBodyAsJsonArray();
+
+        JsonObject publicationAsJson = publicationResponse.responseBodyAsJson();
+        publicationAsJson
+                .remove(RestReceptionist.LIKES_KEY)
+                .add(RestReceptionist.LIKES_KEY,1);
+
+        JsonObject restoredPublicationAsJson = timelineBody.get(0).asObject();
+        assertEquals(publicationAsJson,restoredPublicationAsJson);
+    }
+
+    private void assertActionInLineNumberIs(int lineNumber, String actionName, JsonObject parameters, JsonObject returned) throws IOException {
+        JsonObject savedJson = Json.parse(lineAt(lineNumber)).asObject();
+
+        assertEquals(
+                actionName,
+                savedJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY,null));
+        assertEquals(
+                parameters,
+                savedJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject());
+        assertEquals(
+                returned,
+                savedJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject());
     }
 
     private void assertNumberOfSavedActionsAre(int numberOfSavedActions) throws IOException {
