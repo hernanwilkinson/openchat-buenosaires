@@ -172,6 +172,15 @@ public class ActionPersistentReceptionistTest {
         assertNumberOfSavedActionsAre(1);
     }
 
+    @Test
+    public void wallOfIsNotPersisted() throws IOException {
+        final ReceptionistResponse registrationResponse = receptionist.registerUser(testObjectsBucket.juanPerezRegistrationBodyAsJson());
+        final ReceptionistResponse wallResponse = receptionist.wallOf(registrationResponse.idFromBody());
+
+        assertTrue(wallResponse.isStatus(HttpStatus.OK_200));
+        assertNumberOfSavedActionsAre(1);
+    }
+
     private void assertNumberOfSavedActionsAre(int numberOfSavedActions) throws IOException {
         assertNull(lineAt(numberOfSavedActions));
     }

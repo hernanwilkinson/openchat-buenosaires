@@ -74,7 +74,7 @@ public class ActionPersistentReceptionist implements Receptionist{
 
     @Override
     public ReceptionistResponse wallOf(String userId) {
-        throw new UnsupportedOperationException();
+        return receptionist.wallOf(userId);
     }
 
     @Override
