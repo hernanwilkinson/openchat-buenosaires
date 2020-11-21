@@ -39,17 +39,22 @@ class PersistedReceptionistLoader {
                 () -> lastId);
 
         boolean hasLineToParse;
-        line = lineReader.readLine();
-        hasLineToParse = line != null;
+        hasLineToParse = hasLineToParse();
         while (hasLineToParse) {
             createAction();
             executeAction();
 
-            line = lineReader.readLine();
-            hasLineToParse = line != null;
+            boolean hasLineToParse = hasLineToParse();
         }
 
         return receptionist;
+    }
+
+    public boolean hasLineToParse() throws IOException {
+        boolean hasLineToParse;
+        line = lineReader.readLine();
+        hasLineToParse = line != null;
+        return hasLineToParse;
     }
 
     public void executeAction() {
