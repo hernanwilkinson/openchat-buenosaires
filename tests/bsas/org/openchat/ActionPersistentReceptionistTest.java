@@ -304,6 +304,34 @@ public class ActionPersistentReceptionistTest {
                 juanPerezRegistrationResponse.idFromBody());
     }
 
+    @Test
+    public void recoveredReceptionistUsesNewNowAfterRecovered() throws IOException {
+        testObjectsBucket.changeNowTo(LocalDateTime.of(2020, Month.JANUARY,1,0,0));
+        final JsonObject registrationBodyAsJson = testObjectsBucket.juanPerezRegistrationBodyAsJson();
+        final ReceptionistResponse registrationResponse = receptionist.registerUser(registrationBodyAsJson);
+        final ReceptionistResponse publicationResponse = receptionist.addPublication(
+                registrationResponse.idFromBody(),
+                testObjectsBucket.publicationBodyAsJsonFor("hello"));
+
+        RestReceptionist recoveredReceptionist = PersistedReceptionistLoader.loadFrom(
+                new StringReader(writer.toString()));
+        recoveredReceptionist.addPublication(
+                registrationResponse.idFromBody(),
+                testObjectsBucket.publicationBodyAsJsonFor("bye"));
+
+        final ReceptionistResponse timelineResponse = recoveredReceptionist.timelineOf(registrationResponse.idFromBody());
+
+        JsonArray timelineBody = timelineResponse.responseBodyAsJsonArray();
+        JsonObject firstPublicationAsJson = timelineBody.get(0).asObject();
+        JsonObject secondPublicationAsJson = timelineBody.get(1).asObject();
+
+        assertNotEquals(
+                firstPublicationAsJson.getString(RestReceptionist.DATE_TIME_KEY,null),
+                secondPublicationAsJson.getString(RestReceptionist.DATE_TIME_KEY,null));
+
+    }
+
+
     private void assertActionInLineNumberIs(int lineNumber, String actionName, JsonObject parameters, JsonObject returned) throws IOException {
         JsonObject savedJson = Json.parse(lineAt(lineNumber)).asObject();
 

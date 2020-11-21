@@ -43,18 +43,31 @@ class PersistedReceptionistLoader {
             executeAction();
         }
 
-        clearLastId();
+        startGeneratingNewIds();
+        starUsingCurrentNow();
+
         return receptionist;
     }
 
-    private void clearLastId() {
+    private void starUsingCurrentNow() {
+        lastNow = null;
+    }
+
+    private void startGeneratingNewIds() {
         lastId = null;
     }
 
     public void createReceptionist() {
         receptionist = new RestReceptionist(
-                new OpenChatSystem(() -> lastNow),
+                new OpenChatSystem(() -> now()),
                 () -> generateId());
+    }
+
+    public LocalDateTime now() {
+        if(lastNow==null)
+            return LocalDateTime.now();
+        else
+            return lastNow;
     }
 
     public String generateId() {
