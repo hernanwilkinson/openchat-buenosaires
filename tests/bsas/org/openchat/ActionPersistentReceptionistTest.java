@@ -14,7 +14,6 @@ import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.Month;
 
-import static org.eclipse.jetty.http.HttpStatus.OK_200;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ActionPersistentReceptionistTest {
@@ -235,6 +234,18 @@ public class ActionPersistentReceptionistTest {
 
         JsonObject restoredPublicationAsJson = timelineBody.get(0).asObject();
         assertEquals(publicationAsJson,restoredPublicationAsJson);
+    }
+
+    @Test
+    public void failsGracefullyWhenLineHasNoJsonObject() throws IOException {
+
+        writer.write("something went wrong");
+        RuntimeException error = assertThrows(
+                RuntimeException.class,
+                ()->ActionPersistentReceptionist.recoverFrom(
+                    new StringReader(writer.toString())));
+
+        assertEquals(ActionPersistentReceptionist.invalidRecordErrorMessage(1), error.getMessage());
     }
 
     private void assertActionInLineNumberIs(int lineNumber, String actionName, JsonObject parameters, JsonObject returned) throws IOException {

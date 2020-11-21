@@ -19,6 +19,7 @@ public class ActionPersistentReceptionist implements Receptionist{
     public static final String ACTION_NAME_KEY = "actionName";
     public static final String PARAMETERS_KEY = "parameters";
     public static final String RETURN_KEY = "return";
+    public static final String INVALID_RECORD = "Invalid record";
 
     private final RestReceptionist receptionist;
     private final StringWriter writer;
@@ -38,7 +39,12 @@ public class ActionPersistentReceptionist implements Receptionist{
 
         String line = lineReader.readLine();
         while(line!=null){
-            final JsonObject actionAsJson = Json.parse(line).asObject();
+            final JsonObject actionAsJson;
+            try {
+                actionAsJson = Json.parse(line).asObject();
+            } catch (RuntimeException e) {
+                throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()),e);
+            }
             final JsonObject parameters = actionAsJson.get(PARAMETERS_KEY).asObject();
             final JsonObject returned = actionAsJson.get(RETURN_KEY).asObject();
             if(actionAsJson.getString(ACTION_NAME_KEY,"").equals(REGISTER_USER_ACTION_NAME)) {
@@ -62,6 +68,10 @@ public class ActionPersistentReceptionist implements Receptionist{
         }
 
         return receptionist;
+    }
+
+    public static String invalidRecordErrorMessage(int lineNumber) {
+        return INVALID_RECORD + " at line " + lineNumber;
     }
 
     @Override
