@@ -63,11 +63,15 @@ class PersistedReceptionistLoader {
         } else if (isAddPublicationAction()) {
             executeAddPublicationAction();
         } else if (isLikePublicationAction()) {
-            receptionist.likePublicationIdentifiedAs(
-                    parameters.getString(RestReceptionist.POST_ID_KEY, null),
-                    parameters);
+            executeLikePublicationAction();
         } else
             throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()));
+    }
+
+    public void executeLikePublicationAction() {
+        receptionist.likePublicationIdentifiedAs(
+                parameters.getString(RestReceptionist.POST_ID_KEY, null),
+                parameters);
     }
 
     public boolean isLikePublicationAction() {
