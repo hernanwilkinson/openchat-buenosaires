@@ -56,7 +56,7 @@ class PersistedReceptionistLoader {
     }
 
     public void executeAction() {
-        if (actionName.equals(ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME)) {
+        if (isRegisterUserAction()) {
             lastId = returned.getString(RestReceptionist.ID_KEY, null);
             receptionist.registerUser(parameters);
         } else if (actionName.equals(ActionPersistentReceptionist.FOLLOWINGS_ACTION_NAME)) {
@@ -74,6 +74,10 @@ class PersistedReceptionistLoader {
                     parameters);
         } else
             throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()));
+    }
+
+    public boolean isRegisterUserAction() {
+        return actionName.equals(ActionPersistentReceptionist.REGISTER_USER_ACTION_NAME);
     }
 
     public void createAction() {
