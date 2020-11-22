@@ -131,10 +131,11 @@ public class OpenChatSystemTest {
         system.followForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.JUAN_PEREZ_NAME);
 
         Publication followerPublication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
+        testObjects.changeNowTo(testObjects.fixedNowClock().now().plusSeconds(1));
         Publication followeePublication = system.publishForUserNamed(TestObjectsBucket.JUAN_PEREZ_NAME,"bye");
 
         List<Publication> wall = system.wallForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME);
-        assertEquals(Arrays.asList(followerPublication,followeePublication),wall);
+        assertEquals(Arrays.asList(followeePublication,followerPublication),wall);
     }
 
     @Test
