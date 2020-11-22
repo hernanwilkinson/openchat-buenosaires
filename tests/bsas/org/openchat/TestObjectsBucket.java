@@ -98,4 +98,8 @@ public class TestObjectsBucket {
     public void changeNowTo(LocalDateTime newNow) {
         now = newNow;
     }
+
+    public LocalDateTime now() {
+        return fixedNowClock().now();
+    }
 }
