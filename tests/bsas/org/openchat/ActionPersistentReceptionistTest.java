@@ -264,7 +264,7 @@ public class ActionPersistentReceptionistTest {
     public void failsGracefullyWhenNoReturnObject() throws IOException {
 
         writer.write(new JsonObject()
-                .add(ActionPersistentReceptionist.PARAMETERS_KEY,new JsonObject())
+                .add(PersistentAction.PARAMETERS_KEY,new JsonObject())
                 .toString());
         RuntimeException error = assertThrows(
                 RuntimeException.class,
@@ -278,9 +278,9 @@ public class ActionPersistentReceptionistTest {
     public void failsGracefullyWhenInvalidActionName() throws IOException {
 
         writer.write(new JsonObject()
-                .add(ActionPersistentReceptionist.PARAMETERS_KEY,new JsonObject())
-                .add(ActionPersistentReceptionist.RETURN_KEY,new JsonObject())
-                .add(ActionPersistentReceptionist.ACTION_NAME_KEY,"")
+                .add(PersistentAction.PARAMETERS_KEY,new JsonObject())
+                .add(PersistentAction.RETURN_KEY,new JsonObject())
+                .add(PersistentAction.ACTION_NAME_KEY,"")
                 .toString());
         RuntimeException error = assertThrows(
                 RuntimeException.class,
@@ -337,13 +337,13 @@ public class ActionPersistentReceptionistTest {
 
         assertEquals(
                 actionName,
-                savedJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY,null));
+                savedJson.getString(PersistentAction.ACTION_NAME_KEY,null));
         assertEquals(
                 parameters,
-                savedJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject());
+                savedJson.get(PersistentAction.PARAMETERS_KEY).asObject());
         assertEquals(
                 returned,
-                savedJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject());
+                savedJson.get(PersistentAction.RETURN_KEY).asObject());
     }
 
     private void assertNumberOfSavedActionsAre(int numberOfSavedActions) throws IOException {

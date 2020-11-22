@@ -14,10 +14,6 @@ public class ActionPersistentReceptionist implements InvocationHandler {
     public static final String ADD_PUBLICATION_ACTION_NAME = "addPublication";
     public static final String LIKE_PUBLICATION_ACTION_NAME = "likePublication";
 
-    public static final String ACTION_NAME_KEY = "actionName";
-    public static final String PARAMETERS_KEY = "parameters";
-    public static final String RETURN_KEY = "return";
-
     private final RestReceptionist receptionist;
     private HashMap<Method,PersistentAction> persistentActions;
 

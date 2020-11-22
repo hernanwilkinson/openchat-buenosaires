@@ -154,11 +154,11 @@ class PersistedReceptionistLoader {
     public void createAction() {
         try {
             actionAsJson = Json.parse(line).asObject();
-            parameters = actionAsJson.get(ActionPersistentReceptionist.PARAMETERS_KEY).asObject();
-            returned = actionAsJson.get(ActionPersistentReceptionist.RETURN_KEY).asObject();
+            parameters = actionAsJson.get(PersistentAction.PARAMETERS_KEY).asObject();
+            returned = actionAsJson.get(PersistentAction.RETURN_KEY).asObject();
         } catch (RuntimeException e) {
             throw new RuntimeException(invalidRecordErrorMessage(lineReader.getLineNumber()), e);
         }
-        actionName = actionAsJson.getString(ActionPersistentReceptionist.ACTION_NAME_KEY, "");
+        actionName = actionAsJson.getString(PersistentAction.ACTION_NAME_KEY, "");
     }
 }
