@@ -23,24 +23,14 @@ public class PersistentAction {
         this.parametersToJsonObjectConverter = parametersToJsonObjectConverter;
     }
 
-    public String getActionName() {
-        return actionName;
-    }
-
-    public Function<ReceptionistResponse, JsonObject> getReturnClosure() {
-        return returnClosure;
-    }
-
     ReceptionistResponse persistAction(ReceptionistResponse response,
                                        Object[] parameters, ActionPersistentReceptionist actionPersistentReceptionist) {
 
-        JsonObject parametersAsJson = parametersAsJson(parameters);
-
         if(response.isSucessStatus()) {
             JsonObject actionAsJson = new JsonObject()
-                    .add(ActionPersistentReceptionist.ACTION_NAME_KEY, getActionName())
-                    .add(ActionPersistentReceptionist.PARAMETERS_KEY, parametersAsJson)
-                    .add(ActionPersistentReceptionist.RETURN_KEY, getReturnClosure().apply(response));
+                    .add(ActionPersistentReceptionist.ACTION_NAME_KEY, actionName)
+                    .add(ActionPersistentReceptionist.PARAMETERS_KEY, parametersToJsonObjectConverter.apply(parameters))
+                    .add(ActionPersistentReceptionist.RETURN_KEY, returnClosure.apply(response));
 
             try {
                 writer.write(actionAsJson.toString());
@@ -53,7 +43,4 @@ public class PersistentAction {
         return response;
     }
 
-    private JsonObject parametersAsJson(Object[] parameters) {
-        return parametersToJsonObjectConverter.apply(parameters);
-    }
 }
