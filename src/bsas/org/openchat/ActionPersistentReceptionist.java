@@ -19,11 +19,16 @@ public class ActionPersistentReceptionist implements InvocationHandler {
     public static final String RETURN_KEY = "return";
 
     private final RestReceptionist receptionist;
-    private final HashMap<Method,PersistentAction> persistentActions;
+    private HashMap<Method,PersistentAction> persistentActions;
 
     public ActionPersistentReceptionist(RestReceptionist receptionist, Writer writer) throws NoSuchMethodException {
         this.receptionist = receptionist;
+        createPersistentActions(writer);
+    }
+
+    public void createPersistentActions(Writer writer) throws NoSuchMethodException {
         this.persistentActions = new HashMap<>();
+
         createRegisterUserAction(writer);
         createFollowingsAction(writer);
         createAddPublicationAction(writer);
