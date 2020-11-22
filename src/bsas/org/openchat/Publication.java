@@ -42,7 +42,7 @@ public class Publication {
         return message.equals(potentialMessage);
     }
 
-    public boolean hasPublishAt(LocalDateTime potentialTime) {
+    public boolean wasPublishedAt(LocalDateTime potentialTime) {
         return publicationTime.equals(potentialTime);
     }
 

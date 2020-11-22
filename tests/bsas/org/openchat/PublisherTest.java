@@ -64,10 +64,10 @@ public class PublisherTest {
 
         assertTrue(createdPublisher.hasPublications());
         assertTrue(publication.hasMessage(message));
-        assertTrue(publication.hasPublishAt(publicationTime));
+        assertTrue(publication.wasPublishedAt(publicationTime));
 
         assertFalse(publication.hasMessage(message + "something"));
-        assertFalse(publication.hasPublishAt(publicationTime.plusSeconds(1)));
+        assertFalse(publication.wasPublishedAt(publicationTime.plusSeconds(1)));
     }
     @Test
     public void timelineHasPublisherPublicationsSortedWithLatestPublicationsFirst() {
