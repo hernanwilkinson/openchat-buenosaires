@@ -11,7 +11,7 @@ public interface Receptionist {
 
     ReceptionistResponse followings(JsonObject followingsBodyAsJson);
 
-    ReceptionistResponse followeesOf(String userId);
+    ReceptionistResponse followersOf(String userId);
 
     ReceptionistResponse addPublication(String userId, JsonObject messageBodyAsJson);
 

@@ -20,8 +20,8 @@ public class RestReceptionist implements Receptionist {
     public static final String ABOUT_KEY = "about";
     public static final String HOME_PAGE_KEY = "homePage";
     public static final String ID_KEY = "id";
-    public static final String FOLLOWER_ID_KEY = "followerId";
-    public static final String FOLLOWEE_ID_KEY = "followeeId";
+    public static final String FOLLOWED_ID_KEY = "followerId";
+    public static final String FOLLOWER_ID_KEY = "followeeId";
     public static final String POST_ID_KEY = "postId";
     public static final String USER_ID_KEY = "userId";
     public static final String TEXT_KEY = "text";
@@ -90,13 +90,13 @@ public class RestReceptionist implements Receptionist {
     @Override
     public ReceptionistResponse followings(JsonObject followingsBodyAsJson) {
 
+        String followedId = followingsBodyAsJson.getString(FOLLOWED_ID_KEY,"");
         String followerId = followingsBodyAsJson.getString(FOLLOWER_ID_KEY,"");
-        String followeeId = followingsBodyAsJson.getString(FOLLOWEE_ID_KEY,"");
 
         try {
-            system.followForUserNamed(
-                    userNameIdentifiedAs(followerId),
-                    userNameIdentifiedAs(followeeId));
+            system.userNamedFollowedBy(
+                    userNameIdentifiedAs(followedId),
+                    userNameIdentifiedAs(followerId));
 
             return new ReceptionistResponse(CREATED_201, FOLLOWING_CREATED);
         } catch (ModelException error){
@@ -105,11 +105,11 @@ public class RestReceptionist implements Receptionist {
     }
 
     @Override
-    public ReceptionistResponse followeesOf(String userId) {
-        final List<User> followees =
-                system.followeesOfUserNamed(userNameIdentifiedAs(userId));
+    public ReceptionistResponse followersOf(String userId) {
+        final List<User> followers =
+                system.followersOfUserNamed(userNameIdentifiedAs(userId));
 
-        return okResponseWithUserArrayFrom(followees);
+        return okResponseWithUserArrayFrom(followers);
     }
 
     @Override

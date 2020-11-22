@@ -9,11 +9,11 @@ import java.util.List;
 public class LoadExample {
     private static final int NUMBER_OF_PUBLICATIONS = 300;
     public static final int NUMBER_OF_USERS = 1000;
-    public static final int NUMBER_OF_FOLLOWEES = 20;
+    public static final int NUMBER_OF_FOLLOWERS = 20;
     public static final String USER_NAME_HEADER = "AAAAA";
 
     private String userNamePrefix;
-    private List<String> followees;
+    private List<String> followers;
     private Receptionist receptionist;
 
     public static void main(String[] args) {
@@ -28,12 +28,12 @@ public class LoadExample {
         this.receptionist = receptionist;
 
         userNamePrefix = "";
-        followees = new ArrayList<>();
+        followers = new ArrayList<>();
         for(int currentUserNumber = 0; currentUserNumber< NUMBER_OF_USERS; currentUserNumber++) {
             final String userName = createUserName(currentUserNumber);
 
             String newUserId = registerUser(userName);
-            addFollowees(newUserId);
+            addFollowers(newUserId);
             addPublications(userName, newUserId);
 
             calculatePrefix(currentUserNumber);
@@ -67,19 +67,19 @@ public class LoadExample {
         return response.idFromBody();
     }
 
-    private void addFollowees(String newUserId) {
-        followees.stream().forEach(followee-> receptionist.followings(
+    private void addFollowers(String newUserId) {
+        followers.stream().forEach(follower-> receptionist.followings(
                 new JsonObject()
-                        .add(RestReceptionist.FOLLOWER_ID_KEY, newUserId)
-                        .add(RestReceptionist.FOLLOWEE_ID_KEY,followee)));
-        followees.add(newUserId);
+                        .add(RestReceptionist.FOLLOWED_ID_KEY, newUserId)
+                        .add(RestReceptionist.FOLLOWER_ID_KEY,follower)));
+        followers.add(newUserId);
 
-        keepFolloweesSize();
+        keepFollowersSize();
     }
 
-    private void keepFolloweesSize() {
-        if(followees.size()> NUMBER_OF_FOLLOWEES)
-            followees.remove(0);
+    private void keepFollowersSize() {
+        if(followers.size()> NUMBER_OF_FOLLOWERS)
+            followers.remove(0);
     }
 
     private void addPublications(String userName, String newUserId) {

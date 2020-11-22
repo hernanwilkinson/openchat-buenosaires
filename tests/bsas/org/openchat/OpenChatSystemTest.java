@@ -116,26 +116,26 @@ public class OpenChatSystemTest {
     public void canFollowRegisteredUser() {
         system = createSystem();
         registerPepeSanchez();
-        User followee = registerJuanPerez();
+        User follower = registerJuanPerez();
 
-        system.followForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.JUAN_PEREZ_NAME);
+        system.userNamedFollowedBy(TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.JUAN_PEREZ_NAME);
 
-        List<User> followees = system.followeesOfUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME);
-        assertEquals(Arrays.asList(followee),followees);
+        List<User> followers = system.followersOfUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME);
+        assertEquals(Arrays.asList(follower),followers);
     }
     @Test
     public void canGetWallOfRegisteredUser() {
         system = createSystem();
         registerPepeSanchez();
         registerJuanPerez();
-        system.followForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.JUAN_PEREZ_NAME);
+        system.userNamedFollowedBy(TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.JUAN_PEREZ_NAME);
 
-        Publication followerPublication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
+        Publication followedPublication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
         testObjects.changeNowTo(testObjects.now().plusSeconds(1));
-        Publication followeePublication = system.publishForUserNamed(TestObjectsBucket.JUAN_PEREZ_NAME,"bye");
+        Publication followerPublication = system.publishForUserNamed(TestObjectsBucket.JUAN_PEREZ_NAME,"bye");
 
         List<Publication> wall = system.wallForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME);
-        assertEquals(Arrays.asList(followeePublication,followerPublication),wall);
+        assertEquals(Arrays.asList(followerPublication,followedPublication),wall);
     }
 
     @Test
