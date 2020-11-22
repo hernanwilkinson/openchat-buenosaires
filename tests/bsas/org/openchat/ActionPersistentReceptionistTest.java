@@ -20,13 +20,13 @@ public class ActionPersistentReceptionistTest {
 
     private TestObjectsBucket testObjectsBucket;
     private StringWriter writer;
-    private ActionPersistentReceptionist receptionist;
+    private Receptionist receptionist;
 
     @BeforeEach
     public void setUp() throws NoSuchMethodException {
         testObjectsBucket = new TestObjectsBucket();
         writer = new StringWriter();
-        receptionist = new ActionPersistentReceptionist(
+        receptionist = ActionPersistentReceptionist.asProxyOf(
                 new RestReceptionist(new OpenChatSystem(testObjectsBucket.fixedNowClock())),
                 writer);
     }
@@ -84,7 +84,7 @@ public class ActionPersistentReceptionistTest {
         assertActionInLineNumberIs(
                 1,
                 ActionPersistentReceptionist.ADD_PUBLICATION_ACTION_NAME,
-                receptionist.addPublicationParameters(registrationResponse.idFromBody(),publicationAsJson),
+                new JsonObject(publicationAsJson).add(RestReceptionist.USER_ID_KEY,registrationResponse.idFromBody()),
                 publicationResponse.responseBodyAsJson()
         );
     }
@@ -107,7 +107,7 @@ public class ActionPersistentReceptionistTest {
         assertActionInLineNumberIs(
                 2,
                 ActionPersistentReceptionist.LIKE_PUBLICATION_ACTION_NAME,
-                receptionist.likeParameters(publicationResponse.postIdFromBody(),likerJson),
+                new JsonObject(likerJson).add(RestReceptionist.POST_ID_KEY,publicationResponse.postIdFromBody()),
                 likeResponse.responseBodyAsJson()
         );
     }

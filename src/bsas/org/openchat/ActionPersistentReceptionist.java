@@ -2,12 +2,14 @@ package bsas.org.openchat;
 
 import com.eclipsesource.json.JsonObject;
 
+import java.io.FileWriter;
 import java.io.Writer;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 
-public class ActionPersistentReceptionist implements Receptionist, InvocationHandler {
+public class ActionPersistentReceptionist implements InvocationHandler {
     public static final String REGISTER_USER_ACTION_NAME = "registerUser";
     public static final String FOLLOWINGS_ACTION_NAME = "followings";
     public static final String ADD_PUBLICATION_ACTION_NAME = "addPublication";
@@ -31,15 +33,11 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
         createLikePublicationAction();
     }
 
-    @Override
-    public ReceptionistResponse registerUser(JsonObject registrationBodyAsJson) {
-        try {
-            return (ReceptionistResponse) invoke(this,
-                    Receptionist.class.getMethod("registerUser", JsonObject.class),
-                    new JsonObject[]{registrationBodyAsJson});
-        } catch (Throwable throwable) {
-            return null;
-        }
+    public static Receptionist asProxyOf(RestReceptionist receptionist, Writer writer) throws NoSuchMethodException {
+        return (Receptionist) Proxy.newProxyInstance(
+                ClassLoader.getSystemClassLoader(),
+                new Class[]{Receptionist.class},
+                new ActionPersistentReceptionist(receptionist,writer));
     }
 
     public void createRegisterUserAction() throws NoSuchMethodException {
@@ -50,55 +48,12 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
                 response -> response.responseBodyAsJson()));
     }
 
-    @Override
-    public ReceptionistResponse login(JsonObject loginBodyAsJson) {
-        try {
-            return (ReceptionistResponse) invoke(this,
-                    Receptionist.class.getMethod("login", JsonObject.class),
-                    new JsonObject[]{loginBodyAsJson});
-        } catch (Throwable throwable) {
-            throw new RuntimeException(throwable);
-        }
-    }
-
-    @Override
-    public ReceptionistResponse users() {
-        return receptionist.users();
-    }
-
-    @Override
-    public ReceptionistResponse followings(JsonObject followingsBodyAsJson) {
-        try {
-            return (ReceptionistResponse) invoke(this,
-                    Receptionist.class.getMethod("followings", JsonObject.class),
-                    new JsonObject[]{followingsBodyAsJson});
-        } catch (Throwable throwable) {
-            return null;
-        }
-    }
-
     public void createFollowingsAction() throws NoSuchMethodException {
         persistentActions.put(
                 Receptionist.class.getMethod("followings", JsonObject.class),
                 new PersistentAction(
                     FOLLOWINGS_ACTION_NAME,
                     response -> new JsonObject()));
-    }
-
-    @Override
-    public ReceptionistResponse followeesOf(String userId) {
-        return receptionist.followeesOf(userId);
-    }
-
-    @Override
-    public ReceptionistResponse addPublication(String userId, JsonObject messageBodyAsJson) {
-        try {
-            return (ReceptionistResponse) invoke(this,
-                    Receptionist.class.getMethod("addPublication", String.class, JsonObject.class),
-                    new Object[]{userId,messageBodyAsJson});
-        } catch (Throwable throwable) {
-            throw new RuntimeException(throwable);
-        }
     }
 
     public void createAddPublicationAction() throws NoSuchMethodException {
@@ -114,27 +69,6 @@ public class ActionPersistentReceptionist implements Receptionist, InvocationHan
 
     public JsonObject addPublicationParameters(String userId, JsonObject messageBodyAsJson) {
         return new JsonObject(messageBodyAsJson).add(RestReceptionist.USER_ID_KEY,userId);
-    }
-
-    @Override
-    public ReceptionistResponse timelineOf(String userId) {
-        return receptionist.timelineOf(userId);
-    }
-
-    @Override
-    public ReceptionistResponse wallOf(String userId) {
-        return receptionist.wallOf(userId);
-    }
-
-    @Override
-    public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
-        try {
-            return (ReceptionistResponse) invoke(this,
-                    Receptionist.class.getMethod("likePublicationIdentifiedAs", String.class, JsonObject.class),
-                    new Object[]{publicationId,likerAsJson});
-        } catch (Throwable throwable) {
-            throw new RuntimeException(throwable);
-        }
     }
 
     public void createLikePublicationAction() throws NoSuchMethodException {
