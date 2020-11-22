@@ -16,7 +16,7 @@ import java.time.Month;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ActionPersistentReceptionistTest {
+public class PersistenceTest {
 
     private TestObjectsBucket testObjectsBucket;
     private StringWriter writer;
