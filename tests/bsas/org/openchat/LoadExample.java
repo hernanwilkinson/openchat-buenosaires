@@ -63,9 +63,8 @@ public class LoadExample {
                 .add(RestReceptionist.HOME_PAGE_KEY,"www.10pines.com");
 
         ReceptionistResponse response = receptionist.registerUser(registration);
-        String newUserId = response.responseBodyAsJson().getString(RestReceptionist.ID_KEY,"");
 
-        return newUserId;
+        return response.idFromBody();
     }
 
     private void addFollowees(String newUserId) {
