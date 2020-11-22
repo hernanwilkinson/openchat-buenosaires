@@ -2,7 +2,6 @@ package bsas.org.openchat;
 
 import com.eclipsesource.json.JsonObject;
 
-import java.io.FileWriter;
 import java.io.Writer;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -20,17 +19,15 @@ public class ActionPersistentReceptionist implements InvocationHandler {
     public static final String RETURN_KEY = "return";
 
     private final RestReceptionist receptionist;
-    final Writer writer;
     private final HashMap<Method,PersistentAction> persistentActions;
 
     public ActionPersistentReceptionist(RestReceptionist receptionist, Writer writer) throws NoSuchMethodException {
         this.receptionist = receptionist;
-        this.writer = writer;
         this.persistentActions = new HashMap<>();
-        createRegisterUserAction();
-        createFollowingsAction();
-        createAddPublicationAction();
-        createLikePublicationAction();
+        createRegisterUserAction(writer);
+        createFollowingsAction(writer);
+        createAddPublicationAction(writer);
+        createLikePublicationAction(writer);
     }
 
     public static Receptionist asProxyOf(RestReceptionist receptionist, Writer writer) throws NoSuchMethodException {
@@ -40,28 +37,31 @@ public class ActionPersistentReceptionist implements InvocationHandler {
                 new ActionPersistentReceptionist(receptionist,writer));
     }
 
-    public void createRegisterUserAction() throws NoSuchMethodException {
+    public void createRegisterUserAction(Writer writer) throws NoSuchMethodException {
         persistentActions.put(
             Receptionist.class.getMethod("registerUser", JsonObject.class),
             new PersistentAction(
                 REGISTER_USER_ACTION_NAME,
-                response -> response.responseBodyAsJson()));
+                response -> response.responseBodyAsJson(),
+                writer));
     }
 
-    public void createFollowingsAction() throws NoSuchMethodException {
+    public void createFollowingsAction(Writer writer) throws NoSuchMethodException {
         persistentActions.put(
                 Receptionist.class.getMethod("followings", JsonObject.class),
                 new PersistentAction(
                     FOLLOWINGS_ACTION_NAME,
-                    response -> new JsonObject()));
+                    response -> new JsonObject(),
+                    writer));
     }
 
-    public void createAddPublicationAction() throws NoSuchMethodException {
+    public void createAddPublicationAction(Writer writer) throws NoSuchMethodException {
         persistentActions.put(
                 Receptionist.class.getMethod("addPublication", String.class, JsonObject.class),
                 new PersistentAction(
                         ADD_PUBLICATION_ACTION_NAME,
                         response -> response.responseBodyAsJson(),
+                        writer,
                         args->addPublicationParameters(
                                 (String) args[0],
                                 (JsonObject) args[1])));
@@ -71,12 +71,13 @@ public class ActionPersistentReceptionist implements InvocationHandler {
         return new JsonObject(messageBodyAsJson).add(RestReceptionist.USER_ID_KEY,userId);
     }
 
-    public void createLikePublicationAction() throws NoSuchMethodException {
+    public void createLikePublicationAction(Writer writer) throws NoSuchMethodException {
         persistentActions.put(
                 Receptionist.class.getMethod("likePublicationIdentifiedAs", String.class, JsonObject.class),
                 new PersistentAction(
                     LIKE_PUBLICATION_ACTION_NAME,
                     response -> response.responseBodyAsJson(),
+                    writer,
                     args -> likeParameters(
                             (String) args[0],
                             (JsonObject) args[1])));

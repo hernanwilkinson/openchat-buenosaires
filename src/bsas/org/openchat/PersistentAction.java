@@ -3,20 +3,23 @@ package bsas.org.openchat;
 import com.eclipsesource.json.JsonObject;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.util.function.Function;
 
 public class PersistentAction {
     private final String actionName;
     private final Function<ReceptionistResponse, JsonObject> returnClosure;
+    private final Writer writer;
     private Function<Object[], JsonObject> parametersToJsonObjectConverter;
 
-    public PersistentAction(String actionName, Function<ReceptionistResponse, JsonObject> returnClosure) {
-        this(actionName,returnClosure,args->(JsonObject) args[0]);
+    public PersistentAction(String actionName, Function<ReceptionistResponse, JsonObject> returnClosure, Writer writer) {
+        this(actionName,returnClosure, writer, args->(JsonObject) args[0]);
     }
 
-    public PersistentAction(String actionName, Function<ReceptionistResponse, JsonObject> returnClosure, Function<Object[], JsonObject> parametersToJsonObjectConverter) {
+    public PersistentAction(String actionName, Function<ReceptionistResponse, JsonObject> returnClosure, Writer writer, Function<Object[], JsonObject> parametersToJsonObjectConverter) {
         this.actionName = actionName;
         this.returnClosure = returnClosure;
+        this.writer = writer;
         this.parametersToJsonObjectConverter = parametersToJsonObjectConverter;
     }
 
@@ -40,8 +43,8 @@ public class PersistentAction {
                     .add(ActionPersistentReceptionist.RETURN_KEY, getReturnClosure().apply(response));
 
             try {
-                actionPersistentReceptionist.writer.write(actionAsJson.toString());
-                actionPersistentReceptionist.writer.write("\n");
+                writer.write(actionAsJson.toString());
+                writer.write("\n");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
