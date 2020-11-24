@@ -131,7 +131,7 @@ public class OpenChatSystemTest {
         system.followForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.JUAN_PEREZ_NAME);
 
         Publication followerPublication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
-        testObjects.changeNowTo(testObjects.fixedNowClock().now().plusSeconds(1));
+        testObjects.changeNowTo(testObjects.now().plusSeconds(1));
         Publication followeePublication = system.publishForUserNamed(TestObjectsBucket.JUAN_PEREZ_NAME,"bye");
 
         List<Publication> wall = system.wallForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME);
@@ -163,7 +163,7 @@ public class OpenChatSystemTest {
         system = createSystem();
         User registeredUser = registerPepeSanchez();
 
-        Publication publication = Publication.madeBy(Publisher.relatedTo(registeredUser),"hello",testObjects.fixedNowClock().now());
+        Publication publication = Publication.madeBy(Publisher.relatedTo(registeredUser),"hello", testObjects.now());
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
                 ()->system.likePublication(publication,TestObjectsBucket.PEPE_SANCHEZ_NAME),
                 OpenChatSystem.INVALID_PUBLICATION);
