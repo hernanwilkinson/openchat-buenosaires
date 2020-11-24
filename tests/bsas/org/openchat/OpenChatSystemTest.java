@@ -1,7 +1,6 @@
 package bsas.org.openchat;
 
 import org.junit.jupiter.api.Test;
-import org.openchat.OpenChat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -78,14 +77,14 @@ public class OpenChatSystemTest {
     @Test
     public void notRegisteredUserIsNotAuthenticated() {
         system = createSystem();
-        assertCanNotAuthenticateWith(system, TestObjectsBucket.PEPE_SANCHEZ_PASSWORD);
+        assertCanNotAuthenticatePepeSanchezWith(TestObjectsBucket.PEPE_SANCHEZ_PASSWORD);
     }
     @Test
     public void canNotAuthenticateWithInvalidPassword() {
         system = createSystem();
         registerPepeSanchez();
 
-        assertCanNotAuthenticateWith(system, TestObjectsBucket.PEPE_SANCHEZ_PASSWORD+"something");
+        assertCanNotAuthenticatePepeSanchezWith(TestObjectsBucket.PEPE_SANCHEZ_PASSWORD+"something");
     }
     @Test
     public void registeredUserCanPublish() {
@@ -192,8 +191,8 @@ public class OpenChatSystemTest {
                 OpenChatSystem.USER_NOT_REGISTERED);
     }
 
-    private void assertCanNotAuthenticateWith(OpenChatSystem system, String password) {
-        final Object token = createSystem();
+    private void assertCanNotAuthenticatePepeSanchezWith(String password) {
+        final Object token = new Object();
         final Object notAuthenticatedToken = system.withAuthenticatedUserDo(
                 TestObjectsBucket.PEPE_SANCHEZ_NAME, password,
                 user->fail(),
