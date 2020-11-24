@@ -10,7 +10,7 @@ public class Publisher {
     public static final String CANNOT_FOLLOW_SELF = "Can not follow self";
     public static final String CANNOT_FOLLOW_TWICE = "Can not follow publisher twice";
 
-    private final List<Publisher> followees = new ArrayList<>();
+    private final List<Publisher> followers = new ArrayList<>();
     private final List<Publication> publications = new ArrayList<>();
     private final User user;
 
@@ -22,23 +22,23 @@ public class Publisher {
         this.user = user;
     }
 
-    public boolean hasFollowees() {
-        return !followees.isEmpty();
+    public boolean hasFollowers() {
+        return !followers.isEmpty();
     }
 
-    public void follow(Publisher potentialFollowee) {
-        assertCanNotFollowSelf(potentialFollowee);
-        assertCanNotFollowTwice(potentialFollowee);
+    public void followedBy(Publisher potentialFollower) {
+        assertCanNotFollowSelf(potentialFollower);
+        assertCanNotFollowTwice(potentialFollower);
 
-        followees.add(potentialFollowee);
+        followers.add(potentialFollower);
     }
 
-    public boolean doesFollow(Publisher potentialFollowee) {
-        return followees.contains(potentialFollowee);
+    public boolean isFollowedBy(Publisher potentialFollower) {
+        return followers.contains(potentialFollower);
     }
 
-    public int numberOfFollowees() {
-        return followees.size();
+    public int numberOfFollowers() {
+        return followers.size();
     }
 
     public boolean hasPublications() {
@@ -58,24 +58,24 @@ public class Publisher {
 
     public List<Publication> wall() {
         final ArrayList<Publication> wall = new ArrayList<>(this.publications);
-        followees.stream().forEach(followee->followee.addPublicationTo(wall));
+        followers.stream().forEach(follower->follower.addPublicationTo(wall));
         return sortedPublications(wall);
     }
 
-    public List<Publisher> followees() {
-        return Collections.unmodifiableList(followees);
+    public List<Publisher> followers() {
+        return Collections.unmodifiableList(followers);
     }
 
     public User relatedUser() {
         return user;
     }
 
-    private void assertCanNotFollowTwice(Publisher potentialFollowee) {
-        if(doesFollow(potentialFollowee)) throw new ModelException(CANNOT_FOLLOW_TWICE);
+    private void assertCanNotFollowTwice(Publisher potentialFollower) {
+        if(isFollowedBy(potentialFollower)) throw new ModelException(CANNOT_FOLLOW_TWICE);
     }
 
-    private void assertCanNotFollowSelf(Publisher potentialFollowee) {
-        if(this.equals(potentialFollowee)) throw new ModelException(CANNOT_FOLLOW_SELF);
+    private void assertCanNotFollowSelf(Publisher potentialFollower) {
+        if(this.equals(potentialFollower)) throw new ModelException(CANNOT_FOLLOW_SELF);
     }
 
     private List<Publication> sortedPublications(List<Publication> publications) {

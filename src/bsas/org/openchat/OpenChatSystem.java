@@ -62,15 +62,15 @@ public class OpenChatSystem {
         return publisherForUserNamed(userName).timeLine();
     }
 
-    public void followForUserNamed(String followerUserName, String followeeUserName) {
+    public void followForUserNamed(String followedUserName, String followerUserName) {
+        Publisher followed = publisherForUserNamed(followedUserName);
         Publisher follower = publisherForUserNamed(followerUserName);
-        Publisher followee = publisherForUserNamed(followeeUserName);
 
-        follower.follow(followee);
+        followed.followedBy(follower);
     }
 
-    public List<User> followeesOfUserNamed(String userName) {
-        return publisherForUserNamed(userName).followees().stream()
+    public List<User> followersOfUserNamed(String userName) {
+        return publisherForUserNamed(userName).followers().stream()
                 .map(publisher -> publisher.relatedUser())
                 .collect(Collectors.toList());
     }

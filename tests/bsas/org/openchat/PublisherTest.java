@@ -14,39 +14,39 @@ public class PublisherTest {
     private final TestObjectsBucket testObjects = new TestObjectsBucket();
 
     @Test
-    public void createdPublisherHasNoFollowees() {
+    public void createdPublisherHasNoFollowers() {
         Publisher createdPublisher = createPepeSanchez();
 
-        assertFalse(createdPublisher.hasFollowees());
+        assertFalse(createdPublisher.hasFollowers());
     }
     @Test
     public void publisherCanFollowOtherPublisher() {
-        Publisher follower = createPepeSanchez();
-        Publisher followee = createJuanPerez();
+        Publisher followed = createPepeSanchez();
+        Publisher follower = createJuanPerez();
 
-        follower.follow(followee);
+        followed.followedBy(follower);
 
-        assertTrue(follower.hasFollowees());
-        assertTrue(follower.doesFollow(followee));
-        assertEquals(1,follower.numberOfFollowees());
+        assertTrue(followed.hasFollowers());
+        assertTrue(followed.isFollowedBy(follower));
+        assertEquals(1,followed.numberOfFollowers());
     }
     @Test
     public void publisherCanNotFollowSelf() {
         Publisher follower = createPepeSanchez();
 
-        assertThrowsModelExceptionWithErrorMessage(()->follower.follow(follower), Publisher.CANNOT_FOLLOW_SELF);
-        assertFalse(follower.hasFollowees());
+        assertThrowsModelExceptionWithErrorMessage(()->follower.followedBy(follower), Publisher.CANNOT_FOLLOW_SELF);
+        assertFalse(follower.hasFollowers());
     }
     @Test
     public void publisherCanNotFollowSamePublisherTwice() {
-        Publisher follower = createPepeSanchez();
-        Publisher followee = createJuanPerez();
-        follower.follow(followee);
+        Publisher followed = createPepeSanchez();
+        Publisher follower = createJuanPerez();
+        followed.followedBy(follower);
 
-        assertThrowsModelExceptionWithErrorMessage(()->follower.follow(followee), Publisher.CANNOT_FOLLOW_TWICE);
-        assertTrue(follower.hasFollowees());
-        assertTrue(follower.doesFollow(followee));
-        assertEquals(1,follower.numberOfFollowees());
+        assertThrowsModelExceptionWithErrorMessage(()->followed.followedBy(follower), Publisher.CANNOT_FOLLOW_TWICE);
+        assertTrue(followed.hasFollowers());
+        assertTrue(followed.isFollowedBy(follower));
+        assertEquals(1,followed.numberOfFollowers());
     }
     @Test
     public void createdPusblisherHasNoPublications() {
@@ -95,33 +95,33 @@ public class PublisherTest {
         assertEquals(Arrays.asList(firstPublication),wall);
     }
     @Test
-    public void wallContainsFolloweesPublications() {
-        Publisher follower = createPepeSanchez();
-        Publisher followee = createJuanPerez();
+    public void wallContainsFollowersPublications() {
+        Publisher followed = createPepeSanchez();
+        Publisher follower = createJuanPerez();
 
-        follower.follow(followee);
+        followed.followedBy(follower);
         final LocalDateTime publicationTime = LocalDateTime.now();
         final String message = "a message";
-        Publication firstPublication = followee.publish(message, publicationTime.plusSeconds(1));
+        Publication firstPublication = follower.publish(message, publicationTime.plusSeconds(1));
 
-        List<Publication> wall = follower.wall();
+        List<Publication> wall = followed.wall();
 
         assertEquals(Arrays.asList(firstPublication),wall);
     }
 
     @Test
-    public void wallContainsFolloweesPublicationsWithLatestPublicationsFirst() {
-        Publisher follower = createPepeSanchez();
-        Publisher followee = createJuanPerez();
+    public void wallContainsFollowersPublicationsWithLatestPublicationsFirst() {
+        Publisher followed = createPepeSanchez();
+        Publisher follower = createJuanPerez();
 
-        follower.follow(followee);
+        followed.followedBy(follower);
         final LocalDateTime publicationTime = LocalDateTime.now();
         final String message = "a message";
-        Publication firstPublication = follower.publish(message, publicationTime);
-        Publication secondPublication = followee.publish(message, publicationTime.plusSeconds(1));
-        Publication thirdPublication = follower.publish(message, publicationTime.plusSeconds(2));
+        Publication firstPublication = followed.publish(message, publicationTime);
+        Publication secondPublication = follower.publish(message, publicationTime.plusSeconds(1));
+        Publication thirdPublication = followed.publish(message, publicationTime.plusSeconds(2));
 
-        List<Publication> wall = follower.wall();
+        List<Publication> wall = followed.wall();
 
         assertEquals(Arrays.asList(thirdPublication, secondPublication, firstPublication),wall);
     }

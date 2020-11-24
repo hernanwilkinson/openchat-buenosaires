@@ -55,7 +55,7 @@ public class Routes {
 
     private String followees(Request request, Response response) {
         return receptionistDo(
-                ()->receptionist.followeesOf(followerIdFromParamsOf(request)),
+                ()->receptionist.followersOf(followerIdFromParamsOf(request)),
                 response);
     }
 
@@ -106,7 +106,7 @@ public class Routes {
     }
 
     private String followerIdFromParamsOf(Request request) {
-        return request.params(RestReceptionist.FOLLOWER_ID_KEY);
+        return request.params(RestReceptionist.FOLLOWED_ID_KEY);
     }
 
     private JsonObject requestBodyAsJson(Request request) {
