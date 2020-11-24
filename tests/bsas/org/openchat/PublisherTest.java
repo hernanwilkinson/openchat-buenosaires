@@ -127,43 +127,52 @@ public class PublisherTest {
     }
     @Test
     public void canNotPublishWithInappropriateWord() {
-        Publisher follower = createPepeSanchez();
+        Publisher createdPublisher = createPepeSanchez();
 
         final LocalDateTime publicationTime = LocalDateTime.now();
         final String message = "elephant";
         assertThrowsModelExceptionWithErrorMessage(
-                ()->follower.publish(message, publicationTime),
+                ()->createdPublisher.publish(message, publicationTime),
                 Publication.INAPPROPRIATE_WORD);
+
+        assertFalse(createdPublisher.hasPublications());
     }
     @Test
     public void canNotPublishWithInappropriateWordInUpperCase() {
-        Publisher follower = createPepeSanchez();
+        Publisher createdPublisher = createPepeSanchez();
 
         final LocalDateTime publicationTime = LocalDateTime.now();
         final String message = "ELEPHANT";
         assertThrowsModelExceptionWithErrorMessage(
-                ()->follower.publish(message, publicationTime),
+                ()->createdPublisher.publish(message, publicationTime),
                 Publication.INAPPROPRIATE_WORD);
+
+        assertFalse(createdPublisher.hasPublications());
     }
     @Test
     public void canNotPublishAMessageContainingInappropriateWord() {
-        Publisher follower = createPepeSanchez();
+        Publisher createdPublisher = createPepeSanchez();
 
         final LocalDateTime publicationTime = LocalDateTime.now();
         final String message = "abc ELEPHANT xx";
         assertThrowsModelExceptionWithErrorMessage(
-                ()->follower.publish(message, publicationTime),
+                ()->createdPublisher.publish(message, publicationTime),
                 Publication.INAPPROPRIATE_WORD);
+
+        assertFalse(createdPublisher.hasPublications());
     }
     @Test
     public void canNotPublishAnyInappropriateWord() {
-        Publisher follower = createPepeSanchez();
+        Publisher createdPublisher = createPepeSanchez();
 
         final LocalDateTime publicationTime = LocalDateTime.now();
-        Arrays.asList("elephant","ice cream","orange").forEach(
-                message-> assertThrowsModelExceptionWithErrorMessage(
-                        ()->follower.publish(message, publicationTime),
-                        Publication.INAPPROPRIATE_WORD));
+        Arrays.asList("elephant", "ice cream", "orange").forEach(
+                message -> {
+                    assertThrowsModelExceptionWithErrorMessage(
+                            () -> createdPublisher.publish(message, publicationTime),
+                            Publication.INAPPROPRIATE_WORD);
+                    assertFalse(createdPublisher.hasPublications());
+                });
     }
 
     private Publisher createJuanPerez() {
