@@ -4,6 +4,7 @@ import com.eclipsesource.json.JsonObject;
 
 import java.io.Writer;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
@@ -90,14 +91,24 @@ public class ActionPersistentReceptionist implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        final PersistentAction persistentAction = persistentActions.get(method);
+        final ReceptionistResponse response;
 
-        if(persistentAction==null)
-            return (ReceptionistResponse) method.invoke(receptionist,args);
-        else
-            return persistentAction.persistAction(
-                    (ReceptionistResponse) method.invoke(receptionist,args),
+        response = forwardMessageToReceptionist(method, args);
+        persistActionIfNecessary(method, args, response);
+
+        return response;
+    }
+
+    public void persistActionIfNecessary(Method method, Object[] args, ReceptionistResponse response) {
+        final PersistentAction persistentAction = persistentActions.get(method);
+        if (persistentAction != null)
+            persistentAction.persistAction(
+                    response,
                     args,
                     this);
+    }
+
+    public ReceptionistResponse forwardMessageToReceptionist(Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
+        return (ReceptionistResponse) method.invoke(receptionist, args);
     }
 }
