@@ -102,10 +102,10 @@ public class ActionPersistentReceptionist implements InvocationHandler {
     public void persistActionIfNecessary(Method method, Object[] args, ReceptionistResponse response) {
         final PersistentAction persistentAction = persistentActions.get(method);
         if (persistentAction != null)
-            persistentAction.persistAction(
+            persistentAction.persist(
                     response,
-                    args,
-                    this);
+                    args
+            );
     }
 
     public ReceptionistResponse forwardMessageToReceptionist(Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {

@@ -27,24 +27,25 @@ public class PersistentAction {
         this.parametersToJsonObjectConverter = parametersToJsonObjectConverter;
     }
 
-    ReceptionistResponse persistAction(ReceptionistResponse response,
-                                       Object[] parameters, ActionPersistentReceptionist actionPersistentReceptionist) {
+    public void persist(ReceptionistResponse response, Object[] parameters) {
+        if(response.isSucessStatus())
+            persistActionAsJson(createActionAsJson(response, parameters));
+    }
 
-        if(response.isSucessStatus()) {
-            JsonObject actionAsJson = new JsonObject()
-                    .add(ACTION_NAME_KEY, actionName)
-                    .add(PARAMETERS_KEY, parametersToJsonObjectConverter.apply(parameters))
-                    .add(RETURN_KEY, returnClosure.apply(response));
-
-            try {
-                writer.write(actionAsJson.toString());
-                writer.write("\n");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+    private void persistActionAsJson(JsonObject actionAsJson) {
+        try {
+            writer.write(actionAsJson.toString());
+            writer.write("\n");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+    }
 
-        return response;
+    private JsonObject createActionAsJson(ReceptionistResponse response, Object[] parameters) {
+        return new JsonObject()
+                .add(ACTION_NAME_KEY, actionName)
+                .add(PARAMETERS_KEY, parametersToJsonObjectConverter.apply(parameters))
+                .add(RETURN_KEY, returnClosure.apply(response));
     }
 
 }
