@@ -21,6 +21,7 @@ public class PersistenceTest {
     private TestObjectsBucket testObjectsBucket;
     private StringWriter writer;
     private Receptionist receptionist;
+    private LineNumberReader reader;
 
     @BeforeEach
     public void setUp() throws NoSuchMethodException {
@@ -331,7 +332,6 @@ public class PersistenceTest {
 
     }
 
-
     private void assertActionInLineNumberIs(int lineNumber, String actionName, JsonObject parameters, JsonObject returned) throws IOException {
         JsonObject savedJson = Json.parse(lineAt(lineNumber)).asObject();
 
@@ -344,6 +344,8 @@ public class PersistenceTest {
         assertEquals(
                 returned,
                 savedJson.get(PersistentAction.RETURN_KEY).asObject());
+        // Por correcta sugerencia de Nico PM
+        assertNull(reader.readLine());
     }
 
     private void assertNumberOfSavedActionsAre(int numberOfSavedActions) throws IOException {
@@ -351,7 +353,7 @@ public class PersistenceTest {
     }
 
     private String lineAt(int numberOfSavedActions) throws IOException {
-        LineNumberReader reader = new LineNumberReader(new StringReader(writer.toString()));
+        reader = new LineNumberReader(new StringReader(writer.toString()));
 
         for (int currentLineNumber = 0; currentLineNumber < numberOfSavedActions; currentLineNumber++)
             reader.readLine();

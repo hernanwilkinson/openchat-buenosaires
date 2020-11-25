@@ -99,16 +99,13 @@ public class ActionPersistentReceptionist implements InvocationHandler {
         return response;
     }
 
-    public void persistActionIfNecessary(Method method, Object[] args, ReceptionistResponse response) {
+    private void persistActionIfNecessary(Method method, Object[] args, ReceptionistResponse response) {
         final PersistentAction persistentAction = persistentActions.get(method);
         if (persistentAction != null)
-            persistentAction.persist(
-                    response,
-                    args
-            );
+            persistentAction.persist(response, args);
     }
 
-    public ReceptionistResponse forwardMessageToReceptionist(Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
+    private ReceptionistResponse forwardMessageToReceptionist(Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
         return (ReceptionistResponse) method.invoke(receptionist, args);
     }
 }
