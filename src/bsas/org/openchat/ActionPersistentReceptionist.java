@@ -31,7 +31,7 @@ public class ActionPersistentReceptionist implements InvocationHandler {
         createLikePublicationAction(writer);
     }
 
-    public static Receptionist asProxyOf(RestReceptionist receptionist, Writer writer) throws NoSuchMethodException {
+    public static Receptionist decorating(RestReceptionist receptionist, Writer writer) throws NoSuchMethodException {
         return (Receptionist) Proxy.newProxyInstance(
                 ClassLoader.getSystemClassLoader(),
                 new Class[]{Receptionist.class},

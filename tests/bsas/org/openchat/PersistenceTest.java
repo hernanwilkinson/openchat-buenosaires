@@ -26,7 +26,7 @@ public class PersistenceTest {
     public void setUp() throws NoSuchMethodException {
         testObjectsBucket = new TestObjectsBucket();
         writer = new StringWriter();
-        receptionist = ActionPersistentReceptionist.asProxyOf(
+        receptionist = ActionPersistentReceptionist.decorating(
                 new RestReceptionist(new OpenChatSystem(testObjectsBucket.fixedNowClock())),
                 writer);
     }

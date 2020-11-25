@@ -11,7 +11,7 @@ public class RecoverExample {
         System.out.println("Creating data ...");
         final String fileName = "openchat.data";
         final FileWriter writer = new FileWriter(fileName);
-        new LoadExample().load(ActionPersistentReceptionist.asProxyOf(
+        new LoadExample().load(ActionPersistentReceptionist.decorating(
                 new RestReceptionist(new OpenChatSystem(()-> LocalDateTime.now())),
                 writer));
 
