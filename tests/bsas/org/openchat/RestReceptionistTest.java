@@ -4,6 +4,8 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.eclipse.jetty.http.HttpStatus.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -125,13 +127,13 @@ public class RestReceptionistTest {
     public void invalidUserCanNotPublish() {
         receptionist = createReceptionist();
 
-        final String invalidUserId = "";
+        final String invalidUserId = UUID.randomUUID().toString();
         ReceptionistResponse publicationResponse = receptionist.addPublication(
                 invalidUserId,
                 messageBodyAsJsonFor("something"));
 
         assertTrue(publicationResponse.isStatus(BAD_REQUEST_400));
-        assertEquals(RestReceptionist.INVALID_CREDENTIALS,publicationResponse.responseBody());
+        assertEquals(OpenChatSystem.USER_NOT_REGISTERED,publicationResponse.responseBody());
     }
     @Test
     public void timelineReturnsUserPublications() {
@@ -204,7 +206,7 @@ public class RestReceptionistTest {
                 publicationIdFrom(publicationResponse),likerAsJson);
 
         assertTrue(likeResponse.isStatus(BAD_REQUEST_400));
-        assertEquals(RestReceptionist.INVALID_CREDENTIALS,likeResponse.responseBody());
+        assertEquals(OpenChatSystem.USER_NOT_REGISTERED,likeResponse.responseBody());
     }
     @Test
     public void canNotLikeNotPublishedPublication() {

@@ -1,23 +1,29 @@
 package bsas.org.openchat;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Publication {
     public static final String INAPPROPRIATE_WORD = "Post contains inappropriate language.";
     public static final List<String> inappropriateWords =
-            Collections.unmodifiableList(Arrays.asList("elephant","ice cream","orange"));
+            List.of("elephant", "ice cream", "orange");
 
+    private final String id;
     private final Publisher publisher;
     private final String message;
     private final LocalDateTime publicationTime;
+    private final Set<Publisher> likers;
 
     public Publication(Publisher publisher, String message, LocalDateTime publicationTime) {
+        this(publisher, message, publicationTime, UUID.randomUUID().toString());
+    }
+
+    public Publication(Publisher publisher, String message, LocalDateTime publicationTime, String id) {
         this.publisher = publisher;
         this.message = message;
         this.publicationTime = publicationTime;
+        this.id = id;
+        this.likers = new HashSet<>();
     }
 
     public static Publication madeBy(Publisher publisher, String message, LocalDateTime publicationTime) {
@@ -60,5 +66,25 @@ public class Publication {
 
     public User publisherRelatedUser(){
         return publisher.relatedUser();
+    }
+
+    public String id() {
+        return id;
+    }
+
+    public boolean isIdentifiedAs(String potentialId) {
+        return id.equals(potentialId);
+    }
+
+    String userId() {
+        return publisherRelatedUser().id();
+    }
+
+    public int likes(){
+        return likers.size();
+    }
+
+    void addLiker(Publisher liker) {
+        likers.add(liker);
     }
 }

@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class OpenChatSystem {
     public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Username already in use.";
@@ -11,7 +12,6 @@ public class OpenChatSystem {
     public static final String INVALID_PUBLICATION = "Invalid post";
 
     private final Map<String,UserCard> userCards = new HashMap<>();
-    private final Map<Publication,Set<Publisher>> likersByPublication = new HashMap<>();
     private final Clock clock;
 
     public OpenChatSystem(Clock clock){
@@ -27,16 +27,20 @@ public class OpenChatSystem {
 
         final User newUser = User.named(userName, about,homePage);
         userCards.put(
-                userName,
+                newUser.id(),
                 UserCard.of(newUser,password, Publisher.relatedTo(newUser)));
 
         return newUser;
     }
 
     public boolean hasUserNamed(String potentialUserName) {
-        //Uso userCardForUserName en vez de hacer userCards.get
-        //para que la búsqueda por nombre esté en un solo lugar
-        return userCardForUserName(potentialUserName).isPresent();
+        return userNamed(potentialUserName).isPresent();
+    }
+
+    public Optional<UserCard> userNamed(String potentialUserName) {
+        return userCards.values().stream()
+                .filter(userCard -> userCard.isUserNamed(potentialUserName))
+                .findFirst();
     }
 
     public int numberOfUsers() {
@@ -51,32 +55,31 @@ public class OpenChatSystem {
                 .orElseGet(failedClosure);
     }
 
-    public Publication publishForUserNamed(String userName, String message) {
-        final Publication newPublication = publisherForUserNamed(userName).publish(message, clock.now());
-        likersByPublication.put(newPublication,new HashSet<>());
+    public Publication publishForUserIdentifiedAs(String userId, String message) {
+        final Publication newPublication = publisherIdentifiedAs(userId).publish(message, clock.now());
 
         return newPublication;
     }
 
-    public List<Publication> timeLineForUserNamed(String userName) {
-        return publisherForUserNamed(userName).timeLine();
+    public List<Publication> timeLineOfUserIdentifiedAs(String userId) {
+        return publisherIdentifiedAs(userId).timeLine();
     }
 
-    public void followForUserNamed(String followedUserName, String followerUserName) {
-        Publisher followed = publisherForUserNamed(followedUserName);
-        Publisher follower = publisherForUserNamed(followerUserName);
+    public void followedByFollowerIdentifiedAs(String followedUserId, String followerUserId) {
+        Publisher followed = publisherIdentifiedAs(followedUserId);
+        Publisher follower = publisherIdentifiedAs(followerUserId);
 
         followed.followedBy(follower);
     }
 
-    public List<User> followersOfUserNamed(String userName) {
-        return publisherForUserNamed(userName).followers().stream()
+    public List<User> followersOfUserIdentifiedAs(String userId) {
+        return publisherIdentifiedAs(userId).followers().stream()
                 .map(publisher -> publisher.relatedUser())
                 .collect(Collectors.toList());
     }
 
-    public List<Publication> wallForUserNamed(String userName) {
-        return publisherForUserNamed(userName).wall();
+    public List<Publication> wallOfUserIdentifiedAs(String userId) {
+        return publisherIdentifiedAs(userId).wall();
     }
 
     public List<User> users() {
@@ -91,38 +94,43 @@ public class OpenChatSystem {
     }
 
     private Optional<User> authenticatedUser(String userName, String password) {
-        return userCardForUserName(userName)
+        return userNamed(userName)
                 .filter(foundCard -> foundCard.isPassword(password))
                 .map(foundCard -> foundCard.user());
     }
 
-    private Optional<UserCard> userCardForUserName(String userName) {
-        return Optional.ofNullable(userCards.get(userName));
+    private Optional<UserCard> userCardIdentifiedAs(String userId) {
+        return Optional.ofNullable(userCards.get(userId));
     }
 
-    private Publisher publisherForUserNamed(String userName) {
-        return userCardForUserName(userName)
+    private Publisher publisherIdentifiedAs(String userId) {
+        return userCardIdentifiedAs(userId)
                 .map(userCard -> userCard.publisher())
                 .orElseThrow(()-> new ModelException(USER_NOT_REGISTERED));
     }
 
     public int likesOf(Publication publication) {
-        return likersOf(publication).size();
+        return publication.likes();
     }
 
-    public int likePublication(Publication publication, String userName) {
-        final Set<Publisher> likers = likersOf(publication);
+    public int likePublication(Publication externalPublication, String userId) {
+        final Publication publication = publicationIdentifiedAs(externalPublication.id());
 
-        likers.add(publisherForUserNamed(userName));
+        publication.addLiker(publisherIdentifiedAs(userId));
 
-        return likers.size();
+        return publication.likes();
     }
 
-    private Set<Publisher> likersOf(Publication publication) {
-        final Set<Publisher> likers = likersByPublication.get(publication);
-        if (likers == null) throw new ModelException(INVALID_PUBLICATION);
+    public int likePublicationIdentifiedAs(String publicationId, String userName) {
+        return likePublication(publicationIdentifiedAs(publicationId),userName);
+    }
 
-        return likers;
+    private Publication publicationIdentifiedAs(String publicationId) {
+        return userCards.values().stream()
+                .flatMap(userCard->userCard.publications())
+                .filter(publication -> publication.isIdentifiedAs(publicationId))
+                .findFirst()
+                .orElseThrow(()->new ModelException(INVALID_PUBLICATION));
     }
 
     private static class UserCard {
@@ -151,6 +159,14 @@ public class OpenChatSystem {
 
         public Publisher publisher() {
             return publisher;
+        }
+
+        public Stream<Publication> publications() {
+            return publisher.publications();
+        }
+
+        public boolean isUserNamed(String potentialUserName) {
+            return user.isNamed(potentialUserName);
         }
     }
 }
