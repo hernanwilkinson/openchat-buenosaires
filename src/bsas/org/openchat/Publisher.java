@@ -1,5 +1,6 @@
 package bsas.org.openchat;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,13 +8,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Entity
+@Table(name="PUBLISHERS")
 public class Publisher {
     public static final String CANNOT_FOLLOW_SELF = "Can not follow self";
     public static final String CANNOT_FOLLOW_TWICE = "Can not follow publisher twice";
 
-    private final List<Publisher> followers = new ArrayList<>();
-    private final List<Publication> publications = new ArrayList<>();
-    private final User user;
+    @Id
+    @GeneratedValue
+    private long pid;
+    @OneToMany
+    private List<Publisher> followers = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Publication> publications = new ArrayList<>();
+    @Embedded
+    private User user;
+
+    public Publisher() {
+    }
 
     public static Publisher relatedTo(User user){
         return new Publisher(user);

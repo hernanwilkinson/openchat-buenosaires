@@ -1,54 +1,43 @@
 package bsas.org.openchat;
 
-import java.util.*;
+import com.sun.xml.bind.v2.schemagen.episode.SchemaBindings;
+
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class OpenChatSystem {
+public abstract class OpenChatSystem {
     public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Username already in use.";
     public static final String USER_NOT_REGISTERED = "User not registered";
     public static final String INVALID_PUBLICATION = "Invalid post";
+    protected final Clock clock;
 
-    private final Map<String,UserCard> userCards = new HashMap<>();
-    private final Clock clock;
-
-    public OpenChatSystem(Clock clock){
+    public OpenChatSystem(Clock clock) {
         this.clock = clock;
     }
 
-    public boolean hasUsers() {
-        return !userCards.isEmpty();
-    }
+    public abstract void start();
 
-    public User register(String userName, String password, String about, String homePage) {
-        assertIsNotDuplicated(userName);
+    public abstract void beginTransaction();
 
-        final User newUser = User.named(userName, about,homePage);
-        userCards.put(
-                newUser.id(),
-                UserCard.of(newUser,password, Publisher.relatedTo(newUser)));
+    public abstract void commit();
 
-        return newUser;
-    }
+    public abstract void stop();
 
-    public boolean hasUserNamed(String potentialUserName) {
-        return userNamed(potentialUserName).isPresent();
-    }
+    public abstract boolean hasUsers();
 
-    public Optional<UserCard> userNamed(String potentialUserName) {
-        return userCards.values().stream()
-                .filter(userCard -> userCard.isUserNamed(potentialUserName))
-                .findFirst();
-    }
+    public abstract User register(String userName, String password, String about, String homePage);
 
-    public int numberOfUsers() {
-        return userCards.size();
-    }
+    public abstract boolean hasUserNamed(String potentialUserName);
+
+    public abstract Optional<UserCard> userNamed(String potentialUserName);
+
+    public abstract int numberOfUsers();
 
     public <T> T withAuthenticatedUserDo(String userName, String password,
-                                         Function<User,T> authenticatedClosure,
+                                         Function<User, T> authenticatedClosure,
                                          Supplier<T> failedClosure) {
         return authenticatedUser(userName, password)
                 .map(authenticatedClosure)
@@ -82,91 +71,33 @@ public class OpenChatSystem {
         return publisherIdentifiedAs(userId).wall();
     }
 
-    public List<User> users() {
-        return userCards.values().stream()
-                .map(userCard->userCard.user())
-                .collect(Collectors.toList());
-    }
+    public abstract List<User> users();
 
-    private void assertIsNotDuplicated(String userName) {
+    public void assertIsNotDuplicated(String userName) {
         if(hasUserNamed(userName))
             throw new ModelException(CANNOT_REGISTER_SAME_USER_TWICE);
     }
 
-    private Optional<User> authenticatedUser(String userName, String password) {
+    Optional<User> authenticatedUser(String userName, String password) {
         return userNamed(userName)
                 .filter(foundCard -> foundCard.isPassword(password))
                 .map(foundCard -> foundCard.user());
     }
 
-    private Optional<UserCard> userCardIdentifiedAs(String userId) {
-        return Optional.ofNullable(userCards.get(userId));
-    }
-
-    private Publisher publisherIdentifiedAs(String userId) {
+    protected Publisher publisherIdentifiedAs(String userId) {
         return userCardIdentifiedAs(userId)
                 .map(userCard -> userCard.publisher())
                 .orElseThrow(()-> new ModelException(USER_NOT_REGISTERED));
     }
 
-    public int likesOf(Publication publication) {
-        return publication.likes();
-    }
-
-    public int likePublication(Publication externalPublication, String userId) {
-        final Publication publication = publicationIdentifiedAs(externalPublication.id());
-
-        publication.addLiker(publisherIdentifiedAs(userId));
-
-        return publication.likes();
-    }
+    protected abstract Optional<UserCard> userCardIdentifiedAs(String userId);
 
     public int likePublicationIdentifiedAs(String publicationId, String userName) {
-        return likePublication(publicationIdentifiedAs(publicationId),userName);
+        final Publication publication = publicationIdentifiedAs(publicationIdentifiedAs(publicationId).id());
+        publication.addLiker(publisherIdentifiedAs(userName));
+
+        return publication.likes();
     }
 
-    private Publication publicationIdentifiedAs(String publicationId) {
-        return userCards.values().stream()
-                .flatMap(userCard->userCard.publications())
-                .filter(publication -> publication.isIdentifiedAs(publicationId))
-                .findFirst()
-                .orElseThrow(()->new ModelException(INVALID_PUBLICATION));
-    }
-
-    private static class UserCard {
-
-        private final User user;
-        private final String password;
-        private final Publisher publisher;
-
-        public UserCard(User user, String password, Publisher publisher) {
-            this.user = user;
-            this.password = password;
-            this.publisher = publisher;
-        }
-
-        public static UserCard of(User user, String password, Publisher publisher) {
-            return new UserCard(user,password,publisher);
-        }
-
-        public User user() {
-            return user;
-        }
-
-        public boolean isPassword(String potentialPassword) {
-            return password.equals(potentialPassword);
-        }
-
-        public Publisher publisher() {
-            return publisher;
-        }
-
-        public Stream<Publication> publications() {
-            return publisher.publications();
-        }
-
-        public boolean isUserNamed(String potentialUserName) {
-            return user.isNamed(potentialUserName);
-        }
-    }
+    protected abstract Publication publicationIdentifiedAs(String publicationId);
 }

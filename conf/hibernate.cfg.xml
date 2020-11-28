@@ -52,6 +52,10 @@
         <property name="hbm2ddl.auto">create</property>
 
         <!-- Names the annotated entity class -->
+        <mapping class="bsas.org.openchat.Publication"/>
+        <mapping class="bsas.org.openchat.Publisher"/>
+        <mapping class="bsas.org.openchat.User"/>
+        <mapping class="bsas.org.openchat.UserCard"/>
 
     </session-factory>
 

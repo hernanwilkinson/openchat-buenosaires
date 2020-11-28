@@ -1,5 +1,7 @@
 package bsas.org.openchat;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,21 +14,30 @@ import java.util.UUID;
 public class OpenChatSystemTest {
 
     private OpenChatSystem system;
-    private TestObjectsBucket testObjects = new TestObjectsBucket();
+    private TestObjectsBucket testObjects;
+
+    @BeforeEach
+    public void setUp() {
+        testObjects = new TestObjectsBucket();
+        system = Environment.current().createSystem(testObjects.fixedNowClock());
+        system.start();
+        system.beginTransaction();
+    }
+
+    @AfterEach
+    public void tearDown(){
+        system.commit();
+        system.stop();
+    }
 
     @Test
     public void createSystemHasNoUsers() {
-        //No lo inicializo en el setup por si quiero hacer restart del
-        //contexto mientras debuggeo
-        system = createSystem();
-
         assertFalse(system.hasUsers());
         assertFalse(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
         assertEquals(0, system.numberOfUsers());
     }
     @Test
     public void canRegisterUser() {
-        system = createSystem();
         User registeredUser = registerPepeSanchez();
 
         assertTrue(system.hasUsers());
@@ -40,7 +51,6 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canRegisterManyUsers() {
-        system = createSystem();
         registerPepeSanchez();
         registerJuanPerez();
 
@@ -51,7 +61,6 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canNotRegisterSameUserTwice() {
-        system = createSystem();
         registerPepeSanchez();
 
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
@@ -64,7 +73,6 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canWorkWithAuthenticatedUser() {
-        system = createSystem();
         final User registeredUser = registerPepeSanchez();
 
         final Object token = new Object();
@@ -78,19 +86,16 @@ public class OpenChatSystemTest {
     }
     @Test
     public void notRegisteredUserIsNotAuthenticated() {
-        system = createSystem();
         assertCanNotAuthenticatePepeSanchezWith(TestObjectsBucket.PEPE_SANCHEZ_PASSWORD);
     }
     @Test
     public void canNotAuthenticateWithInvalidPassword() {
-        system = createSystem();
         registerPepeSanchez();
 
         assertCanNotAuthenticatePepeSanchezWith(TestObjectsBucket.PEPE_SANCHEZ_PASSWORD+"something");
     }
     @Test
     public void registeredUserCanPublish() {
-        system = createSystem();
         final User registeredUser = registerPepeSanchez();
 
         Publication publication = system.publishForUserIdentifiedAs(registeredUser.id(),"hello");
@@ -100,23 +105,18 @@ public class OpenChatSystemTest {
     }
     @Test
     public void noRegisteredUserCanNotPublish() {
-        system = createSystem();
-
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
                 ()->system.publishForUserIdentifiedAs(UUID.randomUUID().toString(),"hello"),
                 OpenChatSystem.USER_NOT_REGISTERED);
     }
     @Test
-    public void noRegisteredUserCanAskItsTimeline() {
-        system = createSystem();
-
+    public void noRegisteredUserCanNotAskItsTimeline() {
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
                 ()->system.timeLineOfUserIdentifiedAs(UUID.randomUUID().toString()),
                 OpenChatSystem.USER_NOT_REGISTERED);
     }
     @Test
     public void canFollowRegisteredUser() {
-        system = createSystem();
         final User followed = registerPepeSanchez();
         final User follower = registerJuanPerez();
 
@@ -127,7 +127,6 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canGetWallOfRegisteredUser() {
-        system = createSystem();
         final User followed = registerPepeSanchez();
         final User follower = registerJuanPerez();
         system.followedByFollowerIdentifiedAs(followed.id(), follower.id());
@@ -141,55 +140,50 @@ public class OpenChatSystemTest {
     }
     @Test
     public void publicationsHaveNoLikesWhenCreated() {
-        system = createSystem();
         final User registeredUser = registerPepeSanchez();
 
         Publication publication = system.publishForUserIdentifiedAs(registeredUser.id(),"hello");
-        assertEquals(0,system.likesOf(publication));
+        assertEquals(0, publication.likes());
     }
     @Test
     public void registeredUserCanLikePublication() {
-        system = createSystem();
         final User publisher = registerPepeSanchez();
         final User liker = registerJuanPerez();
 
         Publication publication = system.publishForUserIdentifiedAs(publisher.id(),"hello");
-        int likes = system.likePublication(publication,liker.id());
+        int likes = system.likePublicationIdentifiedAs(publication.id(),liker.id());
 
         assertEquals(1,likes);
-        assertEquals(1,system.likesOf(publication));
+        assertEquals(1, publication.likes());
     }
     @Test
     public void canNotLikeNotPublishPublication() {
-        system = createSystem();
         User registeredUser = registerPepeSanchez();
 
         Publication publication = Publication.madeBy(Publisher.relatedTo(registeredUser),"hello", testObjects.now());
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
-                ()->system.likePublication(publication,registeredUser.id()),
+                ()->system.likePublicationIdentifiedAs(publication.id(),registeredUser.id()),
                 OpenChatSystem.INVALID_PUBLICATION);
     }
     @Test
     public void likesByUserCountOnlyOnce() {
-        system = createSystem();
         final User publisher = registerPepeSanchez();
         final User liker = registerJuanPerez();
 
         Publication publication = system.publishForUserIdentifiedAs(publisher.id(),"hello");
-        system.likePublication(publication,liker.id());
-        int likes = system.likePublication(publication,liker.id());
+        system.likePublicationIdentifiedAs(publication.id(),liker.id());
+        int likes = system.likePublicationIdentifiedAs(publication.id(),liker.id());
 
         assertEquals(1,likes);
-        assertEquals(1,system.likesOf(publication));
+        assertEquals(1, publication.likes());
     }
     @Test
     public void notRegisteredUserCanNotLikePublication() {
-        system = createSystem();
         final User publisher = registerPepeSanchez();
 
         Publication publication = system.publishForUserIdentifiedAs(publisher.id(),"hello");
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
-                ()->system.likePublication(publication,UUID.randomUUID().toString()),
+                ()->system.likePublicationIdentifiedAs(publication.id(),UUID.randomUUID().toString()),
                 OpenChatSystem.USER_NOT_REGISTERED);
     }
 
@@ -202,10 +196,6 @@ public class OpenChatSystemTest {
                 ()-> token);
 
         assertEquals(token,notAuthenticatedToken);
-    }
-
-    private OpenChatSystem createSystem() {
-        return new OpenChatSystem(testObjects.fixedNowClock());
     }
 
     private User registerPepeSanchez() {

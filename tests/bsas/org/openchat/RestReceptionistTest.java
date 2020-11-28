@@ -2,6 +2,8 @@ package bsas.org.openchat;
 
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -12,23 +14,33 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class RestReceptionistTest {
 
-    private final TestObjectsBucket testObjects = new TestObjectsBucket();
+    private TestObjectsBucket testObjects;
     private RestReceptionist receptionist;
+    private TransientOpenChatSystem system;
+
+    @BeforeEach
+    public void setUp() {
+        testObjects = new TestObjectsBucket();
+        system = new TransientOpenChatSystem(testObjects.fixedNowClock());
+        system.start();
+        system.beginTransaction();
+        receptionist = new RestReceptionist(system);
+    }
+
+    @AfterEach
+    public void tearDown(){
+        system.commit();
+        system.stop();
+    }
 
     @Test
     public void canRegisterUserWithValidData() {
-        //No lo inicializo en el setUp por si quiero hacer restart
-        //del contexto cuando debuggeo
-        receptionist = createReceptionist();
-
         ReceptionistResponse response = registerJuanPerez();
 
         assertJuanPerezOk(response, CREATED_201);
     }
     @Test
     public void canNotRegisterDuplicatedUser() {
-        receptionist = createReceptionist();
-
         registerJuanPerez();
         ReceptionistResponse response = registerJuanPerez();
 
@@ -37,7 +49,6 @@ public class RestReceptionistTest {
     }
     @Test
     public void canLoginRegisteredUserWithValidCredentials() {
-        receptionist = createReceptionist();
         registerJuanPerez();
 
         ReceptionistResponse response = receptionist.login(juanPerezLoginBodyAsJson());
@@ -46,7 +57,6 @@ public class RestReceptionistTest {
     }
     @Test
     public void canNotLoginWithInvalidCredentials() {
-        receptionist = createReceptionist();
         registerJuanPerez();
 
         final JsonObject invalidJuanPerezLoginBodyAsJson = juanPerezLoginBodyAsJson();
@@ -61,7 +71,6 @@ public class RestReceptionistTest {
     }
     @Test
     public void usersReturnsAllRegisteredUsers() {
-        receptionist = createReceptionist();
         registerJuanPerez();
 
         ReceptionistResponse response = receptionist.users();
@@ -97,7 +106,6 @@ public class RestReceptionistTest {
     }
     @Test
     public void registeredUserCanPublishAppropriateMessage() {
-        receptionist = createReceptionist();
         ReceptionistResponse registeredUserResponse = registerJuanPerez();
 
         final String publicationMessage = "hello";
@@ -115,7 +123,6 @@ public class RestReceptionistTest {
 
     @Test
     public void canNotPublishInappropriateWords() {
-        receptionist = createReceptionist();
         ReceptionistResponse registeredUserResponse = registerJuanPerez();
 
         ReceptionistResponse publicationResponse = publishMessageOf(registeredUserResponse,"elephant");
@@ -125,8 +132,6 @@ public class RestReceptionistTest {
     }
     @Test
     public void invalidUserCanNotPublish() {
-        receptionist = createReceptionist();
-
         final String invalidUserId = UUID.randomUUID().toString();
         ReceptionistResponse publicationResponse = receptionist.addPublication(
                 invalidUserId,
@@ -137,7 +142,6 @@ public class RestReceptionistTest {
     }
     @Test
     public void timelineReturnsUserPublications() {
-        receptionist = createReceptionist();
         ReceptionistResponse registeredUserResponse = registerJuanPerez();
 
         ReceptionistResponse publicationResponse = publishMessageOf(
@@ -176,7 +180,6 @@ public class RestReceptionistTest {
     }
     @Test
     public void userCanLikePublication() {
-        receptionist = createReceptionist();
         ReceptionistResponse publisherUserResponse = registerJuanPerez();
         ReceptionistResponse likerUserResponse = registerPepeSanchez();
 
@@ -194,7 +197,6 @@ public class RestReceptionistTest {
 
     @Test
     public void notRegisteredUserCanNotLikePublication() {
-        receptionist = createReceptionist();
         ReceptionistResponse publisherUserResponse = registerJuanPerez();
 
         ReceptionistResponse publicationResponse = publishMessageOf(publisherUserResponse, "Hello");
@@ -210,7 +212,6 @@ public class RestReceptionistTest {
     }
     @Test
     public void canNotLikeNotPublishedPublication() {
-        receptionist = createReceptionist();
         ReceptionistResponse publisherUserResponse = registerJuanPerez();
 
         ReceptionistResponse likeResponse = receptionist.likePublicationIdentifiedAs(
@@ -221,7 +222,6 @@ public class RestReceptionistTest {
     }
     @Test
     public void timelineIncludesLikes() {
-        receptionist = createReceptionist();
         ReceptionistResponse publisherUserResponse = registerJuanPerez();
         ReceptionistResponse likerUserResponse = registerPepeSanchez();
 
@@ -243,10 +243,6 @@ public class RestReceptionistTest {
 
     private String publicationIdFrom(ReceptionistResponse publicationResponse) {
         return publicationResponse.responseBodyAsJson().getString(RestReceptionist.POST_ID_KEY, "");
-    }
-
-    private RestReceptionist createReceptionist() {
-        return new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
     }
 
     private ReceptionistResponse registerJuanPerez() {
@@ -312,7 +308,6 @@ public class RestReceptionistTest {
 
     private void makePepeSanchezFollowJuanPerezAndAssert(
             FollowingsAssertion assertions) {
-        receptionist = createReceptionist();
         ReceptionistResponse followedResponse = registerPepeSanchez();
         ReceptionistResponse followerResponse = registerJuanPerez();
 

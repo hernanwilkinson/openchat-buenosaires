@@ -1,14 +1,25 @@
 package bsas.org.openchat;
 
+import com.sun.istack.NotNull;
+
+import javax.persistence.Embeddable;
 import java.util.UUID;
 
+@Embeddable
 public class User {
     public static final String NAME_CANNOT_BE_BLANK = "Name can not be blank";
 
-    private final String id;
-    private final String name;
-    private final String about;
-    private final String homePage;
+    @NotNull
+    private String id;
+    @NotNull
+    private String name;
+    @NotNull
+    private String about;
+    @NotNull
+    private String homePage;
+
+    public User() {
+    }
 
     public static User named(String name, String about, String homePage) {
         assertNameIsNotBlank(name);
@@ -49,9 +60,5 @@ public class User {
 
     public String id() {
         return id;
-    }
-
-    public boolean isIdentifiedAs(String potentialId) {
-        return id.equals(potentialId);
     }
 }

@@ -1,18 +1,32 @@
 package bsas.org.openchat;
 
+import com.sun.istack.NotNull;
+
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Entity
+@Table(name="PUBLICATIONS")
 public class Publication {
     public static final String INAPPROPRIATE_WORD = "Post contains inappropriate language.";
     public static final List<String> inappropriateWords =
             List.of("elephant", "ice cream", "orange");
 
-    private final String id;
-    private final Publisher publisher;
-    private final String message;
-    private final LocalDateTime publicationTime;
-    private final Set<Publisher> likers;
+    @Id
+    @GeneratedValue
+    private long pid;
+    @NotNull
+    private String id;
+    @OneToOne
+    @PrimaryKeyJoinColumn
+    private Publisher publisher;
+    @NotNull
+    private String message;
+    @NotNull
+    private LocalDateTime publicationTime;
+    @OneToMany
+    private Set<Publisher> likers;
 
     public Publication(Publisher publisher, String message, LocalDateTime publicationTime) {
         this(publisher, message, publicationTime, UUID.randomUUID().toString());
@@ -24,6 +38,9 @@ public class Publication {
         this.publicationTime = publicationTime;
         this.id = id;
         this.likers = new HashSet<>();
+    }
+
+    public Publication() {
     }
 
     public static Publication madeBy(Publisher publisher, String message, LocalDateTime publicationTime) {

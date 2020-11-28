@@ -167,7 +167,7 @@ public class RestReceptionist {
                 .add(USER_ID_KEY, userId)
                 .add(TEXT_KEY, publication.message())
                 .add(DATE_TIME_KEY, formatDateTime(publication.publicationTime()))
-                .add(LIKES_KEY,system.likesOf(publication));
+                .add(LIKES_KEY, publication.likes());
     }
 
     private String formatDateTime(LocalDateTime dateTimeToFormat) {
