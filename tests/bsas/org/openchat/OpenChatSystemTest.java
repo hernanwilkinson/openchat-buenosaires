@@ -26,7 +26,7 @@ public class OpenChatSystemTest {
 
     @AfterEach
     public void tearDown(){
-        system.commit();
+        system.commitTransaction();
         system.stop();
     }
 

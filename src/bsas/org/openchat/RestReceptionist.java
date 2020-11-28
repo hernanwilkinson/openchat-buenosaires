@@ -6,6 +6,7 @@ import com.eclipsesource.json.JsonObject;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.eclipse.jetty.http.HttpStatus.*;
@@ -33,92 +34,119 @@ public class RestReceptionist {
 
     public RestReceptionist(OpenChatSystem system) {
         this.system = system;
+        this.system.start();
     }
 
     public ReceptionistResponse registerUser(JsonObject registrationBodyAsJson) {
-        try {
-            User registeredUser = system.register(
-                    userNameFrom(registrationBodyAsJson),
-                    passwordFrom(registrationBodyAsJson),
-                    aboutFrom(registrationBodyAsJson),
-                    homePageFrom(registrationBodyAsJson));
+        return executeInTransaction(()-> {
+            try {
+                User registeredUser = system.register(
+                        userNameFrom(registrationBodyAsJson),
+                        passwordFrom(registrationBodyAsJson),
+                        aboutFrom(registrationBodyAsJson),
+                        homePageFrom(registrationBodyAsJson));
 
-            return new ReceptionistResponse(
-                    CREATED_201,
-                    userResponseAsJson(registeredUser));
-        } catch (ModelException error){
-            return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
+                return new ReceptionistResponse(
+                        CREATED_201,
+                        userResponseAsJson(registeredUser));
+            } catch (ModelException error){
+                return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
+            }
+        });
+    }
+
+    private ReceptionistResponse executeInTransaction(Supplier<ReceptionistResponse> transactionableClosure) {
+        try {
+            system.beginTransaction();
+            final ReceptionistResponse response = transactionableClosure.get();
+            // No necesariamente hay que hacer un rollback si falla puesto que
+            // por cómo está programada la solución, siempre se verifican las
+            // precondiciones antes de hacer algo, pero si llega a existir
+            // algún error de programación dejaría la base inconsistente, por
+            // eso mejor prevenir que curar y rollbackear - Hernan
+            if(response.isSuccessfully())
+                system.commitTransaction();
+            else
+                system.rollbackTransaction();
+
+            return response;
+        } catch (Throwable throwable){
+            system.rollbackTransaction();
+            throw throwable;
         }
     }
 
     public ReceptionistResponse login(JsonObject loginBodyAsJson) {
-        return system.withAuthenticatedUserDo(
-                userNameFrom(loginBodyAsJson),
-                passwordFrom(loginBodyAsJson),
-            authenticatedUser->authenticatedUserResponse(authenticatedUser),
-            ()-> new ReceptionistResponse(NOT_FOUND_404, INVALID_CREDENTIALS));
+        return executeInTransaction(()-> system.withAuthenticatedUserDo(
+                    userNameFrom(loginBodyAsJson),
+                    passwordFrom(loginBodyAsJson),
+                    authenticatedUser -> authenticatedUserResponse(authenticatedUser),
+                    () -> new ReceptionistResponse(NOT_FOUND_404, INVALID_CREDENTIALS)));
     }
 
     public ReceptionistResponse users() {
-        return okResponseWithUserArrayFrom(system.users());
+        return executeInTransaction(()-> okResponseWithUserArrayFrom(system.users()));
     }
 
     public ReceptionistResponse followings(JsonObject followingsBodyAsJson) {
-        String followedId = followingsBodyAsJson.getString(FOLLOWED_ID_KEY,"");
-        String followerId = followingsBodyAsJson.getString(FOLLOWER_ID_KEY,"");
+        return executeInTransaction(()-> {
+            String followedId = followingsBodyAsJson.getString(FOLLOWED_ID_KEY, "");
+            String followerId = followingsBodyAsJson.getString(FOLLOWER_ID_KEY, "");
 
-        try {
-            system.followedByFollowerIdentifiedAs(followedId, followerId);
+            try {
+                system.followedByFollowerIdentifiedAs(followedId, followerId);
 
-            return new ReceptionistResponse(CREATED_201, FOLLOWING_CREATED);
-        } catch (ModelException error){
-            return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
-        }
+                return new ReceptionistResponse(CREATED_201, FOLLOWING_CREATED);
+            } catch (ModelException error) {
+                return new ReceptionistResponse(BAD_REQUEST_400, error.getMessage());
+            }
+        });
     }
 
     public ReceptionistResponse followersOf(String userId) {
-        final List<User> followers = system.followersOfUserIdentifiedAs(userId);
-
-        return okResponseWithUserArrayFrom(followers);
+        return executeInTransaction(()-> okResponseWithUserArrayFrom(
+                system.followersOfUserIdentifiedAs(userId)));
     }
 
     public ReceptionistResponse addPublication(String userId, JsonObject messageBodyAsJson) {
-        try {
-            Publication publication = system.publishForUserIdentifiedAs(
-                    userId,
-                    messageBodyAsJson.getString("text", ""));
+        return executeInTransaction(()-> {
+            try {
+                Publication publication = system.publishForUserIdentifiedAs(
+                        userId,
+                        messageBodyAsJson.getString("text", ""));
 
-            return new ReceptionistResponse(
-                    CREATED_201,
-                    publicationAsJson(userId, publication));
-        } catch (ModelException error){
-            return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
-        }
+                return new ReceptionistResponse(
+                        CREATED_201,
+                        publicationAsJson(userId, publication));
+            } catch (ModelException error) {
+                return new ReceptionistResponse(BAD_REQUEST_400, error.getMessage());
+            }
+        });
     }
 
     public ReceptionistResponse timelineOf(String userId) {
-        List<Publication> timeLine = system.timeLineOfUserIdentifiedAs(userId);
-
-        return publicationsAsJson(timeLine);
+        return executeInTransaction(()-> publicationsAsJson(
+                system.timeLineOfUserIdentifiedAs(userId)));
     }
 
     public ReceptionistResponse wallOf(String userId) {
-        List<Publication> wall = system.wallOfUserIdentifiedAs(userId);
-
-        return publicationsAsJson(wall);
+        return executeInTransaction(()-> publicationsAsJson(
+                system.wallOfUserIdentifiedAs(userId)));
     }
 
     public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
-        try {
-            final String likerId = likerAsJson.getString(USER_ID_KEY, "");
-            int likes = system.likePublicationIdentifiedAs(publicationId, likerId);
+        return executeInTransaction(()-> {
+            try {
+                final String likerId = likerAsJson.getString(USER_ID_KEY, "");
+                int likes = system.likePublicationIdentifiedAs(publicationId, likerId);
 
-            JsonObject likesAsJsonObject = new JsonObject()
-                    .add(LIKES_KEY, likes);
-            return new ReceptionistResponse(OK_200, likesAsJsonObject);
-        } catch (ModelException error) {
-            return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
-        }
+                JsonObject likesAsJsonObject = new JsonObject()
+                        .add(LIKES_KEY, likes);
+                return new ReceptionistResponse(OK_200, likesAsJsonObject);
+            } catch (ModelException error) {
+                return new ReceptionistResponse(BAD_REQUEST_400, error.getMessage());
+            }
+        });
     }
 
     private String passwordFrom(JsonObject registrationAsJson) {

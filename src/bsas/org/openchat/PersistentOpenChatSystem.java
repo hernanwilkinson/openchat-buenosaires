@@ -7,8 +7,11 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PersistentOpenChatSystem extends OpenChatSystem {
     private Session session;
@@ -33,8 +36,13 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
     }
 
     @Override
-    public void commit() {
+    public void commitTransaction() {
         session.getTransaction().commit();
+    }
+
+    @Override
+    public void rollbackTransaction() {
+        session.getTransaction().rollback();
     }
 
     @Override
@@ -81,8 +89,11 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
     }
 
     @Override
-    public List<User> users() {
-        throw new UnsupportedOperationException();
+    public Stream<UserCard> userCardsStream() {
+        return (Stream<UserCard>) session
+                .createCriteria(UserCard.class)
+                .list()
+                .stream();
     }
 
     @Override

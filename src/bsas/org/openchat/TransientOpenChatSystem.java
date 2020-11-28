@@ -1,7 +1,7 @@
 package bsas.org.openchat;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TransientOpenChatSystem extends OpenChatSystem {
 
@@ -21,7 +21,11 @@ public class TransientOpenChatSystem extends OpenChatSystem {
     }
 
     @Override
-    public void commit() {
+    public void commitTransaction() {
+    }
+
+    @Override
+    public void rollbackTransaction() {
     }
 
     @Override
@@ -53,7 +57,7 @@ public class TransientOpenChatSystem extends OpenChatSystem {
 
     @Override
     public Optional<UserCard> userNamed(String potentialUserName) {
-        return userCards.values().stream()
+        return userCardsStream()
                 .filter(userCard -> userCard.isUserNamed(potentialUserName))
                 .findFirst();
     }
@@ -64,10 +68,8 @@ public class TransientOpenChatSystem extends OpenChatSystem {
     }
 
     @Override
-    public List<User> users() {
-        return userCards.values().stream()
-                .map(userCard->userCard.user())
-                .collect(Collectors.toList());
+    public Stream<UserCard> userCardsStream() {
+        return userCards.values().stream();
     }
 
     protected Optional<UserCard> userCardIdentifiedAs(String userId) {
@@ -76,7 +78,7 @@ public class TransientOpenChatSystem extends OpenChatSystem {
 
     @Override
     protected Publication publicationIdentifiedAs(String publicationId) {
-        return userCards.values().stream()
+        return userCardsStream()
                 .flatMap(userCard->userCard.publications())
                 .filter(publication -> publication.isIdentifiedAs(publicationId))
                 .findFirst()

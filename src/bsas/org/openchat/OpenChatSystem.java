@@ -1,12 +1,11 @@
 package bsas.org.openchat;
 
-import com.sun.xml.bind.v2.schemagen.episode.SchemaBindings;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class OpenChatSystem {
     public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Username already in use.";
@@ -22,7 +21,9 @@ public abstract class OpenChatSystem {
 
     public abstract void beginTransaction();
 
-    public abstract void commit();
+    public abstract void commitTransaction();
+
+    public abstract void rollbackTransaction();
 
     public abstract void stop();
 
@@ -71,7 +72,11 @@ public abstract class OpenChatSystem {
         return publisherIdentifiedAs(userId).wall();
     }
 
-    public abstract List<User> users();
+    public List<User> users() {
+        return userCardsStream()
+                .map(userCard->userCard.user())
+                .collect(Collectors.toList());
+    }
 
     public void assertIsNotDuplicated(String userName) {
         if(hasUserNamed(userName))
@@ -89,6 +94,8 @@ public abstract class OpenChatSystem {
                 .map(userCard -> userCard.publisher())
                 .orElseThrow(()-> new ModelException(USER_NOT_REGISTERED));
     }
+
+    public abstract Stream<UserCard> userCardsStream();
 
     protected abstract Optional<UserCard> userCardIdentifiedAs(String userId);
 

@@ -4,6 +4,7 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import org.eclipse.jetty.http.HttpStatus;
 
 public class ReceptionistResponse {
     private final int status;
@@ -40,5 +41,9 @@ public class ReceptionistResponse {
 
     public JsonArray responseBodyAsJsonArray() {
         return Json.parse(responseBody).asArray();
+    }
+
+    public boolean isSuccessfully() {
+        return status>= HttpStatus.OK_200 && status<HttpStatus.MULTIPLE_CHOICES_300;
     }
 }

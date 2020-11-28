@@ -16,20 +16,17 @@ public class RestReceptionistTest {
 
     private TestObjectsBucket testObjects;
     private RestReceptionist receptionist;
-    private TransientOpenChatSystem system;
+    private OpenChatSystem system;
 
     @BeforeEach
     public void setUp() {
         testObjects = new TestObjectsBucket();
-        system = new TransientOpenChatSystem(testObjects.fixedNowClock());
-        system.start();
-        system.beginTransaction();
+        system = DevelopmentEnvironment.current().createSystem(testObjects.fixedNowClock());
         receptionist = new RestReceptionist(system);
     }
 
     @AfterEach
     public void tearDown(){
-        system.commit();
         system.stop();
     }
 
