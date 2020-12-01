@@ -3,8 +3,11 @@ package bsas.org.openchat;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
+
+import java.util.Optional;
 
 public class PersistentOpenChatSystem extends OpenChatSystem {
 
@@ -54,5 +57,15 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
                 userCard);
 
         return newUser;
+    }
+
+    @Override
+    public Optional<UserCard> userNamed(String potentialUserName) {
+        final UserCard found = (UserCard) session
+                .createCriteria(UserCard.class, "userCard")
+                .add(Restrictions.eq("userCard.user.name", potentialUserName))
+                .uniqueResult();
+
+        return Optional.ofNullable(found);
     }
 }
