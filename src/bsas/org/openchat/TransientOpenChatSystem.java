@@ -78,4 +78,8 @@ public class TransientOpenChatSystem extends OpenChatSystem {
     @Override
     public void rollbackTransaction() {
     }
+
+    @Override
+    public void reset() {
+    }
 }

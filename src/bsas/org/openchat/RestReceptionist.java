@@ -70,75 +70,73 @@ public class RestReceptionist {
     }
 
     public ReceptionistResponse login(JsonObject loginBodyAsJson) {
-        return system.withAuthenticatedUserDo(
+        return runInTransaction(()-> system.withAuthenticatedUserDo(
                 userNameFrom(loginBodyAsJson),
                 passwordFrom(loginBodyAsJson),
-            authenticatedUser->authenticatedUserResponse(authenticatedUser),
-            ()-> new ReceptionistResponse(NOT_FOUND_404, INVALID_CREDENTIALS));
-
+                authenticatedUser -> authenticatedUserResponse(authenticatedUser),
+                () -> new ReceptionistResponse(NOT_FOUND_404, INVALID_CREDENTIALS)));
     }
 
     public ReceptionistResponse users() {
-        return okResponseWithUserArrayFrom(system.users());
+        return runInTransaction(()-> okResponseWithUserArrayFrom(system.users()));
     }
 
     public ReceptionistResponse followings(JsonObject followingsBodyAsJson) {
+        return runInTransaction(()-> {
+            String followedId = followingsBodyAsJson.getString(FOLLOWED_ID_KEY, "");
+            String followerId = followingsBodyAsJson.getString(FOLLOWER_ID_KEY, "");
 
-        String followedId = followingsBodyAsJson.getString(FOLLOWED_ID_KEY,"");
-        String followerId = followingsBodyAsJson.getString(FOLLOWER_ID_KEY,"");
+            try {
+                system.followedByFollowerIdentifiedAs(followedId, followerId);
 
-        try {
-            system.followedByFollowerIdentifiedAs(followedId,followerId);
-
-            return new ReceptionistResponse(CREATED_201, FOLLOWING_CREATED);
-        } catch (ModelException error){
-            return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
-        }
+                return new ReceptionistResponse(CREATED_201, FOLLOWING_CREATED);
+            } catch (ModelException error) {
+                return new ReceptionistResponse(BAD_REQUEST_400, error.getMessage());
+            }
+        });
     }
 
     public ReceptionistResponse followersOf(String userId) {
-        final List<User> followers = system.followersOfUserIdentifiedAs(userId);
-
-        return okResponseWithUserArrayFrom(followers);
+        return runInTransaction(()-> okResponseWithUserArrayFrom(system.followersOfUserIdentifiedAs(userId)));
     }
 
     public ReceptionistResponse addPublication(String userId, JsonObject messageBodyAsJson) {
-        try {
-            Publication publication = system.publishForUserIdentifiedAs(
-                    userId,
-                    messageBodyAsJson.getString("text", ""));
+        return runInTransaction(()-> {
+            try {
+                Publication publication = system.publishForUserIdentifiedAs(
+                        userId,
+                        messageBodyAsJson.getString("text", ""));
 
-            return new ReceptionistResponse(
-                    CREATED_201,
-                    publicationAsJson(userId, publication));
-        } catch (ModelException error){
-            return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
-        }
+                return new ReceptionistResponse(
+                        CREATED_201,
+                        publicationAsJson(userId, publication));
+            } catch (ModelException error) {
+                return new ReceptionistResponse(BAD_REQUEST_400, error.getMessage());
+            }
+        });
     }
 
     public ReceptionistResponse timelineOf(String userId) {
-        List<Publication> timeLine = system.timeLineForUserIdentifiedAs(userId);
-
-        return publicationsAsJson(timeLine);
+        return runInTransaction(()-> publicationsAsJson(system.timeLineForUserIdentifiedAs(userId)));
     }
 
     public ReceptionistResponse wallOf(String userId) {
-        List<Publication> wall = system.wallForUserIdentifiedAs(userId);
-
-        return publicationsAsJson(wall);
+        return runInTransaction(()-> publicationsAsJson(system.wallForUserIdentifiedAs(userId)));
     }
 
     public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
-        try {
-            final String userId = likerAsJson.getString(USER_ID_KEY, "");
-            int likes = system.likePublicationIdentifiedAs(publicationId, userId);
+        return runInTransaction(()-> {
+            try {
+                final String userId = likerAsJson.getString(USER_ID_KEY, "");
+                int likes = system.likePublicationIdentifiedAs(publicationId, userId);
 
-            JsonObject likesAsJsonObject = new JsonObject()
-                    .add(LIKES_KEY, likes);
-            return new ReceptionistResponse(OK_200, likesAsJsonObject);
-        } catch (ModelException error) {
-            return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
-        }
+                JsonObject likesAsJsonObject = new JsonObject()
+                        .add(LIKES_KEY, likes);
+                return new ReceptionistResponse(OK_200, likesAsJsonObject);
+            } catch (ModelException error) {
+                return new ReceptionistResponse(BAD_REQUEST_400, error.getMessage());
+            }
+        });
     }
 
     private String passwordFrom(JsonObject registrationAsJson) {

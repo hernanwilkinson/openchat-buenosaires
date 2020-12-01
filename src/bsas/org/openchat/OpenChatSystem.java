@@ -110,4 +110,6 @@ public abstract class OpenChatSystem {
     public abstract void stop();
 
     public abstract void rollbackTransaction();
+
+    public abstract void reset();
 }

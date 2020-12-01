@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 public class PersistentOpenChatSystem extends OpenChatSystem {
 
     private Session session;
+    private static SessionFactory sessionFactory;
 
     public PersistentOpenChatSystem(Clock clock) {
         super(clock);
@@ -20,12 +21,18 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
 
     @Override
     public void start() {
-        Configuration configuration = new Configuration();
-        configuration.configure();
+        session = sessionFactory().openSession();
+    }
 
-        ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
-        SessionFactory sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-        session = sessionFactory.openSession();
+    public static synchronized SessionFactory sessionFactory() {
+        if(sessionFactory==null) {
+            Configuration configuration = new Configuration();
+            configuration.configure();
+
+            ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
+            sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+        }
+        return sessionFactory;
     }
 
     @Override
@@ -46,6 +53,11 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
     @Override
     public void rollbackTransaction() {
         session.getTransaction().rollback();
+    }
+
+    @Override
+    public void reset() {
+        sessionFactory = null;
     }
 
     @Override
