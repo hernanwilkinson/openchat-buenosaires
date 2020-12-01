@@ -1,14 +1,19 @@
 package bsas.org.openchat;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import java.util.UUID;
 
+@Embeddable
 public class User {
     public static final String NAME_CANNOT_BE_BLANK = "Name can not be blank";
 
-    private final String name;
-    private final String about;
-    private final String homePage;
-    private final String restId;
+    @Column(unique = true)
+    private String name;
+    private String about;
+    private String homePage;
+    @Column(unique = true)
+    private String restId;
 
     public static User named(String name, String about, String homePage) {
         return named(name, about, homePage, UUID.randomUUID().toString());

@@ -1,18 +1,29 @@
 package bsas.org.openchat;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
+@Entity
+@Table(name="PUBLICATIONS")
 public class Publication {
     public static final String INAPPROPRIATE_WORD = "Post contains inappropriate language.";
     public static final List<String> inappropriateWords =
             List.of("elephant", "ice cream", "orange");
 
-    private final Publisher publisher;
-    private final String message;
-    private final LocalDateTime publicationTime;
-    private final String restId;
-    private final Set<Publisher> likers;
+    @Id
+    @GeneratedValue
+    private long id;
+    @OneToOne
+    private Publisher publisher;
+    private String message;
+    private LocalDateTime publicationTime;
+    private String restId;
+    @OneToMany
+    private Set<Publisher> likers;
 
     public Publication(Publisher publisher, String message, LocalDateTime publicationTime) {
         this(publisher, message, publicationTime, UUID.randomUUID().toString());

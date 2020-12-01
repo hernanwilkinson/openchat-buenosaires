@@ -1,12 +1,17 @@
 package bsas.org.openchat;
 
+import javax.persistence.*;
 import java.util.stream.Stream;
 
+@Entity
+@Table(name="USERS")
 class UserCard {
 
-    private final User user;
-    private final String password;
-    private final Publisher publisher;
+    @Embedded
+    private User user;
+    private String password;
+    @OneToOne
+    private Publisher publisher;
 
     public UserCard(User user, String password, Publisher publisher) {
         this.user = user;
