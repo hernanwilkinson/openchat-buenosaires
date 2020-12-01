@@ -1,7 +1,8 @@
 package bsas.org.openchat;
 
-public class IntegrationEnvironment {
-    public PersistentOpenChatSystem createSystem(Clock clock) {
+public class IntegrationEnvironment extends Environment {
+    @Override
+    public OpenChatSystem createSystem(Clock clock) {
         return new PersistentOpenChatSystem(clock);
     }
 }

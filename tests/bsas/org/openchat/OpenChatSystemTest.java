@@ -14,7 +14,7 @@ public class OpenChatSystemTest {
 
     private OpenChatSystem system;
     private TestObjectsBucket testObjects;
-    private IntegrationEnvironment environment = new IntegrationEnvironment();
+    private Environment environment = new DevelopmentEnvironment();
 
     @BeforeEach
     public void setUp(){
