@@ -98,7 +98,7 @@ public class OpenChatSystem {
                 .filter(userCard -> userCard.isUserNamed(potentialUserName))
                 .findFirst();
     }
-    private Optional<UserCard> userCardForUserId(String userId) {
+    protected Optional<UserCard> userCardForUserId(String userId) {
         return Optional.ofNullable(userCards.get(userId));
     }
 

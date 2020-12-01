@@ -73,4 +73,14 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
     public int numberOfUsers() {
         return session.createCriteria(UserCard.class).list().size();
     }
+
+    @Override
+    protected Optional<UserCard> userCardForUserId(String userId) {
+        final UserCard found = (UserCard) session
+                .createCriteria(UserCard.class, "userCard")
+                .add(Restrictions.eq("userCard.user.restId", userId))
+                .uniqueResult();
+
+        return Optional.ofNullable(found);
+    }
 }
