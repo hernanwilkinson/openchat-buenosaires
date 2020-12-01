@@ -5,9 +5,7 @@ import com.eclipsesource.json.JsonObject;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.eclipse.jetty.http.HttpStatus.*;
@@ -115,7 +113,7 @@ public class RestReceptionist {
     public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
         try {
             final String userId = likerAsJson.getString(USER_ID_KEY, "");
-            int likes = system.likePublicationIdentifiedAs(userId, publicationId);
+            int likes = system.likePublicationIdentifiedAs(publicationId, userId);
 
             JsonObject likesAsJsonObject = new JsonObject()
                     .add(LIKES_KEY, likes);

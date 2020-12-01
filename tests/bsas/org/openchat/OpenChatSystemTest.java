@@ -151,7 +151,7 @@ public class OpenChatSystemTest {
         final User liker = registerJuanPerez();
 
         Publication publication = system.publishForUserIdentifiedAs(publisher.restId(),"hello");
-        int likes = system.likePublicationIdentifiedAs(liker.restId(), publication.restId());
+        int likes = system.likePublicationIdentifiedAs(publication.restId(), liker.restId());
 
         assertEquals(1,likes);
         assertEquals(1, publication.likes());
@@ -162,7 +162,7 @@ public class OpenChatSystemTest {
 
         Publication publication = Publication.madeBy(Publisher.relatedTo(registeredUser),"hello", testObjects.now());
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
-                ()->system.likePublicationIdentifiedAs(registeredUser.restId(), publication.restId()),
+                ()->system.likePublicationIdentifiedAs(publication.restId(), registeredUser.restId()),
                 OpenChatSystem.INVALID_PUBLICATION);
     }
     @Test
@@ -171,8 +171,8 @@ public class OpenChatSystemTest {
         final User liker = registerJuanPerez();
 
         Publication publication = system.publishForUserIdentifiedAs(publisher.restId(),"hello");
-        system.likePublicationIdentifiedAs(liker.restId(), publication.restId());
-        int likes = system.likePublicationIdentifiedAs(liker.restId(), publication.restId());
+        system.likePublicationIdentifiedAs(publication.restId(), liker.restId());
+        int likes = system.likePublicationIdentifiedAs(publication.restId(), liker.restId());
 
         assertEquals(1,likes);
         assertEquals(1, publication.likes());
@@ -183,7 +183,7 @@ public class OpenChatSystemTest {
 
         Publication publication = system.publishForUserIdentifiedAs(publisher.restId(),"hello");
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
-                ()->system.likePublicationIdentifiedAs(publisher.restId()+"x", publication.restId()),
+                ()->system.likePublicationIdentifiedAs(publication.restId(), publisher.restId()+"x"),
                 OpenChatSystem.USER_NOT_REGISTERED);
     }
 

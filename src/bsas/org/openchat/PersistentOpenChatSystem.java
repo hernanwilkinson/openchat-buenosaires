@@ -83,4 +83,15 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
 
         return Optional.ofNullable(found);
     }
+
+    @Override
+    public Publication publicationIdentifiedAs(String publicationId) {
+        final Publication found = (Publication) session
+                .createCriteria(Publication.class)
+                .add(Restrictions.eq("restId", publicationId))
+                .uniqueResult();
+
+        if(found==null) throw new ModelException(INVALID_PUBLICATION);
+        return found;
+    }
 }
