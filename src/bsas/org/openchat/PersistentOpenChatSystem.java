@@ -7,13 +7,11 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PersistentOpenChatSystem extends OpenChatSystem {
+    private static SessionFactory sessionFactory;
     private Session session;
 
     public PersistentOpenChatSystem(Clock clock) {
@@ -22,12 +20,18 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
 
     @Override
     public void start() {
-        Configuration configuration = new Configuration();
-        configuration.configure();
+        session = sessionFactory().openSession();
+    }
 
-        ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
-        SessionFactory sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-        session = sessionFactory.openSession();
+    public static synchronized SessionFactory sessionFactory() {
+        if(sessionFactory==null) {
+            Configuration configuration = new Configuration();
+            configuration.configure();
+
+            ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
+            sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+        }
+        return sessionFactory;
     }
 
     @Override
@@ -58,8 +62,9 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
 
     @Override
     public User register(String userName, String password, String about, String homePage) {
+        System.out.println("registrando");
         assertIsNotDuplicated(userName);
-
+        //sleep();
         final User newUser = User.named(userName, about,homePage);
         final Publisher newPublisher = Publisher.relatedTo(newUser);
         final UserCard newUserCard = UserCard.of(newUser, password, newPublisher);
@@ -67,6 +72,13 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
         session.persist(newUserCard);
 
         return newUser;
+    }
+
+    public void sleep() {
+        try {
+            Thread.currentThread().sleep(1000);
+        } catch (InterruptedException e) {
+        }
     }
 
     @Override
@@ -115,5 +127,10 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
             throw new ModelException(INVALID_PUBLICATION);
         return found;
 
+    }
+
+    @Override
+    public void reset() {
+        sessionFactory = null;
     }
 }

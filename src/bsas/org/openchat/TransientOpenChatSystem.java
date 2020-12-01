@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 
 public class TransientOpenChatSystem extends OpenChatSystem {
 
-    private Map<String,UserCard> userCards;
+    private Map<String,UserCard> userCards = new HashMap<>();
 
     public TransientOpenChatSystem(Clock clock){
         super(clock);
@@ -13,7 +13,6 @@ public class TransientOpenChatSystem extends OpenChatSystem {
 
     @Override
     public void start() {
-        userCards = new HashMap<>();
     }
 
     @Override
@@ -30,7 +29,6 @@ public class TransientOpenChatSystem extends OpenChatSystem {
 
     @Override
     public void stop() {
-        userCards = null;
     }
 
     @Override
@@ -83,6 +81,10 @@ public class TransientOpenChatSystem extends OpenChatSystem {
                 .filter(publication -> publication.isIdentifiedAs(publicationId))
                 .findFirst()
                 .orElseThrow(()->new ModelException(INVALID_PUBLICATION));
+    }
+
+    @Override
+    public void reset() {
     }
 
 }

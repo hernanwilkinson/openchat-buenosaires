@@ -107,4 +107,6 @@ public abstract class OpenChatSystem {
     }
 
     protected abstract Publication publicationIdentifiedAs(String publicationId);
+
+    public abstract void reset();
 }

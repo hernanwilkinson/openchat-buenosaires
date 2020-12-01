@@ -20,6 +20,7 @@ public class OpenChatSystemTest {
     public void setUp() {
         testObjects = new TestObjectsBucket();
         system = Environment.current().createSystem(testObjects.fixedNowClock());
+        system.reset();
         system.start();
         system.beginTransaction();
     }

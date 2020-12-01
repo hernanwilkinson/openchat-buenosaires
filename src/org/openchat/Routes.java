@@ -1,7 +1,7 @@
 package org.openchat;
 
 import bsas.org.openchat.Environment;
-import bsas.org.openchat.TransientOpenChatSystem;
+import bsas.org.openchat.OpenChatSystem;
 import bsas.org.openchat.ReceptionistResponse;
 import bsas.org.openchat.RestReceptionist;
 import com.eclipsesource.json.Json;
@@ -20,8 +20,8 @@ public class Routes {
     private RestReceptionist receptionist;
 
     public void create() {
-         receptionist = new RestReceptionist(
-                Environment.current().createSystem(() -> LocalDateTime.now()));
+         final OpenChatSystem openChatSystem = Environment.current().createSystem(() -> LocalDateTime.now());
+         receptionist = new RestReceptionist(() -> openChatSystem);
 
         openchatRoutes();
 

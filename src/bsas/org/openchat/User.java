@@ -2,6 +2,7 @@ package bsas.org.openchat;
 
 import com.sun.istack.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ public class User {
     @NotNull
     private String id;
     @NotNull
+    @Column(unique = true)
     private String name;
     @NotNull
     private String about;

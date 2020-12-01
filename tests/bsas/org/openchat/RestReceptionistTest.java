@@ -22,12 +22,12 @@ public class RestReceptionistTest {
     public void setUp() {
         testObjects = new TestObjectsBucket();
         system = DevelopmentEnvironment.current().createSystem(testObjects.fixedNowClock());
-        receptionist = new RestReceptionist(system);
+        system.reset();
+        receptionist = new RestReceptionist(() -> system );
     }
 
     @AfterEach
     public void tearDown(){
-        system.stop();
     }
 
     @Test
