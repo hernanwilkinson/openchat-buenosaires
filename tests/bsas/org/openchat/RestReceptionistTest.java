@@ -244,7 +244,9 @@ public class RestReceptionistTest {
     }
 
     private RestReceptionist createReceptionist() {
-        return new RestReceptionist(new TransientOpenChatSystem(testObjects.fixedNowClock()));
+        final OpenChatSystem system = Environment.current().createSystem(testObjects.fixedNowClock());
+
+        return new RestReceptionist(system);
     }
 
     private ReceptionistResponse registerJuanPerez() {

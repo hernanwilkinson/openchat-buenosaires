@@ -6,6 +6,7 @@ import com.eclipsesource.json.JsonObject;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.Function;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.eclipse.jetty.http.HttpStatus.*;
@@ -36,6 +37,21 @@ public class RestReceptionist {
     }
 
     public ReceptionistResponse registerUser(JsonObject registrationBodyAsJson) {
+        system.start();
+        system.beginTransaction();
+
+        final ReceptionistResponse response = registerUser2(registrationBodyAsJson);
+
+        if(response.isSuccessfully())
+            system.commitTransaction();
+        else
+            system.rollbackTransaction();
+        system.stop();
+
+        return response;
+    }
+
+    public ReceptionistResponse registerUser2(JsonObject registrationBodyAsJson) {
         try {
             User registeredUser = system.register(
                     userNameFrom(registrationBodyAsJson),
@@ -46,8 +62,8 @@ public class RestReceptionist {
             return new ReceptionistResponse(
                     CREATED_201,
                     userResponseAsJson(registeredUser));
-        } catch (ModelException error){
-            return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
+        } catch (ModelException error) {
+            return new ReceptionistResponse(BAD_REQUEST_400, error.getMessage());
         }
     }
 

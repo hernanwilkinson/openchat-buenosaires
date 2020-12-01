@@ -108,4 +108,6 @@ public abstract class OpenChatSystem {
     public abstract void commitTransaction();
 
     public abstract void stop();
+
+    public abstract void rollbackTransaction();
 }

@@ -45,4 +45,8 @@ public class ReceptionistResponse {
     String idFromBody() {
         return responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
     }
+
+    public boolean isSuccessfully() {
+        return status>=200 && status<299;
+    }
 }

@@ -44,6 +44,11 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
     }
 
     @Override
+    public void rollbackTransaction() {
+        session.getTransaction().rollback();
+    }
+
+    @Override
     public User register(String userName, String password, String about, String homePage) {
         assertIsNotDuplicated(userName);
 
