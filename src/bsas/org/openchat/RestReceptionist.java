@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.eclipse.jetty.http.HttpStatus.*;
@@ -33,7 +32,6 @@ public class RestReceptionist {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     private final OpenChatSystem system;
-    private final Map<User,String> idsByUser = new HashMap<>();
 
     public RestReceptionist(OpenChatSystem system) {
         this.system = system;
@@ -47,12 +45,9 @@ public class RestReceptionist {
                     aboutFrom(registrationBodyAsJson),
                     homePageFrom(registrationBodyAsJson));
 
-            final String registeredUserId = UUID.randomUUID().toString();
-            idsByUser.put(registeredUser,registeredUserId);
-
             return new ReceptionistResponse(
                     CREATED_201,
-                    userResponseAsJson(registeredUser, registeredUserId));
+                    userResponseAsJson(registeredUser));
         } catch (ModelException error){
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }
@@ -77,9 +72,7 @@ public class RestReceptionist {
         String followerId = followingsBodyAsJson.getString(FOLLOWER_ID_KEY,"");
 
         try {
-            system.followForUserNamed(
-                    userNameIdentifiedAs(followedId),
-                    userNameIdentifiedAs(followerId));
+            system.followedByFollowerIdentifiedAs(followedId,followerId);
 
             return new ReceptionistResponse(CREATED_201, FOLLOWING_CREATED);
         } catch (ModelException error){
@@ -88,15 +81,16 @@ public class RestReceptionist {
     }
 
     public ReceptionistResponse followersOf(String userId) {
-        final List<User> followers =
-                system.followersOfUserNamed(userNameIdentifiedAs(userId));
+        final List<User> followers = system.followersOfUserIdentifiedAs(userId);
 
         return okResponseWithUserArrayFrom(followers);
     }
 
     public ReceptionistResponse addPublication(String userId, JsonObject messageBodyAsJson) {
         try {
-            Publication publication = system.publishForUserNamed(userNameIdentifiedAs(userId), messageBodyAsJson.getString("text", ""));
+            Publication publication = system.publishForUserIdentifiedAs(
+                    userId,
+                    messageBodyAsJson.getString("text", ""));
 
             return new ReceptionistResponse(
                     CREATED_201,
@@ -107,22 +101,21 @@ public class RestReceptionist {
     }
 
     public ReceptionistResponse timelineOf(String userId) {
-        List<Publication> timeLine =
-                system.timeLineForUserNamed(userNameIdentifiedAs(userId));
+        List<Publication> timeLine = system.timeLineForUserIdentifiedAs(userId);
 
         return publicationsAsJson(timeLine);
     }
 
     public ReceptionistResponse wallOf(String userId) {
-        List<Publication> wall = system.wallForUserNamed(userNameIdentifiedAs(userId));
+        List<Publication> wall = system.wallForUserIdentifiedAs(userId);
 
         return publicationsAsJson(wall);
     }
 
     public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
         try {
-            final String userName = userNameIdentifiedAs(likerAsJson.getString(USER_ID_KEY, ""));
-            int likes = system.likePublicationIdentifiedAs(userName, publicationId);
+            final String userId = likerAsJson.getString(USER_ID_KEY, "");
+            int likes = system.likePublicationIdentifiedAs(userId, publicationId);
 
             JsonObject likesAsJsonObject = new JsonObject()
                     .add(LIKES_KEY, likes);
@@ -148,42 +141,28 @@ public class RestReceptionist {
         return registrationAsJson.getString(HOME_PAGE_KEY, "");
     }
 
-    private JsonObject userResponseAsJson(User registeredUser, String registeredUserId) {
+    private JsonObject userResponseAsJson(User registeredUser) {
         return new JsonObject()
-                .add(ID_KEY, registeredUserId)
+                .add(ID_KEY, registeredUser.restId())
                 .add(USERNAME_KEY, registeredUser.name())
                 .add(ABOUT_KEY, registeredUser.about())
                 .add(HOME_PAGE_KEY,registeredUser.homePage());
     }
 
     private ReceptionistResponse authenticatedUserResponse(User authenticatedUser) {
-        JsonObject responseAsJson = userResponseAsJson(
-                authenticatedUser,
-                userIdFor(authenticatedUser));
+        JsonObject responseAsJson = userResponseAsJson(authenticatedUser);
 
         return new ReceptionistResponse(OK_200,responseAsJson.toString());
-    }
-
-    private User userIdentifiedAs(String userId) {
-        return idsByUser.entrySet().stream()
-                .filter(userAndId->userAndId.getValue().equals(userId))
-                .findFirst()
-                .map(userAndId->userAndId.getKey())
-                .orElseThrow(()->new ModelException(INVALID_CREDENTIALS));
     }
 
     private ReceptionistResponse okResponseWithUserArrayFrom(List<User> users) {
         JsonArray usersAsJsonArray = new JsonArray();
 
         users.stream()
-                .map(user -> userResponseAsJson(user, userIdFor(user)))
+                .map(user -> userResponseAsJson(user))
                 .forEach(userAsJson -> usersAsJsonArray.add(userAsJson));
 
         return new ReceptionistResponse(OK_200, usersAsJsonArray);
-    }
-
-    private String userNameIdentifiedAs(String userId) {
-        return userIdentifiedAs(userId).name();
     }
 
     private JsonObject publicationAsJson(String userId, Publication publication) {
@@ -204,15 +183,11 @@ public class RestReceptionist {
 
         timeLine.stream()
                 .map(publication -> publicationAsJson(
-                        userIdFor(publication.publisherRelatedUser()),
+                        publication.publisherRelatedUser().restId(),
                         publication))
                 .forEach(userAsJson -> publicationsAsJsonObject.add(userAsJson));
 
         return new ReceptionistResponse(OK_200, publicationsAsJsonObject);
-    }
-
-    private String userIdFor(User user) {
-        return idsByUser.get(user);
     }
 
 }

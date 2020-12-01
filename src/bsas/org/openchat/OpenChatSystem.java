@@ -27,16 +27,14 @@ public class OpenChatSystem {
 
         final User newUser = User.named(userName, about,homePage);
         userCards.put(
-                userName,
+                newUser.restId(),
                 UserCard.of(newUser,password, Publisher.relatedTo(newUser)));
 
         return newUser;
     }
 
     public boolean hasUserNamed(String potentialUserName) {
-        //Uso userCardForUserName en vez de hacer userCards.get
-        //para que la búsqueda por nombre esté en un solo lugar
-        return userCardForUserName(potentialUserName).isPresent();
+        return userNamed(potentialUserName).isPresent();
     }
 
     public int numberOfUsers() {
@@ -51,31 +49,31 @@ public class OpenChatSystem {
                 .orElseGet(failedClosure);
     }
 
-    public Publication publishForUserNamed(String userName, String message) {
-        final Publication newPublication = publisherForUserNamed(userName).publish(message, clock.now());
+    public Publication publishForUserIdentifiedAs(String userId, String message) {
+        final Publication newPublication = publisherForUserId(userId).publish(message, clock.now());
 
         return newPublication;
     }
 
-    public List<Publication> timeLineForUserNamed(String userName) {
-        return publisherForUserNamed(userName).timeLine();
+    public List<Publication> timeLineForUserIdentifiedAs(String userId) {
+        return publisherForUserId(userId).timeLine();
     }
 
-    public void followForUserNamed(String followedUserName, String followerUserName) {
-        Publisher followed = publisherForUserNamed(followedUserName);
-        Publisher follower = publisherForUserNamed(followerUserName);
+    public void followedByFollowerIdentifiedAs(String followedUserId, String followerUserId) {
+        Publisher followed = publisherForUserId(followedUserId);
+        Publisher follower = publisherForUserId(followerUserId);
 
         followed.followedBy(follower);
     }
 
-    public List<User> followersOfUserNamed(String userName) {
-        return publisherForUserNamed(userName).followers().stream()
+    public List<User> followersOfUserIdentifiedAs(String userId) {
+        return publisherForUserId(userId).followers().stream()
                 .map(publisher -> publisher.relatedUser())
                 .collect(Collectors.toList());
     }
 
-    public List<Publication> wallForUserNamed(String userName) {
-        return publisherForUserNamed(userName).wall();
+    public List<Publication> wallForUserIdentifiedAs(String userId) {
+        return publisherForUserId(userId).wall();
     }
 
     public List<User> users() {
@@ -90,29 +88,34 @@ public class OpenChatSystem {
     }
 
     private Optional<User> authenticatedUser(String userName, String password) {
-        return userCardForUserName(userName)
+        return userNamed(userName)
                 .filter(foundCard -> foundCard.isPassword(password))
                 .map(foundCard -> foundCard.user());
     }
 
-    private Optional<UserCard> userCardForUserName(String userName) {
-        return Optional.ofNullable(userCards.get(userName));
+    public Optional<UserCard> userNamed(String potentialUserName) {
+        return userCardsStream()
+                .filter(userCard -> userCard.isUserNamed(potentialUserName))
+                .findFirst();
+    }
+    private Optional<UserCard> userCardForUserId(String userId) {
+        return Optional.ofNullable(userCards.get(userId));
     }
 
-    private Publisher publisherForUserNamed(String userName) {
-        return userCardForUserName(userName)
+    private Publisher publisherForUserId(String userId) {
+        return userCardForUserId(userId)
                 .map(userCard -> userCard.publisher())
                 .orElseThrow(()-> new ModelException(USER_NOT_REGISTERED));
     }
 
-    public int likePublicationIdentifiedAs(String userName, String publicationId) {
+    public int likePublicationIdentifiedAs(String userId, String publicationId) {
         final Publication publication = userCardsStream()
                 .flatMap(userCard -> userCard.publications())
                 .filter(registeredPublication -> registeredPublication.isIdentifiedAs(publicationId))
                 .findFirst()
                 .orElseThrow(() -> new ModelException(INVALID_PUBLICATION));
 
-        publication.addLiker(publisherForUserNamed(userName));
+        publication.addLiker(publisherForUserId(userId));
 
         return publication.likes();
     }
@@ -151,6 +154,10 @@ public class OpenChatSystem {
 
         public Stream<Publication> publications() {
             return publisher.publications();
+        }
+
+        public boolean isUserNamed(String potentialUserName) {
+            return user.isNamed(potentialUserName);
         }
     }
 }

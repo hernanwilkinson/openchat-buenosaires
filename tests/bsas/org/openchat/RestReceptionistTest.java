@@ -3,6 +3,7 @@ package bsas.org.openchat;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.junit.jupiter.api.Test;
+import org.openchat.OpenChat;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.eclipse.jetty.http.HttpStatus.*;
@@ -88,7 +89,7 @@ public class RestReceptionistTest {
     public void followersReturnsUserFollowers() {
         makePepeSanchezFollowJuanPerezAndAssert(
             (receptionist,firstResponse,followingsBody,followedResponse,followerResponse)-> {
-                ReceptionistResponse response = receptionist.followersOf(idOfRegisteredUser(followedResponse));
+                ReceptionistResponse response = receptionist.followersOf(followedResponse.idFromBody());
 
                 assertIsArrayWithJuanPerezOnly(response);
             });
@@ -105,7 +106,7 @@ public class RestReceptionistTest {
         assertTrue(publicationResponse.isStatus(CREATED_201));
         JsonObject responseBody = publicationResponse.responseBodyAsJson();
         assertFalse(responseBody.getString(RestReceptionist.POST_ID_KEY,"").isBlank());
-        assertEquals(idOfRegisteredUser(registeredUserResponse), responseBody.getString(RestReceptionist.USER_ID_KEY,""));
+        assertEquals(registeredUserResponse.idFromBody(), responseBody.getString(RestReceptionist.USER_ID_KEY,""));
         assertEquals(publicationMessage, responseBody.getString(RestReceptionist.TEXT_KEY,""));
         assertEquals(formattedNow(),responseBody.getString(RestReceptionist.DATE_TIME_KEY,""));
         assertEquals(0,responseBody.getInt(RestReceptionist.LIKES_KEY,-1));
@@ -131,7 +132,7 @@ public class RestReceptionistTest {
                 messageBodyAsJsonFor("something"));
 
         assertTrue(publicationResponse.isStatus(BAD_REQUEST_400));
-        assertEquals(RestReceptionist.INVALID_CREDENTIALS,publicationResponse.responseBody());
+        assertEquals(OpenChatSystem.USER_NOT_REGISTERED,publicationResponse.responseBody());
     }
     @Test
     public void timelineReturnsUserPublications() {
@@ -141,7 +142,7 @@ public class RestReceptionistTest {
         ReceptionistResponse publicationResponse = publishMessageOf(
                 registeredUserResponse,"hello");
 
-        ReceptionistResponse timelineResponse = receptionist.timelineOf(idOfRegisteredUser(registeredUserResponse));
+        ReceptionistResponse timelineResponse = receptionist.timelineOf(registeredUserResponse.idFromBody());
         assertTrue(timelineResponse.isStatus(OK_200));
         JsonArray timelineBody = timelineResponse.responseBodyAsJsonArray();
         assertEquals(1,timelineBody.size());
@@ -159,7 +160,7 @@ public class RestReceptionistTest {
                 ReceptionistResponse followerPublicationResponse = publishMessageOf(
                         followerResponse,"Bye");
 
-                ReceptionistResponse wallInfo = receptionist.wallOf(idOfRegisteredUser(followedResponse));
+                ReceptionistResponse wallInfo = receptionist.wallOf(followedResponse.idFromBody());
                 assertTrue(wallInfo.isStatus(OK_200));
                 JsonArray timelineBody = wallInfo.responseBodyAsJsonArray();
                 assertEquals(2,timelineBody.size());
@@ -204,7 +205,7 @@ public class RestReceptionistTest {
                 publicationIdFrom(publicationResponse),likerAsJson);
 
         assertTrue(likeResponse.isStatus(BAD_REQUEST_400));
-        assertEquals(RestReceptionist.INVALID_CREDENTIALS,likeResponse.responseBody());
+        assertEquals(OpenChatSystem.USER_NOT_REGISTERED,likeResponse.responseBody());
     }
     @Test
     public void canNotLikeNotPublishedPublication() {
@@ -229,7 +230,7 @@ public class RestReceptionistTest {
                 publicationIdFrom(publicationResponse),
                 likerAsJsonFrom(likerUserResponse));
 
-        ReceptionistResponse timelineResponse = receptionist.timelineOf(idOfRegisteredUser(publisherUserResponse));
+        ReceptionistResponse timelineResponse = receptionist.timelineOf(publisherUserResponse.idFromBody());
         assertTrue(timelineResponse.isStatus(OK_200));
         JsonArray timelineBody = timelineResponse.responseBodyAsJsonArray();
         assertEquals(1,timelineBody.size());
@@ -315,8 +316,8 @@ public class RestReceptionistTest {
         ReceptionistResponse followerResponse = registerJuanPerez();
 
         JsonObject followingsBodyAsJson = new JsonObject()
-                .add(RestReceptionist.FOLLOWED_ID_KEY, idOfRegisteredUser(followedResponse))
-                .add(RestReceptionist.FOLLOWER_ID_KEY, idOfRegisteredUser(followerResponse));
+                .add(RestReceptionist.FOLLOWED_ID_KEY, followedResponse.idFromBody())
+                .add(RestReceptionist.FOLLOWER_ID_KEY, followerResponse.idFromBody());
 
         ReceptionistResponse response = receptionist.followings(followingsBodyAsJson);
         assertions.accept(receptionist,response,followingsBodyAsJson,followedResponse,followerResponse);
@@ -327,17 +328,13 @@ public class RestReceptionistTest {
                 .add(RestReceptionist.TEXT_KEY, message);
     }
 
-    private String idOfRegisteredUser(ReceptionistResponse registeredUserResponse) {
-        return registeredUserResponse.responseBodyAsJson().getString(RestReceptionist.ID_KEY, "");
-    }
-
     private JsonObject likerAsJsonFrom(ReceptionistResponse likerUserResponse) {
         return new JsonObject()
-                .add(RestReceptionist.USER_ID_KEY,idOfRegisteredUser(likerUserResponse));
+                .add(RestReceptionist.USER_ID_KEY, likerUserResponse.idFromBody());
     }
 
     private ReceptionistResponse publishMessageOf(ReceptionistResponse publisherUserResponse, String message) {
-        final String publisherId = idOfRegisteredUser(publisherUserResponse);
+        final String publisherId = publisherUserResponse.idFromBody();
         return receptionist.addPublication(
                 publisherId,
                 messageBodyAsJsonFor(message));

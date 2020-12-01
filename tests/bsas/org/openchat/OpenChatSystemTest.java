@@ -89,19 +89,20 @@ public class OpenChatSystemTest {
     @Test
     public void registeredUserCanPublish() {
         system = createSystem();
-        registerPepeSanchez();
+        final User registeredUser = registerPepeSanchez();
 
-        Publication publication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
+        Publication publication = system.publishForUserIdentifiedAs(registeredUser.restId(),"hello");
 
-        List<Publication> timeLine = system.timeLineForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME);
+        List<Publication> timeLine = system.timeLineForUserIdentifiedAs(registeredUser.restId());
         assertEquals(Arrays.asList(publication),timeLine);
     }
     @Test
     public void noRegisteredUserCanNotPublish() {
         system = createSystem();
 
+        final String invalidUserId = "";
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
-                ()->system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello"),
+                ()-> system.publishForUserIdentifiedAs(invalidUserId,"hello"),
                 OpenChatSystem.USER_NOT_REGISTERED);
     }
     @Test
@@ -109,51 +110,51 @@ public class OpenChatSystemTest {
         system = createSystem();
 
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
-                ()->system.timeLineForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME),
+                ()->system.timeLineForUserIdentifiedAs(""),
                 OpenChatSystem.USER_NOT_REGISTERED);
     }
     @Test
     public void canFollowRegisteredUser() {
         system = createSystem();
-        registerPepeSanchez();
-        User follower = registerJuanPerez();
+        final User followed = registerPepeSanchez();
+        final User follower = registerJuanPerez();
 
-        system.followForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.JUAN_PEREZ_NAME);
+        system.followedByFollowerIdentifiedAs(followed.restId(), follower.restId());
 
-        List<User> followers = system.followersOfUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME);
+        List<User> followers = system.followersOfUserIdentifiedAs(followed.restId());
         assertEquals(Arrays.asList(follower),followers);
     }
     @Test
     public void canGetWallOfRegisteredUser() {
         system = createSystem();
-        registerPepeSanchez();
-        registerJuanPerez();
-        system.followForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME, TestObjectsBucket.JUAN_PEREZ_NAME);
+        final User followed = registerPepeSanchez();
+        final User follower = registerJuanPerez();
+        system.followedByFollowerIdentifiedAs(followed.restId(), follower.restId());
 
-        Publication followedPublication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
+        Publication followedPublication = system.publishForUserIdentifiedAs(followed.restId(),"hello");
         testObjects.changeNowTo(testObjects.now().plusSeconds(1));
-        Publication followerPublication = system.publishForUserNamed(TestObjectsBucket.JUAN_PEREZ_NAME,"bye");
+        Publication followerPublication = system.publishForUserIdentifiedAs(follower.restId(),"bye");
 
-        List<Publication> wall = system.wallForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME);
+        List<Publication> wall = system.wallForUserIdentifiedAs(followed.restId());
         assertEquals(Arrays.asList(followerPublication,followedPublication),wall);
     }
 
     @Test
     public void publicationsHaveNoLikesWhenCreated() {
         system = createSystem();
-        registerPepeSanchez();
+        final User registeredUser = registerPepeSanchez();
 
-        Publication publication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
+        Publication publication = system.publishForUserIdentifiedAs(registeredUser.restId(),"hello");
         assertEquals(0, publication.likes());
     }
     @Test
     public void registeredUserCanLikePublication() {
         system = createSystem();
-        registerPepeSanchez();
-        registerJuanPerez();
+        final User publisher = registerPepeSanchez();
+        final User liker = registerJuanPerez();
 
-        Publication publication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
-        int likes = system.likePublicationIdentifiedAs(TestObjectsBucket.JUAN_PEREZ_NAME, publication.restId());
+        Publication publication = system.publishForUserIdentifiedAs(publisher.restId(),"hello");
+        int likes = system.likePublicationIdentifiedAs(liker.restId(), publication.restId());
 
         assertEquals(1,likes);
         assertEquals(1, publication.likes());
@@ -161,22 +162,22 @@ public class OpenChatSystemTest {
     @Test
     public void canNotLikeNotPublishPublication() {
         system = createSystem();
-        User registeredUser = registerPepeSanchez();
+        final User registeredUser = registerPepeSanchez();
 
         Publication publication = Publication.madeBy(Publisher.relatedTo(registeredUser),"hello", testObjects.now());
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
-                ()->system.likePublicationIdentifiedAs(TestObjectsBucket.PEPE_SANCHEZ_NAME, publication.restId()),
+                ()->system.likePublicationIdentifiedAs(registeredUser.restId(), publication.restId()),
                 OpenChatSystem.INVALID_PUBLICATION);
     }
     @Test
     public void likesByUserCountOnlyOnce() {
         system = createSystem();
-        registerPepeSanchez();
-        registerJuanPerez();
+        final User publisher = registerPepeSanchez();
+        final User liker = registerJuanPerez();
 
-        Publication publication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
-        system.likePublicationIdentifiedAs(TestObjectsBucket.JUAN_PEREZ_NAME, publication.restId());
-        int likes = system.likePublicationIdentifiedAs(TestObjectsBucket.JUAN_PEREZ_NAME, publication.restId());
+        Publication publication = system.publishForUserIdentifiedAs(publisher.restId(),"hello");
+        system.likePublicationIdentifiedAs(liker.restId(), publication.restId());
+        int likes = system.likePublicationIdentifiedAs(liker.restId(), publication.restId());
 
         assertEquals(1,likes);
         assertEquals(1, publication.likes());
@@ -184,11 +185,11 @@ public class OpenChatSystemTest {
     @Test
     public void notRegisteredUserCanNotLikePublication() {
         system = createSystem();
-        registerPepeSanchez();
+        final User publisher = registerPepeSanchez();
 
-        Publication publication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
+        Publication publication = system.publishForUserIdentifiedAs(publisher.restId(),"hello");
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
-                ()->system.likePublicationIdentifiedAs(TestObjectsBucket.JUAN_PEREZ_NAME, publication.restId()),
+                ()->system.likePublicationIdentifiedAs(publisher.restId()+"x", publication.restId()),
                 OpenChatSystem.USER_NOT_REGISTERED);
     }
 
