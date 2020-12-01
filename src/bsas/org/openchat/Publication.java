@@ -25,6 +25,8 @@ public class Publication {
     @OneToMany
     private Set<Publisher> likers;
 
+    public Publication(){}
+
     public Publication(Publisher publisher, String message, LocalDateTime publicationTime) {
         this(publisher, message, publicationTime, UUID.randomUUID().toString());
     }

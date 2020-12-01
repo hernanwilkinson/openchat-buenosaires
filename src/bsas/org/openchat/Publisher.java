@@ -28,6 +28,7 @@ public class Publisher {
         return new Publisher(user);
     }
 
+    public Publisher(){}
     private Publisher(User user) {
         this.user = user;
     }

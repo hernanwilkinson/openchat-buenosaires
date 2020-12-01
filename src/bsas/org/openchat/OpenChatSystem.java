@@ -11,7 +11,7 @@ public class OpenChatSystem {
     public static final String USER_NOT_REGISTERED = "User not registered";
     public static final String INVALID_PUBLICATION = "Invalid post";
 
-    private final Map<String,UserCard> userCards = new HashMap<>();
+    protected final Map<String,UserCard> userCards = new HashMap<>();
     private final Clock clock;
 
     public OpenChatSystem(Clock clock){
@@ -82,7 +82,7 @@ public class OpenChatSystem {
                 .collect(Collectors.toList());
     }
 
-    private void assertIsNotDuplicated(String userName) {
+    void assertIsNotDuplicated(String userName) {
         if(hasUserNamed(userName))
             throw new ModelException(CANNOT_REGISTER_SAME_USER_TWICE);
     }

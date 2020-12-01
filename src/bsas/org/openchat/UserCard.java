@@ -16,6 +16,8 @@ class UserCard {
     @OneToOne
     private Publisher publisher;
 
+    public UserCard(){}
+
     public UserCard(User user, String password, Publisher publisher) {
         this.user = user;
         this.password = password;

@@ -29,6 +29,9 @@ public class User {
         if(name.isBlank()) throw new ModelException(NAME_CANNOT_BE_BLANK);
     }
 
+    public User(){
+    }
+
     private User(String name, String about, String homePage, String restId) {
         this.name = name;
         this.about = about;

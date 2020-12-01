@@ -38,4 +38,21 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
     public void stop() {
         session.close();
     }
+
+    @Override
+    public User register(String userName, String password, String about, String homePage) {
+        assertIsNotDuplicated(userName);
+
+        final User newUser = User.named(userName, about,homePage);
+        final Publisher publisher = Publisher.relatedTo(newUser);
+        final UserCard userCard = UserCard.of(newUser, password, publisher);
+        session.persist(publisher);
+        session.persist(userCard);
+
+        userCards.put(
+                newUser.restId(),
+                userCard);
+
+        return newUser;
+    }
 }
