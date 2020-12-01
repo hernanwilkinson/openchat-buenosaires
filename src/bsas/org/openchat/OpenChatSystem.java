@@ -105,12 +105,12 @@ public class OpenChatSystem {
                 .orElseThrow(()-> new ModelException(USER_NOT_REGISTERED));
     }
 
-    public int likePublication(Publication publication, String userName) {
-        userCardsStream()
-                .flatMap(userCard->userCard.publications())
-                .filter(registeredPublication -> registeredPublication == publication)
+    public int likePublicationIdentifiedAs(String userName, String publicationId) {
+        final Publication publication = userCardsStream()
+                .flatMap(userCard -> userCard.publications())
+                .filter(registeredPublication -> registeredPublication.isIdentifiedAs(publicationId))
                 .findFirst()
-                .orElseThrow(()->new ModelException(INVALID_PUBLICATION));
+                .orElseThrow(() -> new ModelException(INVALID_PUBLICATION));
 
         publication.addLiker(publisherForUserNamed(userName));
 

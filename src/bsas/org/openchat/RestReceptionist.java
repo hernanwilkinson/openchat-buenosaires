@@ -32,10 +32,8 @@ public class RestReceptionist {
     public static final String INVALID_PUBLICATION = "Invalid post";
     public static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-
     private final OpenChatSystem system;
     private final Map<User,String> idsByUser = new HashMap<>();
-    private final Map<Publication,String> idsByPublication = new HashMap<>();
 
     public RestReceptionist(OpenChatSystem system) {
         this.system = system;
@@ -99,12 +97,10 @@ public class RestReceptionist {
     public ReceptionistResponse addPublication(String userId, JsonObject messageBodyAsJson) {
         try {
             Publication publication = system.publishForUserNamed(userNameIdentifiedAs(userId), messageBodyAsJson.getString("text", ""));
-            String publicationId = UUID.randomUUID().toString();
-            idsByPublication.put(publication, publicationId);
 
             return new ReceptionistResponse(
                     CREATED_201,
-                    publicationAsJson(userId, publication, publicationId));
+                    publicationAsJson(userId, publication));
         } catch (ModelException error){
             return new ReceptionistResponse(BAD_REQUEST_400,error.getMessage());
         }
@@ -126,13 +122,7 @@ public class RestReceptionist {
     public ReceptionistResponse likePublicationIdentifiedAs(String publicationId, JsonObject likerAsJson) {
         try {
             final String userName = userNameIdentifiedAs(likerAsJson.getString(USER_ID_KEY, ""));
-            final Publication publication = idsByPublication.entrySet().stream()
-                    .filter(idByPublication->idByPublication.getValue().equals(publicationId))
-                    .findFirst()
-                    .map(idByPublication->idByPublication.getKey())
-                    .orElseThrow(()->new ModelException(INVALID_PUBLICATION));
-
-            int likes = system.likePublication(publication, userName);
+            int likes = system.likePublicationIdentifiedAs(userName, publicationId);
 
             JsonObject likesAsJsonObject = new JsonObject()
                     .add(LIKES_KEY, likes);
@@ -196,9 +186,9 @@ public class RestReceptionist {
         return userIdentifiedAs(userId).name();
     }
 
-    private JsonObject publicationAsJson(String userId, Publication publication, String publicationId) {
+    private JsonObject publicationAsJson(String userId, Publication publication) {
         return new JsonObject()
-                .add(POST_ID_KEY, publicationId)
+                .add(POST_ID_KEY, publication.restId())
                 .add(USER_ID_KEY, userId)
                 .add(TEXT_KEY, publication.message())
                 .add(DATE_TIME_KEY, formatDateTime(publication.publicationTime()))
@@ -215,15 +205,10 @@ public class RestReceptionist {
         timeLine.stream()
                 .map(publication -> publicationAsJson(
                         userIdFor(publication.publisherRelatedUser()),
-                        publication,
-                        publicationIdFor(publication)))
+                        publication))
                 .forEach(userAsJson -> publicationsAsJsonObject.add(userAsJson));
 
         return new ReceptionistResponse(OK_200, publicationsAsJsonObject);
-    }
-
-    private String publicationIdFor(Publication publication) {
-        return idsByPublication.get(publication);
     }
 
     private String userIdFor(User user) {

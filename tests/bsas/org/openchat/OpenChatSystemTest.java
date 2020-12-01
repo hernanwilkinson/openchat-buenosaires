@@ -153,7 +153,7 @@ public class OpenChatSystemTest {
         registerJuanPerez();
 
         Publication publication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
-        int likes = system.likePublication(publication,TestObjectsBucket.JUAN_PEREZ_NAME);
+        int likes = system.likePublicationIdentifiedAs(TestObjectsBucket.JUAN_PEREZ_NAME, publication.restId());
 
         assertEquals(1,likes);
         assertEquals(1, publication.likes());
@@ -165,7 +165,7 @@ public class OpenChatSystemTest {
 
         Publication publication = Publication.madeBy(Publisher.relatedTo(registeredUser),"hello", testObjects.now());
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
-                ()->system.likePublication(publication,TestObjectsBucket.PEPE_SANCHEZ_NAME),
+                ()->system.likePublicationIdentifiedAs(TestObjectsBucket.PEPE_SANCHEZ_NAME, publication.restId()),
                 OpenChatSystem.INVALID_PUBLICATION);
     }
     @Test
@@ -175,8 +175,8 @@ public class OpenChatSystemTest {
         registerJuanPerez();
 
         Publication publication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
-        system.likePublication(publication,TestObjectsBucket.JUAN_PEREZ_NAME);
-        int likes = system.likePublication(publication,TestObjectsBucket.JUAN_PEREZ_NAME);
+        system.likePublicationIdentifiedAs(TestObjectsBucket.JUAN_PEREZ_NAME, publication.restId());
+        int likes = system.likePublicationIdentifiedAs(TestObjectsBucket.JUAN_PEREZ_NAME, publication.restId());
 
         assertEquals(1,likes);
         assertEquals(1, publication.likes());
@@ -188,7 +188,7 @@ public class OpenChatSystemTest {
 
         Publication publication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
-                ()->system.likePublication(publication,TestObjectsBucket.JUAN_PEREZ_NAME),
+                ()->system.likePublicationIdentifiedAs(TestObjectsBucket.JUAN_PEREZ_NAME, publication.restId()),
                 OpenChatSystem.USER_NOT_REGISTERED);
     }
 

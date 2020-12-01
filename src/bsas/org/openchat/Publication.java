@@ -6,17 +6,23 @@ import java.util.*;
 public class Publication {
     public static final String INAPPROPRIATE_WORD = "Post contains inappropriate language.";
     public static final List<String> inappropriateWords =
-            Collections.unmodifiableList(Arrays.asList("elephant","ice cream","orange"));
+            List.of("elephant", "ice cream", "orange");
 
     private final Publisher publisher;
     private final String message;
     private final LocalDateTime publicationTime;
+    private final String restId;
     private final Set<Publisher> likers;
 
     public Publication(Publisher publisher, String message, LocalDateTime publicationTime) {
+        this(publisher, message, publicationTime, UUID.randomUUID().toString());
+    }
+
+    public Publication(Publisher publisher, String message, LocalDateTime publicationTime, String restId) {
         this.publisher = publisher;
         this.message = message;
         this.publicationTime = publicationTime;
+        this.restId = restId;
         this.likers = new HashSet<>();
     }
 
@@ -69,5 +75,13 @@ public class Publication {
 
     public int likes() {
         return likers.size();
+    }
+
+    public String restId() {
+        return restId;
+    }
+
+    public boolean isIdentifiedAs(String potentialPublication) {
+        return restId.equals(potentialPublication);
     }
 }
