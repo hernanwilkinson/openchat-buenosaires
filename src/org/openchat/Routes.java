@@ -1,5 +1,6 @@
 package org.openchat;
 
+import bsas.org.openchat.Environment;
 import bsas.org.openchat.TransientOpenChatSystem;
 import bsas.org.openchat.ReceptionistResponse;
 import bsas.org.openchat.RestReceptionist;
@@ -16,8 +17,8 @@ import static spark.Spark.post;
 
 public class Routes {
 
-    private RestReceptionist receptionist = new RestReceptionist(new TransientOpenChatSystem(
-            ()-> LocalDateTime.now()));
+    private RestReceptionist receptionist = new RestReceptionist(
+            Environment.current().createSystem(()-> LocalDateTime.now()));
 
     public void create() {
         openchatRoutes();
