@@ -14,11 +14,12 @@ public class OpenChatSystemTest {
 
     private OpenChatSystem system;
     private TestObjectsBucket testObjects;
+    private IntegrationEnvironment environment = new IntegrationEnvironment();
 
     @BeforeEach
     public void setUp(){
         testObjects = new TestObjectsBucket();
-        system = new PersistentOpenChatSystem(testObjects.fixedNowClock());
+        system = environment.createSystem(testObjects.fixedNowClock());
         system.start();
         system.beginTransaction();
     }
