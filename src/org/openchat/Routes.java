@@ -20,11 +20,9 @@ public class Routes {
     private RestReceptionist receptionist;
 
     public void create() {
-         final OpenChatSystem openChatSystem = Environment.current().createSystem(() -> LocalDateTime.now());
-         receptionist = new RestReceptionist(() -> openChatSystem);
+        receptionist = new RestReceptionist(Environment.current().systemFactory());
 
         openchatRoutes();
-
     }
 
     private void openchatRoutes() {
