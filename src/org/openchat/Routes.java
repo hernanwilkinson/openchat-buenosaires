@@ -1,7 +1,6 @@
 package org.openchat;
 
 import bsas.org.openchat.Environment;
-import bsas.org.openchat.TransientOpenChatSystem;
 import bsas.org.openchat.ReceptionistResponse;
 import bsas.org.openchat.RestReceptionist;
 import com.eclipsesource.json.Json;
@@ -18,7 +17,7 @@ import static spark.Spark.post;
 public class Routes {
 
     private RestReceptionist receptionist = new RestReceptionist(
-            Environment.current().createSystem(()-> LocalDateTime.now()));
+            Environment.current().systemFactory());
 
     public void create() {
         openchatRoutes();
@@ -39,7 +38,7 @@ public class Routes {
 
     private String likePublication(Request request, Response response) {
         return receptionistDo(
-                ()->receptionist.likePublicationIdentifiedAs(
+                ()-> receptionist.likePublicationIdentifiedAs(
                         publicationIdFromParamsOf(request),requestBodyAsJson(request)),
                 response);
     }
