@@ -54,11 +54,12 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
         session.persist(publisher);
         session.persist(userCard);
 
-        userCards.put(
-                newUser.restId(),
-                userCard);
-
         return newUser;
+    }
+
+    @Override
+    public boolean hasUsers() {
+        return numberOfUsers()>0;
     }
 
     @Override
