@@ -1,45 +1,31 @@
 package bsas.org.openchat;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class OpenChatSystem {
+public abstract class OpenChatSystem {
     public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Username already in use.";
     public static final String USER_NOT_REGISTERED = "User not registered";
     public static final String INVALID_PUBLICATION = "Invalid post";
+    protected final Clock clock;
 
-    protected final Map<String,UserCard> userCards = new HashMap<>();
-    private final Clock clock;
-
-    public OpenChatSystem(Clock clock){
+    public OpenChatSystem(Clock clock) {
         this.clock = clock;
     }
 
-    public boolean hasUsers() {
-        return !userCards.isEmpty();
-    }
+    public abstract boolean hasUsers();
 
-    public User register(String userName, String password, String about, String homePage) {
-        assertIsNotDuplicated(userName);
-
-        final User newUser = User.named(userName, about,homePage);
-        userCards.put(
-                newUser.restId(),
-                UserCard.of(newUser,password, Publisher.relatedTo(newUser)));
-
-        return newUser;
-    }
+    public abstract User register(String userName, String password, String about, String homePage);
 
     public boolean hasUserNamed(String potentialUserName) {
         return userNamed(potentialUserName).isPresent();
     }
 
-    public int numberOfUsers() {
-        return userCards.size();
-    }
+    public abstract int numberOfUsers();
 
     public <T> T withAuthenticatedUserDo(String userName, String password,
                                          Function<User,T> authenticatedClosure,
@@ -87,20 +73,15 @@ public class OpenChatSystem {
             throw new ModelException(CANNOT_REGISTER_SAME_USER_TWICE);
     }
 
-    private Optional<User> authenticatedUser(String userName, String password) {
+    protected Optional<User> authenticatedUser(String userName, String password) {
         return userNamed(userName)
                 .filter(foundCard -> foundCard.isPassword(password))
                 .map(foundCard -> foundCard.user());
     }
 
-    public Optional<UserCard> userNamed(String potentialUserName) {
-        return userCardsStream()
-                .filter(userCard -> userCard.isUserNamed(potentialUserName))
-                .findFirst();
-    }
-    protected Optional<UserCard> userCardForUserId(String userId) {
-        return Optional.ofNullable(userCards.get(userId));
-    }
+    public abstract Optional<UserCard> userNamed(String potentialUserName);
+
+    protected abstract Optional<UserCard> userCardForUserId(String userId);
 
     private Publisher publisherForUserId(String userId) {
         return userCardForUserId(userId)
@@ -116,27 +97,15 @@ public class OpenChatSystem {
         return publication.likes();
     }
 
-    public Publication publicationIdentifiedAs(String publicationId) {
-        return userCardsStream()
-                .flatMap(userCard -> userCard.publications())
-                .filter(registeredPublication -> registeredPublication.isIdentifiedAs(publicationId))
-                .findFirst()
-                .orElseThrow(() -> new ModelException(INVALID_PUBLICATION));
-    }
+    public abstract Publication publicationIdentifiedAs(String publicationId);
 
-    protected Stream<UserCard> userCardsStream() {
-        return userCards.values().stream();
-    }
+    protected abstract Stream<UserCard> userCardsStream();
 
-    public void start() {
-    }
+    public abstract void start();
 
-    public void beginTransaction() {
-    }
+    public abstract void beginTransaction();
 
-    public void commitTransaction() {
-    }
+    public abstract void commitTransaction();
 
-    public void stop() {
-    }
+    public abstract void stop();
 }

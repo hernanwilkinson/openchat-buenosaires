@@ -3,7 +3,6 @@ package bsas.org.openchat;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.junit.jupiter.api.Test;
-import org.openchat.OpenChat;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.eclipse.jetty.http.HttpStatus.*;
@@ -32,7 +31,7 @@ public class RestReceptionistTest {
         ReceptionistResponse response = registerJuanPerez();
 
         assertTrue(response.isStatus(BAD_REQUEST_400));
-        assertEquals(OpenChatSystem.CANNOT_REGISTER_SAME_USER_TWICE,response.responseBody());
+        assertEquals(TransientOpenChatSystem.CANNOT_REGISTER_SAME_USER_TWICE,response.responseBody());
     }
     @Test
     public void canLoginRegisteredUserWithValidCredentials() {
@@ -132,7 +131,7 @@ public class RestReceptionistTest {
                 messageBodyAsJsonFor("something"));
 
         assertTrue(publicationResponse.isStatus(BAD_REQUEST_400));
-        assertEquals(OpenChatSystem.USER_NOT_REGISTERED,publicationResponse.responseBody());
+        assertEquals(TransientOpenChatSystem.USER_NOT_REGISTERED,publicationResponse.responseBody());
     }
     @Test
     public void timelineReturnsUserPublications() {
@@ -205,7 +204,7 @@ public class RestReceptionistTest {
                 publicationIdFrom(publicationResponse),likerAsJson);
 
         assertTrue(likeResponse.isStatus(BAD_REQUEST_400));
-        assertEquals(OpenChatSystem.USER_NOT_REGISTERED,likeResponse.responseBody());
+        assertEquals(TransientOpenChatSystem.USER_NOT_REGISTERED,likeResponse.responseBody());
     }
     @Test
     public void canNotLikeNotPublishedPublication() {
@@ -245,7 +244,7 @@ public class RestReceptionistTest {
     }
 
     private RestReceptionist createReceptionist() {
-        return new RestReceptionist(new OpenChatSystem(testObjects.fixedNowClock()));
+        return new RestReceptionist(new TransientOpenChatSystem(testObjects.fixedNowClock()));
     }
 
     private ReceptionistResponse registerJuanPerez() {

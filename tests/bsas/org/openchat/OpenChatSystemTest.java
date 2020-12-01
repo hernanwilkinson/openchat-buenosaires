@@ -64,7 +64,7 @@ public class OpenChatSystemTest {
 
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
                 ()->registerPepeSanchez(),
-                OpenChatSystem.CANNOT_REGISTER_SAME_USER_TWICE);
+                TransientOpenChatSystem.CANNOT_REGISTER_SAME_USER_TWICE);
 
         assertTrue(system.hasUsers());
         assertTrue(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
@@ -106,13 +106,13 @@ public class OpenChatSystemTest {
         final String invalidUserId = "";
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
                 ()-> system.publishForUserIdentifiedAs(invalidUserId,"hello"),
-                OpenChatSystem.USER_NOT_REGISTERED);
+                TransientOpenChatSystem.USER_NOT_REGISTERED);
     }
     @Test
     public void noRegisteredUserCanAskItsTimeline() {
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
                 ()->system.timeLineForUserIdentifiedAs(""),
-                OpenChatSystem.USER_NOT_REGISTERED);
+                TransientOpenChatSystem.USER_NOT_REGISTERED);
     }
     @Test
     public void canFollowRegisteredUser() {
@@ -163,7 +163,7 @@ public class OpenChatSystemTest {
         Publication publication = Publication.madeBy(Publisher.relatedTo(registeredUser),"hello", testObjects.now());
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
                 ()->system.likePublicationIdentifiedAs(publication.restId(), registeredUser.restId()),
-                OpenChatSystem.INVALID_PUBLICATION);
+                TransientOpenChatSystem.INVALID_PUBLICATION);
     }
     @Test
     public void likesByUserCountOnlyOnce() {
@@ -184,7 +184,7 @@ public class OpenChatSystemTest {
         Publication publication = system.publishForUserIdentifiedAs(publisher.restId(),"hello");
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
                 ()->system.likePublicationIdentifiedAs(publication.restId(), publisher.restId()+"x"),
-                OpenChatSystem.USER_NOT_REGISTERED);
+                TransientOpenChatSystem.USER_NOT_REGISTERED);
     }
 
     private void assertCanNotAuthenticatePepeSanchezWith(String password) {
