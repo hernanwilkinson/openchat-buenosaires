@@ -37,6 +37,7 @@ public class RestReceptionist implements Receptionist {
     private final OpenChatSystem system;
     private final Supplier<String> idGenerator;
     private final Map<User,String> idsByUser = new HashMap<>();
+    private final Map<String,String> userNameById = new HashMap<>();
     private final Map<Publication,String> idsByPublication = new HashMap<>();
 
     public RestReceptionist(OpenChatSystem system) {
@@ -59,6 +60,7 @@ public class RestReceptionist implements Receptionist {
 
             final String registeredUserId = generateId();
             idsByUser.put(registeredUser,registeredUserId);
+            userNameById.put(registeredUserId,registeredUser.name());
 
             return new ReceptionistResponse(
                     CREATED_201,
@@ -213,7 +215,10 @@ public class RestReceptionist implements Receptionist {
     }
 
     private String userNameIdentifiedAs(String userId) {
-        return userIdentifiedAs(userId).name();
+        final String userName = userNameById.get(userId);
+        if(userName==null) throw new ModelException(INVALID_CREDENTIALS);
+
+        return userName;
     }
 
     private JsonObject publicationAsJson(String userId, Publication publication, String publicationId) {
