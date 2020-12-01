@@ -144,7 +144,7 @@ public class OpenChatSystemTest {
         registerPepeSanchez();
 
         Publication publication = system.publishForUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME,"hello");
-        assertEquals(0,system.likesOf(publication));
+        assertEquals(0, publication.likes());
     }
     @Test
     public void registeredUserCanLikePublication() {
@@ -156,7 +156,7 @@ public class OpenChatSystemTest {
         int likes = system.likePublication(publication,TestObjectsBucket.JUAN_PEREZ_NAME);
 
         assertEquals(1,likes);
-        assertEquals(1,system.likesOf(publication));
+        assertEquals(1, publication.likes());
     }
     @Test
     public void canNotLikeNotPublishPublication() {
@@ -179,7 +179,7 @@ public class OpenChatSystemTest {
         int likes = system.likePublication(publication,TestObjectsBucket.JUAN_PEREZ_NAME);
 
         assertEquals(1,likes);
-        assertEquals(1,system.likesOf(publication));
+        assertEquals(1, publication.likes());
     }
     @Test
     public void notRegisteredUserCanNotLikePublication() {

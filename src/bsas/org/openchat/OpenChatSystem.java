@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class OpenChatSystem {
     public static final String CANNOT_REGISTER_SAME_USER_TWICE = "Username already in use.";
@@ -106,23 +107,20 @@ public class OpenChatSystem {
                 .orElseThrow(()-> new ModelException(USER_NOT_REGISTERED));
     }
 
-    public int likesOf(Publication publication) {
-        return likersOf(publication).size();
-    }
-
     public int likePublication(Publication publication, String userName) {
-        final Set<Publisher> likers = likersOf(publication);
+        userCardsStream()
+                .flatMap(userCard->userCard.publications())
+                .filter(registeredPublication -> registeredPublication == publication)
+                .findFirst()
+                .orElseThrow(()->new ModelException(INVALID_PUBLICATION));
 
-        likers.add(publisherForUserNamed(userName));
+        publication.addLiker(publisherForUserNamed(userName));
 
-        return likers.size();
+        return publication.likes();
     }
 
-    private Set<Publisher> likersOf(Publication publication) {
-        final Set<Publisher> likers = likersByPublication.get(publication);
-        if (likers == null) throw new ModelException(INVALID_PUBLICATION);
-
-        return likers;
+    private Stream<UserCard> userCardsStream() {
+        return userCards.values().stream();
     }
 
     private static class UserCard {
@@ -151,6 +149,10 @@ public class OpenChatSystem {
 
         public Publisher publisher() {
             return publisher;
+        }
+
+        public Stream<Publication> publications() {
+            return publisher.publications();
         }
     }
 }

@@ -1,9 +1,7 @@
 package bsas.org.openchat;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Publication {
     public static final String INAPPROPRIATE_WORD = "Post contains inappropriate language.";
@@ -13,11 +11,13 @@ public class Publication {
     private final Publisher publisher;
     private final String message;
     private final LocalDateTime publicationTime;
+    private final Set<Publisher> likers;
 
     public Publication(Publisher publisher, String message, LocalDateTime publicationTime) {
         this.publisher = publisher;
         this.message = message;
         this.publicationTime = publicationTime;
+        this.likers = new HashSet<>();
     }
 
     public static Publication madeBy(Publisher publisher, String message, LocalDateTime publicationTime) {
@@ -60,5 +60,14 @@ public class Publication {
 
     public User publisherRelatedUser(){
         return publisher.relatedUser();
+    }
+
+    // Acceso de paquete para que no puedan agregar por fuera del sistema
+    void addLiker(Publisher liker) {
+        likers.add(liker);
+    }
+
+    public int likes() {
+        return likers.size();
     }
 }

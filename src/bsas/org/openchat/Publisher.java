@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Publisher {
     public static final String CANNOT_FOLLOW_SELF = "Can not follow self";
@@ -88,4 +89,7 @@ public class Publisher {
         publicationCollector.addAll(publications);
     }
 
+    public Stream<Publication> publications() {
+        return publications.stream();
+    }
 }
