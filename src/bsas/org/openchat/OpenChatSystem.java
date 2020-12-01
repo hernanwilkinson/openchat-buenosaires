@@ -12,7 +12,6 @@ public class OpenChatSystem {
     public static final String INVALID_PUBLICATION = "Invalid post";
 
     private final Map<String,UserCard> userCards = new HashMap<>();
-    private final Map<Publication,Set<Publisher>> likersByPublication = new HashMap<>();
     private final Clock clock;
 
     public OpenChatSystem(Clock clock){
@@ -54,7 +53,6 @@ public class OpenChatSystem {
 
     public Publication publishForUserNamed(String userName, String message) {
         final Publication newPublication = publisherForUserNamed(userName).publish(message, clock.now());
-        likersByPublication.put(newPublication,new HashSet<>());
 
         return newPublication;
     }
