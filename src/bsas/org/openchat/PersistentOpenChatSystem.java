@@ -68,4 +68,9 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
 
         return Optional.ofNullable(found);
     }
+
+    @Override
+    public int numberOfUsers() {
+        return session.createCriteria(UserCard.class).list().size();
+    }
 }
