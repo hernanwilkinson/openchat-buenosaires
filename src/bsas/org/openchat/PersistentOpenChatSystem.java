@@ -7,7 +7,9 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class PersistentOpenChatSystem extends OpenChatSystem {
 
@@ -93,5 +95,13 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
 
         if(found==null) throw new ModelException(INVALID_PUBLICATION);
         return found;
+    }
+
+    @Override
+    protected Stream<UserCard> userCardsStream() {
+        return session
+                .createCriteria(UserCard.class)
+                .list()
+                .stream();
     }
 }

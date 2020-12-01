@@ -77,7 +77,7 @@ public class OpenChatSystem {
     }
 
     public List<User> users() {
-        return userCards.values().stream()
+        return userCardsStream()
                 .map(userCard->userCard.user())
                 .collect(Collectors.toList());
     }
@@ -124,7 +124,7 @@ public class OpenChatSystem {
                 .orElseThrow(() -> new ModelException(INVALID_PUBLICATION));
     }
 
-    private Stream<UserCard> userCardsStream() {
+    protected Stream<UserCard> userCardsStream() {
         return userCards.values().stream();
     }
 
