@@ -124,4 +124,15 @@ public class OpenChatSystem {
         return userCards.values().stream();
     }
 
+    public void start() {
+    }
+
+    public void beginTransaction() {
+    }
+
+    public void commitTransaction() {
+    }
+
+    public void stop() {
+    }
 }

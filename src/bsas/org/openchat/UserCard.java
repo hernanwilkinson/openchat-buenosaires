@@ -7,6 +7,9 @@ import java.util.stream.Stream;
 @Table(name="USERS")
 class UserCard {
 
+    @Id
+    @GeneratedValue
+    private long id;
     @Embedded
     private User user;
     private String password;
