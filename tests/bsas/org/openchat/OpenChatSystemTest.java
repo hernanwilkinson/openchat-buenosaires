@@ -1,5 +1,6 @@
 package bsas.org.openchat;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,21 +12,22 @@ import java.util.List;
 public class OpenChatSystemTest {
 
     private OpenChatSystem system;
-    private TestObjectsBucket testObjects = new TestObjectsBucket();
+    private TestObjectsBucket testObjects;
+
+    @BeforeEach
+    public void setUp(){
+        testObjects = new TestObjectsBucket();
+        system = new PersistentOpenChatSystem(testObjects.fixedNowClock());
+    }
 
     @Test
     public void createSystemHasNoUsers() {
-        //No lo inicializo en el setup por si quiero hacer restart del
-        //contexto mientras debuggeo
-        system = createSystem();
-
         assertFalse(system.hasUsers());
         assertFalse(system.hasUserNamed(TestObjectsBucket.PEPE_SANCHEZ_NAME));
         assertEquals(0, system.numberOfUsers());
     }
     @Test
     public void canRegisterUser() {
-        system = createSystem();
         User registeredUser = registerPepeSanchez();
 
         assertTrue(system.hasUsers());
@@ -39,7 +41,6 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canRegisterManyUsers() {
-        system = createSystem();
         registerPepeSanchez();
         registerJuanPerez();
 
@@ -50,7 +51,6 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canNotRegisterSameUserTwice() {
-        system = createSystem();
         registerPepeSanchez();
 
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
@@ -63,7 +63,6 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canWorkWithAuthenticatedUser() {
-        system = createSystem();
         registerPepeSanchez();
 
         final Object token = new Object();
@@ -76,19 +75,16 @@ public class OpenChatSystemTest {
     }
     @Test
     public void notRegisteredUserIsNotAuthenticated() {
-        system = createSystem();
         assertCanNotAuthenticatePepeSanchezWith(TestObjectsBucket.PEPE_SANCHEZ_PASSWORD);
     }
     @Test
     public void canNotAuthenticateWithInvalidPassword() {
-        system = createSystem();
         registerPepeSanchez();
 
         assertCanNotAuthenticatePepeSanchezWith(TestObjectsBucket.PEPE_SANCHEZ_PASSWORD+"something");
     }
     @Test
     public void registeredUserCanPublish() {
-        system = createSystem();
         final User registeredUser = registerPepeSanchez();
 
         Publication publication = system.publishForUserIdentifiedAs(registeredUser.restId(),"hello");
@@ -98,8 +94,6 @@ public class OpenChatSystemTest {
     }
     @Test
     public void noRegisteredUserCanNotPublish() {
-        system = createSystem();
-
         final String invalidUserId = "";
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
                 ()-> system.publishForUserIdentifiedAs(invalidUserId,"hello"),
@@ -107,15 +101,12 @@ public class OpenChatSystemTest {
     }
     @Test
     public void noRegisteredUserCanAskItsTimeline() {
-        system = createSystem();
-
         TestObjectsBucket.assertThrowsModelExceptionWithErrorMessage(
                 ()->system.timeLineForUserIdentifiedAs(""),
                 OpenChatSystem.USER_NOT_REGISTERED);
     }
     @Test
     public void canFollowRegisteredUser() {
-        system = createSystem();
         final User followed = registerPepeSanchez();
         final User follower = registerJuanPerez();
 
@@ -126,7 +117,6 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canGetWallOfRegisteredUser() {
-        system = createSystem();
         final User followed = registerPepeSanchez();
         final User follower = registerJuanPerez();
         system.followedByFollowerIdentifiedAs(followed.restId(), follower.restId());
@@ -141,7 +131,6 @@ public class OpenChatSystemTest {
 
     @Test
     public void publicationsHaveNoLikesWhenCreated() {
-        system = createSystem();
         final User registeredUser = registerPepeSanchez();
 
         Publication publication = system.publishForUserIdentifiedAs(registeredUser.restId(),"hello");
@@ -149,7 +138,6 @@ public class OpenChatSystemTest {
     }
     @Test
     public void registeredUserCanLikePublication() {
-        system = createSystem();
         final User publisher = registerPepeSanchez();
         final User liker = registerJuanPerez();
 
@@ -161,7 +149,6 @@ public class OpenChatSystemTest {
     }
     @Test
     public void canNotLikeNotPublishPublication() {
-        system = createSystem();
         final User registeredUser = registerPepeSanchez();
 
         Publication publication = Publication.madeBy(Publisher.relatedTo(registeredUser),"hello", testObjects.now());
@@ -171,7 +158,6 @@ public class OpenChatSystemTest {
     }
     @Test
     public void likesByUserCountOnlyOnce() {
-        system = createSystem();
         final User publisher = registerPepeSanchez();
         final User liker = registerJuanPerez();
 
@@ -184,7 +170,6 @@ public class OpenChatSystemTest {
     }
     @Test
     public void notRegisteredUserCanNotLikePublication() {
-        system = createSystem();
         final User publisher = registerPepeSanchez();
 
         Publication publication = system.publishForUserIdentifiedAs(publisher.restId(),"hello");
@@ -201,10 +186,6 @@ public class OpenChatSystemTest {
                 ()-> token);
 
         assertEquals(token,notAuthenticatedToken);
-    }
-
-    private OpenChatSystem createSystem() {
-        return new OpenChatSystem(testObjects.fixedNowClock());
     }
 
     private User registerPepeSanchez() {
