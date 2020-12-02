@@ -6,6 +6,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.openchat.OpenChat;
 
+import static io.restassured.RestAssured.given;
+
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         IT_RegistrationAPI.class,
@@ -29,6 +31,9 @@ public class APITestSuit {
         openChat = new OpenChat();
         openChat.start();
         openChat.awaitInitialization();
+        // Para probar el sistema en Smalltalk, ya sea Cuis o GemStone
+        // descomentar la siguiente linea y comentar la linea del tearDown
+        //given().post(BASE_URL+"/reset");
     }
 
     @AfterClass
