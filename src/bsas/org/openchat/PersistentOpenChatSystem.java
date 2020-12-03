@@ -89,8 +89,10 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
     }
 
     @Override
-    public int numberOfUsers() {
-        return session.createCriteria(UserCard.class).list().size();
+    public long numberOfUsers() {
+        return (long) session
+                .createQuery("SELECT COUNT(*) FROM User")
+                .uniqueResult();
     }
 
     @Override

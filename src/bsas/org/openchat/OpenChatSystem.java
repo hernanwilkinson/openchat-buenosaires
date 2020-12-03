@@ -25,7 +25,7 @@ public abstract class OpenChatSystem {
         return userNamed(potentialUserName).isPresent();
     }
 
-    public abstract int numberOfUsers();
+    public abstract long numberOfUsers();
 
     public <T> T withAuthenticatedUserDo(String userName, String password,
                                          Function<User,T> authenticatedClosure,

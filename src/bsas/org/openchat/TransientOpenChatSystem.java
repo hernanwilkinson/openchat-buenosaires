@@ -15,7 +15,7 @@ public class TransientOpenChatSystem extends OpenChatSystem {
         return !userCards.isEmpty();
     }
 
-    public int numberOfUsers() {
+    public long numberOfUsers() {
         return userCards.size();
     }
 
