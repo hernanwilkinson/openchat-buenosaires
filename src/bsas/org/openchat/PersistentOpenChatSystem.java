@@ -65,10 +65,11 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
         assertIsNotDuplicated(userName);
 
         final User newUser = User.named(userName, about,homePage);
-        final Publisher publisher = Publisher.relatedTo(newUser);
-        final UserCard userCard = UserCard.of(newUser, password, publisher);
-        session.persist(publisher);
-        session.persist(userCard);
+        final Publisher newPublisher = Publisher.relatedTo(newUser);
+        final UserCard newUserCard = UserCard.of(newUser, password, newPublisher);
+        session.persist(newUser);
+        session.persist(newPublisher);
+        session.persist(newUserCard);
 
         return newUser;
     }
@@ -81,8 +82,7 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
     @Override
     public Optional<UserCard> userNamed(String potentialUserName) {
         final UserCard found = (UserCard) session
-                .createCriteria(UserCard.class, "userCard")
-                .add(Restrictions.eq("userCard.user.name", potentialUserName))
+                .createQuery("SELECT a FROM UserCard a JOIN a.user b WHERE b.name = '" +potentialUserName+"'")
                 .uniqueResult();
 
         return Optional.ofNullable(found);
@@ -96,8 +96,7 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
     @Override
     protected Optional<UserCard> userCardForUserId(String userId) {
         final UserCard found = (UserCard) session
-                .createCriteria(UserCard.class, "userCard")
-                .add(Restrictions.eq("userCard.user.restId", userId))
+                .createQuery("SELECT a FROM UserCard a JOIN a.user b WHERE b.restId = '" +userId+"'")
                 .uniqueResult();
 
         return Optional.ofNullable(found);

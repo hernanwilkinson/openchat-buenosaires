@@ -21,7 +21,7 @@ public class Publisher {
     private List<Publisher> followers = new ArrayList<>();
     @OneToMany(cascade = CascadeType.ALL)
     private List<Publication> publications = new ArrayList<>();
-    @Embedded
+    @OneToOne
     private User user;
 
     public static Publisher relatedTo(User user){

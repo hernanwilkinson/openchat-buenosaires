@@ -4,13 +4,13 @@ import javax.persistence.*;
 import java.util.stream.Stream;
 
 @Entity
-@Table(name="USERS")
+@Table(name="USERCARDS")
 class UserCard {
 
     @Id
     @GeneratedValue
     private long id;
-    @Embedded
+    @OneToOne
     private User user;
     private String password;
     @OneToOne

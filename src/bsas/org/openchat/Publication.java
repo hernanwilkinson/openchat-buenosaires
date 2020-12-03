@@ -21,6 +21,7 @@ public class Publication {
     private Publisher publisher;
     private String message;
     private LocalDateTime publicationTime;
+    @Column(unique = true)
     private String restId;
     @OneToMany
     private Set<Publisher> likers;

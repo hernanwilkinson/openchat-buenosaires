@@ -1,13 +1,16 @@
 package bsas.org.openchat;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import javax.persistence.*;
 import java.util.UUID;
 
-@Embeddable
+@Entity
+@Table(name="USERS")
 public class User {
     public static final String NAME_CANNOT_BE_BLANK = "Name can not be blank";
 
+    @Id
+    @GeneratedValue
+    private long id;
     @Column(unique = true)
     private String name;
     private String about;
