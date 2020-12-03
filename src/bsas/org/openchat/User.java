@@ -13,7 +13,9 @@ public class User {
     private long id;
     @Column(unique = true)
     private String name;
+    @Basic(fetch = FetchType.LAZY)
     private String about;
+    @Basic(fetch = FetchType.LAZY)
     private String homePage;
     @Column(unique = true)
     private String restId;

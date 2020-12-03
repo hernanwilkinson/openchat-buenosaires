@@ -18,12 +18,15 @@ public class Publication {
     @GeneratedValue
     private long id;
     @OneToOne
+    @Basic(fetch = FetchType.LAZY)
     private Publisher publisher;
+    @Column(length = 2100)
     private String message;
     private LocalDateTime publicationTime;
-    @Column(unique = true)
+    @Column(unique = true,length = 36)
     private String restId;
     @OneToMany
+    @Basic(fetch = FetchType.LAZY)
     private Set<Publisher> likers;
 
     public Publication(){}

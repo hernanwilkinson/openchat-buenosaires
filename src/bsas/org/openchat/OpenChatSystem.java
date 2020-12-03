@@ -83,11 +83,7 @@ public abstract class OpenChatSystem {
 
     protected abstract Optional<UserCard> userCardForUserId(String userId);
 
-    private Publisher publisherForUserId(String userId) {
-        return userCardForUserId(userId)
-                .map(userCard -> userCard.publisher())
-                .orElseThrow(()-> new ModelException(USER_NOT_REGISTERED));
-    }
+    protected abstract Publisher publisherForUserId(String userId);
 
     public int likePublicationIdentifiedAs(String publicationId, String userId) {
         final Publication publication = publicationIdentifiedAs(publicationId);

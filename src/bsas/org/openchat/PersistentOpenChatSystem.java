@@ -120,4 +120,14 @@ public class PersistentOpenChatSystem extends OpenChatSystem {
                 .list()
                 .stream();
     }
+
+    @Override
+    protected Publisher publisherForUserId(String userId) {
+        final Publisher found = (Publisher) session
+                .createQuery("SELECT a FROM Publisher a JOIN a.user b WHERE b.restId = '" +userId+"'")
+                .uniqueResult();
+
+        if(found==null) throw new ModelException(USER_NOT_REGISTERED);
+        return found;
+    }
 }

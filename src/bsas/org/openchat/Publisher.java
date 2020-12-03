@@ -17,9 +17,11 @@ public class Publisher {
     @Id
     @GeneratedValue
     private long id;
-    @OneToMany
+    @ManyToMany
+    @Basic(fetch = FetchType.LAZY)
     private List<Publisher> followers = new ArrayList<>();
     @OneToMany(cascade = CascadeType.ALL)
+    @Basic(fetch = FetchType.LAZY)
     private List<Publication> publications = new ArrayList<>();
     @OneToOne
     private User user;

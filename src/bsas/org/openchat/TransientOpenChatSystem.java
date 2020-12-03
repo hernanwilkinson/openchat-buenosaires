@@ -1,9 +1,6 @@
 package bsas.org.openchat;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class TransientOpenChatSystem extends OpenChatSystem {
@@ -81,5 +78,12 @@ public class TransientOpenChatSystem extends OpenChatSystem {
 
     @Override
     public void reset() {
+    }
+
+    @Override
+    protected Publisher publisherForUserId(String userId) {
+        return userCardForUserId(userId)
+                .map(userCard -> userCard.publisher())
+                .orElseThrow(()-> new ModelException(USER_NOT_REGISTERED));
     }
 }

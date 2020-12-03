@@ -12,8 +12,10 @@ class UserCard {
     private long id;
     @OneToOne
     private User user;
+    @Basic(fetch = FetchType.LAZY)
     private String password;
     @OneToOne
+    @Basic(fetch = FetchType.LAZY)
     private Publisher publisher;
 
     public UserCard(){}
